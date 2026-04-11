@@ -1,0 +1,10 @@
+{
+  "id": "Survival-v1",
+  "name": "Survival",
+  "description": "Ini adalah contoh struktur folder game. Ganti dengan game sungguhan.",
+  "category": "action",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.png",
+  "createdAt": "2026-04-11"
+}

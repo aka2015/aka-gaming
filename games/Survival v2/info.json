@@ -1,0 +1,10 @@
+{
+  "id": "Survival-v2",
+  "name": "Survival Roguelike 2D",
+  "description": "Selamat dari gelombang musuh → Dapat XP → Naik Level → Pilih Upgrade → Makin Kuat → Selamat Lebih Lama",
+  "category": "action",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.png",
+  "createdAt": "2026-04-11"
+}

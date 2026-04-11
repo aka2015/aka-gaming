@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Survival Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div id="healthBar">
+                <div id="healthFill"></div>
+                <span id="healthText">Health: 100</span>
+            </div>
+            <div id="score">Score: 0</div>
+            <div id="time">Time: 0s</div>
+            <button id="musicToggle" class="music-toggle-btn">🔊</button>
+        </div>
+        <div id="mainMenu" class="screen">
+            <h1>Survival Game</h1>
+            <div class="menu-buttons">
+                <button id="playBtn" class="menu-btn">Play</button>
+                <button id="settingsBtn" class="menu-btn">Settings</button>
+                <button id="howToPlayBtn" class="menu-btn">How to Play</button>
+                <button id="highScoresBtn" class="menu-btn">High Scores</button>
+            </div>
+        </div>
+        <div id="settingsScreen" class="screen hidden">
+            <div class="settings-header">
+                <h1>Settings</h1>
+                <button id="closeSettingsBtn" class="close-btn">✕</button>
+            </div>
+            <div class="settings-container">
+                <div class="setting-item">
+                    <label>Player Name:</label>
+                    <div class="name-input-container">
+                        <input type="text" id="playerNameInput" maxlength="15" placeholder="Enter name">
+                        <button id="setNameBtn" class="lock-btn" title="Lock/Change name">🔒</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Difficulty:</label>
+                    <select id="difficultySelect">
+                        <option value="easy">Easy</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Player Size:</label>
+                    <select id="playerSizeSelect">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Theme:</label>
+                    <select id="themeSelect">
+                        <option value="neon" selected>Neon</option>
+                        <option value="dark">Dark</option>
+                        <option value="retro">Retro</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Language:</label>
+                    <select id="languageSelect">
+                        <option value="en" selected>English</option>
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="it">Italiano</option>
+                        <option value="es">Español</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Sound:</label>
+                    <button id="soundToggle" class="sound-toggle-btn">🔊</button>
+                </div>
+            </div>
+            <button id="settingsBackBtn" class="menu-btn">Back</button>
+        </div>
+        <div id="howToPlayScreen" class="screen hidden">
+            <h1>How to Play</h1>
+            <div class="instructions">
+                <div class="instruction-item">
+                    <span class="key">W / ↑</span>
+                    <span>Move Up</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">S / ↓</span>
+                    <span>Move Down</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">A / ←</span>
+                    <span>Move Left</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">D / →</span>
+                    <span>Move Right</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">Space</span>
+                    <span>Pause Game</span>
+                </div>
+                <p class="instruction-text">Survive as long as possible! Enemies will spawn from all sides and get faster over time. Dodge them to stay alive!</p>
+            </div>
+            <button id="howToPlayBackBtn" class="menu-btn">Back</button>
+        </div>
+        <div id="highScoresScreen" class="screen hidden">
+            <h1>High Scores</h1>
+            <div id="scoresList" class="scores-list">
+                <p class="no-scores">No scores yet. Play the game to set a record!</p>
+            </div>
+            <button id="highScoresBackBtn" class="menu-btn">Back</button>
+        </div>
+        <div id="nameChangeModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Change Name?</h2>
+                <div class="modal-buttons">
+                    <button id="confirmNameChange" class="modal-btn confirm">Yes</button>
+                    <button id="cancelNameChange" class="modal-btn cancel">No</button>
+                </div>
+            </div>
+        </div>
+        <div id="startScreen" class="screen hidden">
+            <h1>Get Ready!</h1>
+            <p>Use WASD or Arrow Keys to move</p>
+            <p>Survive as long as you can!</p>
+            <button id="startBtn">Start Game</button>
+            <button id="menuBtn" class="menu-btn">Back to Menu</button>
+        </div>
+        <div id="pauseScreen" class="screen hidden">
+            <h1>Paused</h1>
+            <button id="resumeBtn" class="menu-btn">Resume</button>
+            <button id="pauseMenuBtn" class="menu-btn">Main Menu</button>
+        </div>
+        <div id="gameOverScreen" class="screen hidden">
+            <h1>Game Over</h1>
+            <p id="finalScore">Score: 0</p>
+            <p id="finalTime">Time: 0s</p>
+            <p id="newHighScore" class="high-score-msg hidden">🏆 New High Score!</p>
+            <button id="restartBtn">Play Again</button>
+            <button id="gameOverMenuBtn" class="menu-btn">Main Menu</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

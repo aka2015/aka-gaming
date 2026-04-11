@@ -7,12 +7,13 @@
 // 4. Salin firebaseConfig di bawah
 // ============================================================
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBAEWUD-B5cF1ac1COTxKVoCks9s6tzUzQ",
+  authDomain: "game-portal-fb78e.firebaseapp.com",
+  projectId: "game-portal-fb78e",
+  storageBucket: "game-portal-fb78e.firebasestorage.app",
+  messagingSenderId: "404337933327",
+  appId: "1:404337933327:web:aa17284f67d3899784777a",
+  measurementId: "G-LKCH28D755"
 };
 
 export default firebaseConfig;

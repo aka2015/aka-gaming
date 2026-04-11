@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Game - Survival.io Style</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- In-Game HUD -->
+        <div id="ui" class="hidden">
+            <div id="hud-left">
+                <div id="healthBar">
+                    <div id="healthFill"></div>
+                    <span id="healthText">100/100</span>
+                </div>
+                <div id="levelIndicator">⭐ Lv.1</div>
+                <div id="xpBar">
+                    <div id="xpFill"></div>
+                    <span id="xpText">0/100 XP</span>
+                </div>
+                <div id="coinDisplay">
+                    <span class="coin-icon">💰</span>
+                    <span id="coinCount">0</span>
+                </div>
+            </div>
+            <div id="hud-right">
+                <div id="score">Skor: 0</div>
+                <div id="wave">Wave: 1</div>
+                <div id="timer">00:00</div>
+                <button id="shopButton" class="shop-btn">🛒 Toko</button>
+            </div>
+        </div>
+        
+        <!-- Weapon Display (Bottom) -->
+        <div id="weaponDisplay" class="hidden"></div>
+        
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen">
+            <h1>🎮 Survival Game</h1>
+            <p class="subtitle">Survival.io Style</p>
+            <div class="menu-buttons">
+                <button id="playBtn" class="menu-btn">▶️ Main</button>
+                <button id="settingsBtn" class="menu-btn">⚙️ Pengaturan</button>
+                <button id="howToPlayBtn" class="menu-btn">📖 Cara Main</button>
+                <button id="highScoresBtn" class="menu-btn">🏆 Skor Tertinggi</button>
+            </div>
+        </div>
+        
+        <!-- Character Select Screen -->
+        <div id="characterSelectScreen" class="screen hidden">
+            <h1>Pilih Karakter Kamu</h1>
+            <p class="subtitle">Setiap karakter memiliki senjata awal yang berbeda</p>
+            <div class="character-select-container">
+                <!-- Warrior Card -->
+                <div class="character-card" data-character="warrior">
+                    <div class="character-preview" id="warriorPreview"></div>
+                    <h2 class="character-name warrior">⚔️ Warrior</h2>
+                    <p class="character-desc">Petarung berani dengan pedang dan perisai</p>
+                    <div class="character-info">
+                        <div class="info-item">
+                            <span class="info-label">Senjata:</span>
+                            <span class="info-value">Pedang (Melee)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gaya:</span>
+                            <span class="info-value">Serangan jarak dekat</span>
+                        </div>
+                    </div>
+                    <button class="select-btn" data-character="warrior">PILIH WARRIOR</button>
+                </div>
+                
+                <!-- Mage Card -->
+                <div class="character-card" data-character="mage">
+                    <div class="character-preview" id="magePreview"></div>
+                    <h2 class="character-name mage">🔮 Mage</h2>
+                    <p class="character-desc">Ahli sihir dengan kekuatan elementer</p>
+                    <div class="character-info">
+                        <div class="info-item">
+                            <span class="info-label">Senjata:</span>
+                            <span class="info-value">Orb Sihir (Homing)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gaya:</span>
+                            <span class="info-value">Magic jarak jauh</span>
+                        </div>
+                    </div>
+                    <button class="select-btn" data-character="mage">PILIH MAGE</button>
+                </div>
+                
+                <!-- Ranger Card -->
+                <div class="character-card" data-character="ranger">
+                    <div class="character-preview" id="rangerPreview"></div>
+                    <h2 class="character-name ranger">🏹 Ranger</h2>
+                    <p class="character-desc">Penembak handal dari alam liar</p>
+                    <div class="character-info">
+                        <div class="info-item">
+                            <span class="info-label">Senjata:</span>
+                            <span class="info-value">Busur (Piercing)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gaya:</span>
+                            <span class="info-value">Tembakan akurat</span>
+                        </div>
+                    </div>
+                    <button class="select-btn" data-character="ranger">PILIH RANGER</button>
+                </div>
+            </div>
+            <button id="backToMenuFromCharSelect" class="menu-btn">⬅️ Kembali ke Menu</button>
+        </div>
+        
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen hidden">
+            <h1>Siap Bertarung?</h1>
+            <p id="selectedCharacterDisplay">Karakter: -</p>
+            <p>Gunakan WASD atau Arrow Keys untuk bergerak</p>
+            <p>Serang otomatis! Kumpulkan XP & Koin!</p>
+            <button id="startBtn" class="menu-btn">🚀 Mulai Game</button>
+            <button id="backToMenuFromStart" class="menu-btn">⬅️ Kembali ke Menu</button>
+        </div>
+        
+        <!-- Level Up Screen -->
+        <div id="levelUpScreen" class="screen hidden">
+            <h1 class="level-up-title">⭐ LEVEL UP! ⭐</h1>
+            <p id="levelUpText">Level 1 → 2</p>
+            <div class="upgrade-choices" id="upgradeChoices">
+                <!-- Upgrade cards akan di-render di sini -->
+            </div>
+            <p class="level-up-hint">Pilih salah satu upgrade</p>
+        </div>
+        
+        <!-- Shop Screen -->
+        <div id="shopScreen" class="screen hidden">
+            <div class="shop-header">
+                <h1>🛒 Toko Senjata & Armor</h1>
+                <div class="shop-coins">
+                    <span class="coin-icon">💰</span>
+                    <span id="shopCoinCount">0</span>
+                </div>
+                <button id="closeShopBtn" class="close-btn">✕</button>
+            </div>
+            
+            <div class="shop-tabs">
+                <button class="tab-btn active" data-tab="weapons">⚔️ Senjata</button>
+                <button class="tab-btn" data-tab="armor">🛡️ Armor</button>
+                <button class="tab-btn" data-tab="special">⭐ Khusus</button>
+            </div>
+            
+            <div class="shop-container">
+                <div class="shop-grid" id="shopGrid">
+                    <!-- Items akan di-render di sini -->
+                </div>
+            </div>
+            
+            <div class="shop-footer">
+                <p class="shop-info">💡 Klik item untuk membeli</p>
+                <p class="shop-hint">Tekan [B] atau [ESC] untuk tutup toko</p>
+            </div>
+        </div>
+        
+        <!-- Pause Screen -->
+        <div id="pauseScreen" class="screen hidden">
+            <h1>⏸️ Game Dijeda</h1>
+            <button id="resumeBtn" class="menu-btn">▶️ Lanjutkan</button>
+            <button id="openShopFromPause" class="menu-btn">🛒 Buka Toko</button>
+            <button id="pauseMenuBtn" class="menu-btn">🏠 Menu Utama</button>
+        </div>
+        
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen hidden">
+            <h1>💀 Game Over</h1>
+            <div class="final-stats">
+                <p id="finalScore">Skor: 0</p>
+                <p id="finalTime">Waktu: 00:00</p>
+                <p id="finalWave">Wave: 1</p>
+                <p id="finalLevel">Level: 1</p>
+                <p id="enemiesKilled">Musuh Dikalahkan: 0</p>
+            </div>
+            <p id="newHighScore" class="high-score-msg hidden">🏆 Skor Tertinggi Baru!</p>
+            <button id="restartBtn" class="menu-btn">🔄 Main Lagi</button>
+            <button id="gameOverMenuBtn" class="menu-btn">🏠 Menu Utama</button>
+        </div>
+        
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="screen hidden">
+            <div class="settings-header">
+                <h1>⚙️ Pengaturan</h1>
+                <button id="closeSettingsBtn" class="close-btn">✕</button>
+            </div>
+            <div class="settings-container">
+                <div class="setting-item">
+                    <label>Bahasa:</label>
+                    <select id="languageSelect">
+                        <option value="id" selected>Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Kesulitan:</label>
+                    <select id="difficultySelect">
+                        <option value="easy">Mudah</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Sulit</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Sound:</label>
+                    <button id="soundToggle" class="sound-toggle-btn">🔊 ON</button>
+                </div>
+            </div>
+            <button id="settingsBackBtn" class="menu-btn">⬅️ Kembali</button>
+        </div>
+        
+        <!-- How to Play Screen -->
+        <div id="howToPlayScreen" class="screen hidden">
+            <h1>📖 Cara Main</h1>
+            <div class="instructions">
+                <div class="instruction-item">
+                    <span class="key">W / ↑</span>
+                    <span>Gerak Atas</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">S / ↓</span>
+                    <span>Gerak Bawah</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">A / ←</span>
+                    <span>Gerak Kiri</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">D / →</span>
+                    <span>Gerak Kanan</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">SPACE</span>
+                    <span>Jeda Game</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key">B</span>
+                    <span>Buka Toko (saat istirahat)</span>
+                </div>
+                <p class="instruction-text">
+                    Selamat dari gelombang musuh! Kumpulkan XP untuk naik level dan pilih upgrade. 
+                    Kumpulkan koin untuk membeli upgrade di toko. Serang otomatis!
+                </p>
+            </div>
+            <button id="howToPlayBackBtn" class="menu-btn">⬅️ Kembali</button>
+        </div>
+        
+        <!-- High Scores Screen -->
+        <div id="highScoresScreen" class="screen hidden">
+            <h1>🏆 Skor Tertinggi</h1>
+            <div id="scoresList" class="scores-list">
+                <p class="no-scores">Belum ada skor. Mainkan game untuk mencetak rekor!</p>
+            </div>
+            <button id="highScoresBackBtn" class="menu-btn">⬅️ Kembali</button>
+        </div>
+        
+        <!-- Purchase Confirmation Modal -->
+        <div id="purchaseConfirmation" class="modal hidden">
+            <div class="modal-content shop-modal">
+                <h2>Konfirmasi Pembelian</h2>
+                <div class="item-preview">
+                    <div class="item-icon" id="confirmItemIcon">⚔️</div>
+                    <div class="item-info">
+                        <div class="item-name" id="confirmItemName">Upgrade</div>
+                        <div class="item-effect" id="confirmItemEffect">Efek</div>
+                        <div class="item-price" id="confirmItemPrice">💰 0</div>
+                        <div class="item-level" id="confirmItemLevel">Level: 0 → 1</div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button id="confirmPurchase" class="modal-btn confirm">✅ BELI</button>
+                    <button id="cancelPurchase" class="modal-btn cancel">❌ BATAL</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Boss HP Bar -->
+        <div id="bossHpBar" class="hidden">
+            <div class="boss-name" id="bossName">Boss Name</div>
+            <div class="boss-hp-bar">
+                <div class="boss-hp-fill" id="bossHpFill"></div>
+            </div>
+            <div class="boss-hp-text" id="bossHpText">1000/1000</div>
+        </div>
+        
+        <!-- Warnings -->
+        <div id="warnings"></div>
+    </div>
+    
+    <!-- Load game modules in correct order -->
+    <!-- 1. Data definitions -->
+    <script src="src/data/game-data.js"></script>
+    
+    <!-- 2. System modules -->
+    <script src="src/system/game-state.js"></script>
+    <script src="src/system/audio.js"></script>
+    
+    <!-- 3. Rendering modules -->
+    <script src="src/render/character-render.js"></script>
+    <script src="src/render/rendering.js"></script>
+    
+    <!-- 4. UI modules -->
+    <script src="src/ui/ui-functions.js"></script>
+    
+    <!-- 5. Game logic modules -->
+    <script src="src/game/game-setup.js"></script>
+    <script src="src/game/game-start.js"></script>
+    <script src="src/game/player.js"></script>
+    <script src="src/game/weapons.js"></script>
+    <script src="src/game/enemies.js"></script>
+    <script src="src/game/projectiles.js"></script>
+    <script src="src/game/wave-system.js"></script>
+    <script src="src/game/collisions.js"></script>
+    <script src="src/game/collectibles.js"></script>
+    <script src="src/game/level-up.js"></script>
+    <script src="src/game/shop.js"></script>
+    <script src="src/game/wave-rest.js"></script>
+    
+    <!-- 6. Main entry point -->
+    <script src="src/main.js"></script>
+</body>
+</html>
