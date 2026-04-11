@@ -1,8 +1,8 @@
 {
   "id": "take-you-money",
   "name": "Take Your Money",
-  "description": "Selamat dari gelombang musuh → Dapat XP → Naik Level → Pilih Upgrade → Makin Kuat → Selamat Lebih Lama",
-  "category": "action",
+  "description": "ambil uangmu!",
+  "category": "clicker",
   "badge": "new",
   "gameFile": "index.html",
   "thumbnail": "thumbnail.png",

@@ -1,0 +1,10 @@
+{
+  "id": "Catch-the-box",
+  "name": "Catch The Box",
+  "description": "Tangkap bok yang muncul",
+  "category": "action",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.png",
+  "createdAt": "2026-04-12"
+}

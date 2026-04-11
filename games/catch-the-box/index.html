@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch the Box</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="game-container">
+      <!-- Main Menu -->
+      <div id="main-menu" class="main-menu">
+        <h1>🎮 Catch the Box</h1>
+        <p class="subtitle">Click the box before it moves!</p>
+        <button id="play-btn" class="menu-btn play-btn">▶️ Play</button>
+        <button id="special-mode-btn" class="menu-btn special-mode-btn">⭐ Special Mode</button>
+        <button id="shop-btn" class="menu-btn shop-btn">🛒 Shop</button>
+        <button id="settings-btn" class="menu-btn settings-btn">⚙️ Settings</button>
+        <div class="coin-display">
+          <span class="coin-icon">🪙</span>
+          <span id="total-coins">0</span> Coins
+        </div>
+      </div>
+      
+      <!-- Shop Panel -->
+      <div id="shop-panel" class="shop-panel hidden">
+        <h2>🛒 Shop</h2>
+        <div class="shop-content">
+          <div class="player-coins">
+            <span class="coin-icon">🪙</span>
+            <span id="shop-coins">0</span> Coins
+          </div>
+          <div class="shop-items">
+            <div class="shop-item">
+              <div class="item-icon">📈</div>
+              <div class="item-info">
+                <h3>Point Multiplier</h3>
+                <p>Get more points per box!</p>
+                <p class="item-level">Level: <span id="multiplier-level">1</span></p>
+                <p class="item-bonus">+<span id="multiplier-bonus">0</span> bonus points</p>
+              </div>
+              <button id="upgrade-multiplier-btn" class="upgrade-btn">
+                <span class="upgrade-cost">🪙 <span id="multiplier-cost">10</span></span>
+              </button>
+            </div>
+            <div class="shop-item">
+              <div class="item-icon">⏱️</div>
+              <div class="item-info">
+                <h3>Extra Time</h3>
+                <p>+5 seconds game time!</p>
+                <p class="item-level">Level: <span id="time-level">1</span></p>
+                <p class="item-bonus">+<span id="time-bonus">0</span>s bonus</p>
+              </div>
+              <button id="upgrade-time-btn" class="upgrade-btn">
+                <span class="upgrade-cost">🪙 <span id="time-cost">15</span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button id="back-from-shop" class="menu-btn back-btn">↩️ Back</button>
+      </div>
+      
+      <!-- Settings Panel -->
+      <div id="settings-panel" class="settings-panel hidden">
+        <h2>⚙️ Settings</h2>
+        <div class="settings-content">
+          <div class="setting-group">
+            <label for="language-select">🌐 Language / Bahasa:</label>
+            <select id="language-select">
+              <option value="en-US">🇺🇸 English (US)</option>
+              <option value="en-GB">🇬🇧 English (UK)</option>
+              <option value="id">🇮🇩 Indonesian</option>
+              <option value="de">🇩🇪 German</option>
+              <option value="es">🇪🇸 Spanish</option>
+              <option value="it">🇮🇹 Italian</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label for="time-select">⏱️ Game Time:</label>
+            <select id="time-select">
+              <option value="15">🕐 15 seconds</option>
+              <option value="30" selected>🕐 30 seconds</option>
+              <option value="45">🕐 45 seconds</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label for="speed-select">🎯 Difficulty:</label>
+            <select id="speed-select">
+              <option value="easy">🟢 Easy</option>
+              <option value="normal" selected>🔵 Normal</option>
+              <option value="hard">🟠 Hard</option>
+              <option value="extreme">🔴 Extreme</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label for="sound-toggle">🔊 Sound:</label>
+            <input type="checkbox" id="sound-toggle" checked>
+          </div>
+          <div class="setting-group">
+            <label for="player-name-input">👤 Your Name:</label>
+            <input type="text" id="player-name-input" placeholder="Enter name" maxlength="15">
+          </div>
+        </div>
+        <button id="back-from-settings" class="menu-btn back-btn">↩️ Back</button>
+      </div>
+      
+      <!-- Game Area -->
+      <div id="game-area" class="game-area hidden">
+        <div id="box" class="box"></div>
+      </div>
+      
+      <!-- Game Stats -->
+      <div id="game-stats" class="game-stats hidden">
+        <button id="back-to-menu-btn" class="back-to-menu-btn">↩️ Menu</button>
+        <div class="stat">
+          <span class="stat-label">Score:</span>
+          <span id="score">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Time:</span>
+          <span id="time">30</span>s
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best:</span>
+          <span id="best-score">0</span>
+        </div>
+      </div>
+      
+      <!-- Play Again Button (shown after game ends) -->
+      <div id="game-over-buttons" class="game-over-buttons hidden">
+        <p id="final-score" class="final-score">0 points</p>
+        <button id="play-again-btn" class="menu-btn play-again-btn">🔄 Play Again</button>
+        <button id="back-to-menu-gameover" class="menu-btn back-to-menu-gameover">🏠 Menu</button>
+      </div>
+    </div>
+    
+    <div class="highscore-panel">
+      <div class="highscore-board">
+        <h3>🏆 High Scores</h3>
+        <ol id="highscore-list">
+          <li>No scores yet - be the first!</li>
+        </ol>
+        <button id="clear-scores-btn" class="clear-btn">🗑️ Clear Scores</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>
