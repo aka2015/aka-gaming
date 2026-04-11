@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKA GAMING - Portal Game Seru untuk Anak</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🎮</span>
+        <span class="logo-text">AKA GAMING</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link active">Beranda</a>
+      </nav>
+
+      <div class="auth-area">
+        <button id="btn-login" class="btn-google">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" />
+          Masuk
+        </button>
+        <div id="user-menu" class="user-menu hidden">
+          <img id="user-avatar" class="user-avatar" src="" alt="avatar" />
+          <span id="user-name" class="user-name"></span>
+          <button id="btn-logout" class="btn-logout">Keluar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="bubble b1"></div>
+      <div class="bubble b2"></div>
+      <div class="bubble b3"></div>
+      <div class="bubble b4"></div>
+      <div class="bubble b5"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">✨ Platform Game Anak Terbaik</div>
+
+      <!-- Belum login -->
+      <div id="hero-cta">
+        <h1 class="hero-title">
+          Selamat Datang di<br />
+          <span class="gradient-text">AKA GAMING!</span>
+        </h1>
+        <p class="hero-subtitle">Mainkan game seru, kumpulkan pengalaman, dan bergabung dengan teman-teman!</p>
+        <button id="btn-login-hero" class="btn-primary btn-big">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="22" />
+          Masuk &amp; Main Sekarang!
+        </button>
+      </div>
+
+      <!-- Sudah login -->
+      <div id="hero-welcome" class="hidden">
+        <h1 class="hero-title">Halo, <span id="hero-username" class="gradient-text"></span>! 👋</h1>
+        <p class="hero-subtitle">Siap main game seru hari ini?</p>
+      </div>
+
+      <div class="hero-art">🕹️ 🎯 🏆 🎲 ⭐</div>
+    </div>
+  </section>
+
+  <!-- ===== SEARCH & FILTER ===== -->
+  <section class="search-section">
+    <div class="container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input id="search-input" type="text" placeholder="Cari game..." autocomplete="off" />
+      </div>
+      <div class="category-filter">
+        <button class="cat-btn active" data-cat="all">🎮 Semua</button>
+        <button class="cat-btn" data-cat="action">⚔️ Aksi</button>
+        <button class="cat-btn" data-cat="puzzle">🧩 Puzzle</button>
+        <button class="cat-btn" data-cat="educational">📚 Edukasi</button>
+        <button class="cat-btn" data-cat="adventure">🗺️ Petualangan</button>
+        <button class="cat-btn" data-cat="sport">⚽ Olahraga</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GAMES ===== -->
+  <main class="games-section">
+    <div class="container">
+      <h2 class="section-title">🕹️ Daftar Game</h2>
+
+      <!-- Loading -->
+      <div id="games-loading" class="loading-area">
+        <div class="spinner"></div>
+        <p>Memuat game...</p>
+      </div>
+
+      <!-- Grid -->
+      <div id="games-grid" class="games-grid hidden"></div>
+
+      <!-- Empty -->
+      <div id="games-empty" class="empty-state hidden">
+        <div class="empty-icon">🎮</div>
+        <h3>Belum ada game</h3>
+        <p>Game sedang disiapkan. Pantau terus ya!</p>
+      </div>
+
+      <!-- Login prompt -->
+      <div id="login-prompt" class="login-prompt hidden">
+        <div class="login-prompt-card">
+          <div class="empty-icon">🔐</div>
+          <h3>Login untuk Melihat Game!</h3>
+          <p>Masuk dengan akun Google kamu untuk memainkan semua game seru di sini.</p>
+          <button id="btn-login-prompt" class="btn-primary btn-big" style="margin-top:20px">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" />
+            Masuk dengan Google
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== GAME CARD TEMPLATE ===== -->
+  <template id="game-card-template">
+    <div class="game-card">
+      <div class="game-thumb">
+        <img class="game-img" src="" alt="" />
+        <div class="game-overlay">
+          <button class="btn-play">▶ Main Sekarang</button>
+        </div>
+        <span class="game-badge"></span>
+      </div>
+      <div class="game-info">
+        <h3 class="game-title"></h3>
+        <p class="game-desc"></p>
+        <div class="game-meta">
+          <span class="game-cat-tag"></span>
+          <span class="game-comments-count"></span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
