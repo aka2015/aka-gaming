@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mainkan Game - AKA GAMING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="game-page">
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🎮</span>
+        <span class="logo-text">AKA GAMING</span>
+      </a>
+      <a href="index.html" class="btn-back">← Kembali</a>
+      <div class="auth-area">
+        <div id="user-menu" class="user-menu hidden">
+          <img id="user-avatar" class="user-avatar" src="" alt="avatar" />
+          <span id="user-name" class="user-name"></span>
+          <button id="btn-logout" class="btn-logout">Keluar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== GAME PLAYER ===== -->
+  <main class="game-main">
+    <div class="container">
+
+      <!-- Game Info Bar -->
+      <div class="game-infobar">
+        <div>
+          <h1 id="game-title-display" class="game-page-title">Memuat Game...</h1>
+          <span id="game-cat-display" class="game-cat-tag"></span>
+        </div>
+        <div class="game-actions">
+          <button id="btn-fullscreen" class="btn-icon" title="Layar Penuh">⛶</button>
+        </div>
+      </div>
+
+      <!-- Game Frame -->
+      <div class="game-frame-wrapper" id="game-frame-wrapper">
+        <div id="game-loading" class="game-loading">
+          <div class="spinner big"></div>
+          <p>Memuat game, tunggu sebentar...</p>
+        </div>
+        <iframe
+          id="game-iframe"
+          class="game-iframe hidden"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
+          allowfullscreen
+          title="Game Frame"
+        ></iframe>
+        <div id="game-error" class="game-error hidden">
+          <div class="error-icon">😢</div>
+          <h3>Oops! Game tidak bisa dimuat</h3>
+          <p>Coba muat ulang halaman ini.</p>
+          <button onclick="location.reload()" class="btn-primary">Coba Lagi</button>
+        </div>
+      </div>
+
+      <!-- Not Logged In Overlay -->
+      <div id="game-login-overlay" class="game-login-overlay hidden">
+        <div class="overlay-card">
+          <div class="overlay-icon">🔐</div>
+          <h2>Login untuk Bermain!</h2>
+          <p>Kamu perlu login dulu untuk memainkan game ini.</p>
+          <button id="btn-login-overlay" class="btn-primary btn-big">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" />
+            Masuk dengan Google
+          </button>
+          <a href="index.html" class="link-back">← Kembali ke Beranda</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== COMMENTS SECTION ===== -->
+  <section class="comments-section" id="comments-section">
+    <div class="container comments-container">
+      <h2 class="section-title">💬 Komentar</h2>
+
+      <!-- Comment Form -->
+      <div id="comment-form-area" class="comment-form-area hidden">
+        <div class="comment-input-row">
+          <img id="comment-avatar" class="comment-user-avatar" src="" alt="avatar" />
+          <div class="comment-input-wrapper">
+            <textarea id="comment-input" placeholder="Tulis komentar kamu... Gimana gamenya? 😊" rows="2" maxlength="300"></textarea>
+            <div class="comment-input-footer">
+              <span id="comment-char-count" class="char-count">0/300</span>
+              <button id="btn-submit-comment" class="btn-primary btn-sm">Kirim 💬</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Login to comment -->
+      <div id="comment-login-prompt" class="comment-login-prompt hidden">
+        <p>Login untuk meninggalkan komentar! <button id="btn-login-comment" class="btn-link">Masuk sekarang</button></p>
+      </div>
+
+      <!-- Comments List -->
+      <div id="comments-loading" class="loading-area">
+        <div class="spinner"></div>
+        <p>Memuat komentar...</p>
+      </div>
+      <div id="comments-list" class="comments-list hidden"></div>
+      <div id="comments-empty" class="empty-state hidden">
+        <div class="empty-icon">💬</div>
+        <p>Belum ada komentar. Jadilah yang pertama!</p>
+      </div>
+
+      <!-- Load more -->
+      <div id="load-more-area" class="load-more-area hidden">
+        <button id="btn-load-more" class="btn-secondary">Muat Komentar Lainnya</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMMENT TEMPLATE ===== -->
+  <template id="comment-template">
+    <div class="comment-item">
+      <img class="comment-avatar" src="" alt="avatar" />
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-author"></span>
+          <span class="comment-time"></span>
+        </div>
+        <p class="comment-text"></p>
+      </div>
+    </div>
+  </template>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

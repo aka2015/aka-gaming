@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - AKA GAMING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body class="admin-body">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">
+      <span>🎮</span>
+      <span>Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="sidebar-link active" data-page="dashboard">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="#" class="sidebar-link" data-page="upload">
+        <span>⬆️</span> Upload Game
+      </a>
+      <a href="#" class="sidebar-link" data-page="manage">
+        <span>🗂️</span> Kelola Game
+      </a>
+      <a href="#" class="sidebar-link" data-page="comments">
+        <span>💬</span> Moderasi Komentar
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="index.html" class="sidebar-link">
+        <span>🏠</span> Kembali ke Portal
+      </a>
+      <button id="btn-logout-admin" class="sidebar-link sidebar-logout">
+        <span>🚪</span> Keluar
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="admin-main">
+
+    <!-- Top Bar -->
+    <div class="admin-topbar">
+      <h1 id="page-title" class="admin-page-title">Dashboard</h1>
+      <div class="topbar-right">
+        <div id="admin-user-info" class="admin-user-info hidden">
+          <img id="admin-avatar" class="user-avatar" src="" alt="avatar" />
+          <div>
+            <span id="admin-name" class="admin-name"></span>
+            <span class="admin-badge">Admin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LOGIN REQUIRED ===== -->
+    <div id="admin-login-required" class="admin-login-required">
+      <div class="login-card">
+        <div class="login-card-icon">🔐</div>
+        <h2>Akses Admin</h2>
+        <p>Login dengan akun Google yang terdaftar sebagai admin.</p>
+        <button id="btn-login-admin" class="btn-google btn-big">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="22" />
+          Masuk dengan Google
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== NOT ADMIN ===== -->
+    <div id="admin-not-authorized" class="admin-login-required hidden">
+      <div class="login-card">
+        <div class="login-card-icon">⛔</div>
+        <h2>Akses Ditolak</h2>
+        <p>Akun kamu tidak memiliki akses admin. Hubungi administrator.</p>
+        <button id="btn-logout-noauth" class="btn-secondary">Keluar</button>
+      </div>
+    </div>
+
+    <!-- ===== ADMIN CONTENT ===== -->
+    <div id="admin-content" class="hidden">
+
+      <!-- DASHBOARD PAGE -->
+      <div id="page-dashboard" class="admin-page">
+        <div class="stats-grid">
+          <div class="stat-card stat-blue">
+            <div class="stat-icon">🎮</div>
+            <div>
+              <div id="stat-total-games" class="stat-number">0</div>
+              <div class="stat-label">Total Game</div>
+            </div>
+          </div>
+          <div class="stat-card stat-green">
+            <div class="stat-icon">👥</div>
+            <div>
+              <div id="stat-total-comments" class="stat-number">0</div>
+              <div class="stat-label">Total Komentar</div>
+            </div>
+          </div>
+          <div class="stat-card stat-purple">
+            <div class="stat-icon">📦</div>
+            <div>
+              <div id="stat-storage" class="stat-number">-</div>
+              <div class="stat-label">Storage Terpakai</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="recent-games">
+          <h3>Game Terbaru</h3>
+          <div id="recent-games-list" class="admin-game-list"></div>
+        </div>
+      </div>
+
+      <!-- UPLOAD PAGE -->
+      <div id="page-upload" class="admin-page hidden">
+        <div class="upload-card">
+          <h2 class="upload-title">⬆️ Upload Game Baru</h2>
+
+          <form id="upload-form" class="upload-form" novalidate>
+
+            <div class="form-group">
+              <label class="form-label">Nama Game <span class="required">*</span></label>
+              <input type="text" id="game-name" class="form-input" placeholder="Contoh: Puzzle Hewan Seru" required maxlength="60" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Deskripsi Game <span class="required">*</span></label>
+              <textarea id="game-desc-input" class="form-input" rows="3" placeholder="Ceritakan sedikit tentang game ini..." required maxlength="200"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Kategori <span class="required">*</span></label>
+                <select id="game-category" class="form-input" required>
+                  <option value="">-- Pilih Kategori --</option>
+                  <option value="puzzle">Puzzle</option>
+                  <option value="action">Aksi</option>
+                  <option value="educational">Edukasi</option>
+                  <option value="adventure">Petualangan</option>
+                  <option value="sport">Olahraga</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Badge / Label</label>
+                <select id="game-badge" class="form-input">
+                  <option value="">Tidak ada</option>
+                  <option value="new">🆕 Baru</option>
+                  <option value="hot">🔥 Populer</option>
+                  <option value="featured">⭐ Unggulan</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Thumbnail -->
+            <div class="form-group">
+              <label class="form-label">Thumbnail Game <span class="required">*</span></label>
+              <div class="file-drop-area" id="thumb-drop">
+                <input type="file" id="thumb-input" accept="image/*" hidden />
+                <div class="file-drop-content" id="thumb-drop-content">
+                  <div class="file-drop-icon">🖼️</div>
+                  <p>Klik atau drag gambar ke sini</p>
+                  <small>PNG, JPG, GIF (maks 2MB)</small>
+                </div>
+                <img id="thumb-preview" class="thumb-preview hidden" src="" alt="preview" />
+              </div>
+            </div>
+
+            <!-- Game File -->
+            <div class="form-group">
+              <label class="form-label">File Game HTML <span class="required">*</span></label>
+              <div class="file-drop-area" id="game-drop">
+                <input type="file" id="game-file-input" accept=".html,.htm,.zip" hidden />
+                <div class="file-drop-content" id="game-drop-content">
+                  <div class="file-drop-icon">📁</div>
+                  <p>Klik atau drag file game ke sini</p>
+                  <small>File HTML tunggal (maks 20MB)</small>
+                </div>
+                <div id="game-file-chosen" class="file-chosen hidden">
+                  <span class="file-icon">📄</span>
+                  <span id="game-file-name"></span>
+                  <button type="button" id="btn-remove-game-file" class="btn-icon-sm">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div id="upload-progress-area" class="upload-progress-area hidden">
+              <div class="progress-labels">
+                <span id="progress-label">Mengupload...</span>
+                <span id="progress-percent">0%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div id="progress-bar" class="progress-bar-fill" style="width:0%"></div>
+              </div>
+            </div>
+
+            <!-- Alert -->
+            <div id="upload-alert" class="alert hidden"></div>
+
+            <div class="form-actions">
+              <button type="button" id="btn-reset-form" class="btn-secondary">Reset</button>
+              <button type="submit" id="btn-upload-submit" class="btn-primary">
+                <span id="upload-btn-text">⬆️ Upload Game</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- MANAGE GAMES PAGE -->
+      <div id="page-manage" class="admin-page hidden">
+        <div class="admin-toolbar">
+          <input type="text" id="manage-search" class="form-input search-sm" placeholder="🔍 Cari game..." />
+          <select id="manage-filter-cat" class="form-input filter-sm">
+            <option value="all">Semua Kategori</option>
+            <option value="puzzle">Puzzle</option>
+            <option value="action">Aksi</option>
+            <option value="educational">Edukasi</option>
+            <option value="adventure">Petualangan</option>
+            <option value="sport">Olahraga</option>
+          </select>
+        </div>
+        <div id="manage-loading" class="loading-area">
+          <div class="spinner"></div>
+          <p>Memuat data game...</p>
+        </div>
+        <div id="manage-games-table" class="admin-game-table hidden"></div>
+        <div id="manage-empty" class="empty-state hidden">
+          <div class="empty-icon">🎮</div>
+          <p>Belum ada game. Upload game pertamamu!</p>
+        </div>
+      </div>
+
+      <!-- COMMENTS MODERATION PAGE -->
+      <div id="page-comments" class="admin-page hidden">
+        <div id="mod-loading" class="loading-area">
+          <div class="spinner"></div>
+          <p>Memuat komentar...</p>
+        </div>
+        <div id="mod-comments-list" class="mod-comments-list hidden"></div>
+        <div id="mod-empty" class="empty-state hidden">
+          <div class="empty-icon">💬</div>
+          <p>Tidak ada komentar.</p>
+        </div>
+      </div>
+
+    </div><!-- end admin-content -->
+  </div><!-- end admin-main -->
+
+  <!-- ===== DELETE CONFIRM MODAL ===== -->
+  <div id="modal-delete" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h3>Hapus Game?</h3>
+      <p id="modal-delete-name" class="modal-game-name"></p>
+      <p>Game yang dihapus tidak bisa dikembalikan!</p>
+      <div class="modal-actions">
+        <button id="btn-modal-cancel" class="btn-secondary">Batal</button>
+        <button id="btn-modal-confirm" class="btn-danger">Ya, Hapus!</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
