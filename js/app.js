@@ -47,12 +47,19 @@ if (btnLogout) btnLogout.addEventListener("click", () => signOut(auth));
 //  AUTH STATE
 // ────────────────────────────────────────────────────────────
 let currentUser = null;
+let gamesReady  = false;
 
 onAuthStateChanged(auth, user => {
   currentUser = user;
   updateAuthUI(user);
-  loadGames();
+  // Kalau game sudah diload, cukup render ulang (jangan reload dari awal)
+  if (gamesReady) {
+    renderGames();
+  }
 });
+
+// Load game SEKALI saja saat halaman pertama kali dibuka
+loadGames();
 
 function updateAuthUI(user) {
   if (user) {
@@ -111,9 +118,11 @@ async function loadGames() {
       })
     );
 
+    gamesReady = true;
     renderGames();
   } catch (e) {
     console.error("Load games error:", e);
+    gamesReady = true;
     showGamesState("empty");
   }
 }
