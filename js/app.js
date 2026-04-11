@@ -105,15 +105,20 @@ async function loadGames() {
     );
 
     // Filter null (gagal load) dan hitung komentar dari Firestore
+    // Komentar bersifat opsional — kalau Firestore gagal, game tetap tampil
     allGames = await Promise.all(
       gameDataList.filter(Boolean).map(async game => {
-        const commentsSnap = await getCountFromServer(
-          query(collection(db, "comments"), where("gameId", "==", game.id))
-        );
+        let commentsCount = 0;
+        try {
+          const commentsSnap = await getCountFromServer(
+            query(collection(db, "comments"), where("gameId", "==", game.id))
+          );
+          commentsCount = commentsSnap.data().count;
+        } catch { /* Firestore belum dikonfigurasi atau offline, abaikan */ }
         return {
           ...game,
           thumbnailUrl: `games/${game.id}/${game.thumbnail || "thumbnail.png"}`,
-          commentsCount: commentsSnap.data().count
+          commentsCount
         };
       })
     );
