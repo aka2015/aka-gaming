@@ -4,7 +4,7 @@
 import { auth, db }              from "./firebase.js";
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { collection, getDocs, query, orderBy, where, getCountFromServer }
+import { collection, query, where, getCountFromServer }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ────────────────────────────────────────────────────────────
@@ -81,17 +81,35 @@ async function loadGames() {
   showGamesState("loading");
 
   try {
-    const q = query(collection(db, "games"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
+    // Load manifest
+    const indexRes = await fetch("games/index.json");
+    if (!indexRes.ok) throw new Error("index.json not found");
+    const gameIds = await indexRes.json();
 
-    allGames = await Promise.all(snap.docs.map(async doc => {
-      const data = doc.data();
-      // Count comments for this game
-      const commentsSnap = await getCountFromServer(
-        query(collection(db, "comments"), where("gameId", "==", doc.id))
-      );
-      return { id: doc.id, ...data, commentsCount: commentsSnap.data().count };
-    }));
+    // Load each game's info.json
+    const gameDataList = await Promise.all(
+      gameIds.map(async id => {
+        try {
+          const res = await fetch(`games/${id}/info.json`);
+          if (!res.ok) return null;
+          return await res.json();
+        } catch { return null; }
+      })
+    );
+
+    // Filter null (gagal load) dan hitung komentar dari Firestore
+    allGames = await Promise.all(
+      gameDataList.filter(Boolean).map(async game => {
+        const commentsSnap = await getCountFromServer(
+          query(collection(db, "comments"), where("gameId", "==", game.id))
+        );
+        return {
+          ...game,
+          thumbnailUrl: `games/${game.id}/${game.thumbnail || "thumbnail.png"}`,
+          commentsCount: commentsSnap.data().count
+        };
+      })
+    );
 
     renderGames();
   } catch (e) {

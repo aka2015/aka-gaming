@@ -5,9 +5,8 @@ import { auth, db }   from "./firebase.js";
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  doc, getDoc,
-  collection, addDoc, getDocs, deleteDoc,
-  query, orderBy, limit, startAfter, serverTimestamp, where, getCountFromServer
+  collection, addDoc, getDocs,
+  query, orderBy, limit, startAfter, serverTimestamp, where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ────────────────────────────────────────────────────────────
@@ -97,12 +96,13 @@ function updateAuthUI(user) {
 // ────────────────────────────────────────────────────────────
 async function loadGame() {
   try {
-    const snap = await getDoc(doc(db, "games", gameId));
-    if (!snap.exists()) {
+    const res = await fetch(`games/${gameId}/info.json`);
+    if (!res.ok) {
       showGameError();
       return;
     }
-    const game = snap.data();
+    const game = await res.json();
+
     document.title = `${game.name} - AKA GAMING`;
     if (gameTitleDisplay) gameTitleDisplay.textContent = game.name;
 
@@ -111,12 +111,9 @@ async function loadGame() {
       gameCatDisplay.className   = `game-cat-tag cat-${game.category || ""}`;
     }
 
-    // Load iframe
-    if (game.gameUrl) {
-      loadGameIframe(game.gameUrl);
-    } else {
-      showGameError();
-    }
+    // Load iframe — game file ada di dalam folder game itu sendiri
+    const gameUrl = `games/${gameId}/${game.gameFile || "index.html"}`;
+    loadGameIframe(gameUrl);
   } catch(e) {
     console.error("Load game error:", e);
     showGameError();
