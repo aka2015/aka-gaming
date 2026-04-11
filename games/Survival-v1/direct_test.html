@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Direct JS Test</title>
+    <style>
+        body { font-family: monospace; background: #1a1a2e; color: #fff; padding: 20px; }
+        .success { color: #44ff44; font-size: 24px; font-weight: bold; }
+        .error { color: #ff4444; font-size: 24px; font-weight: bold; }
+        #output { background: #000; padding: 15px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; max-height: 500px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Testing game.js with direct load</h1>
+    <div id="status">Loading game.js...</div>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        
+        function log(msg) {
+            console.log(msg);
+            output.textContent += msg + '\n';
+        }
+        
+        log('=== DIRECT JS LOAD TEST ===\n');
+    </script>
+    
+    <!-- Try to load game.js -->
+    <script src="game.js?v=999" onerror="handleError()" onload="handleLoad()"></script>
+    
+    <script>
+        function handleLoad() {
+            console.log('game.js loaded successfully');
+            if (typeof startGame === 'function') {
+                log('✅ game.js LOADED successfully!');
+                log('✅ startGame function exists');
+                document.getElementById('status').innerHTML = '<span class="success">✅ game.js works! Go back to index.html</span>';
+            } else {
+                log('⚠️  game.js loaded but startGame not found');
+                log('File might be incomplete or missing the function');
+                document.getElementById('status').innerHTML = '<span class="error">⚠️ game.js loaded but startGame missing</span>';
+            }
+        }
+        
+        function handleError() {
+            log('❌ game.js FAILED to load!');
+            log('\nThis means game.js has a syntax error.');
+            log('\nTry loading game_minimal.js instead to confirm:');
+            document.getElementById('status').innerHTML = '<span class="error">❌ game.js has syntax error!</span>';
+        }
+        
+        // Timeout check
+        setTimeout(() => {
+            if (typeof startGame === 'undefined') {
+                log('\n⏱️  Timeout - game.js still not loaded after 5 seconds');
+                log('This confirms game.js has a syntax error');
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -1,1573 +1,1634 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+// ========================================
+// 2D SURVIVAL GAME - WITH WEAPONS SYSTEM
+// ========================================
 
-// Set canvas to full screen
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+'use strict';
 
-// Handle window resize
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    // Reposition player if out of bounds
-    player.x = Math.min(player.x, canvas.width - player.width);
-    player.y = Math.min(player.y, canvas.height - player.height);
-});
+console.log('🎮=== GAME SCRIPT LOADING ===');
 
-// Audio system using Web Audio API
-let audioCtx = null;
-let menuMusicInterval = null;
-let gameMusicInterval = null;
-let musicEnabled = true;
-let masterGain = null;
-
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        masterGain = audioCtx.createGain();
-        masterGain.connect(audioCtx.destination);
-        masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
+function waitForDOM(callback) {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(callback, 1);
+    } else {
+        document.addEventListener('DOMContentLoaded', callback);
     }
 }
 
-function playNote(frequency, duration, type = 'sine', volume = 0.1, delay = 0) {
-    if (!audioCtx || !musicEnabled) return;
+waitForDOM(function() {
+    console.log('✅ DOM is ready!');
     
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(masterGain);
-    
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime + delay);
-    
-    gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
-    
-    oscillator.start(audioCtx.currentTime + delay);
-    oscillator.stop(audioCtx.currentTime + delay + duration);
-}
-
-function playChord(frequencies, duration, type = 'sine', volume = 0.05, delay = 0) {
-    frequencies.forEach(freq => {
-        playNote(freq, duration, type, volume, delay);
-    });
-}
-
-// Menu music - calm and relaxing
-function startMenuMusic() {
-    if (!audioCtx || !musicEnabled) return;
-    stopAllMusic();
-
-    const menuMelody = [261.63, 293.66, 329.63, 349.23, 392.00, 349.23, 329.63, 293.66];
-    const menuBass = [130.81, 146.83, 164.81, 174.61, 196.00, 174.61, 164.81, 146.83];
-    let noteIndex = 0;
-
-    menuMusicInterval = setInterval(() => {
-        if (!musicEnabled) return;
-
-        // Soft melody
-        playNote(menuMelody[noteIndex], 0.8, 'sine', 0.25, 0);
-        // Bass line
-        playNote(menuBass[noteIndex], 1.2, 'sine', 0.15, 0);
-        // Gentle chord
-        playChord([menuMelody[noteIndex] * 1.5, menuMelody[noteIndex] * 2], 0.6, 'sine', 0.12, 0.1);
-
-        noteIndex = (noteIndex + 1) % menuMelody.length;
-    }, 1000);
-}
-
-// Game music - energetic and upbeat
-function startGameMusic() {
-    if (!audioCtx || !musicEnabled) return;
-    stopAllMusic();
-    
-    const gameMelody = [
-        523.25, 587.33, 659.25, 698.46, 783.99, 698.46, 659.25, 587.33,
-        523.25, 659.25, 783.99, 880.00, 783.99, 659.25, 523.25, 587.33
-    ];
-    const gameBass = [261.63, 293.66, 329.63, 349.23, 392.00, 349.23, 329.63, 293.66];
-    let noteIndex = 0;
-    
-    gameMusicInterval = setInterval(() => {
-        if (!musicEnabled) return;
-        
-        // Fast melody
-        playNote(gameMelody[noteIndex], 0.3, 'square', 0.06, 0);
-        // Bass line
-        playNote(gameBass[noteIndex % gameBass.length], 0.4, 'triangle', 0.08, 0);
-        // Rhythmic pulse
-        playNote(130.81, 0.1, 'square', 0.04, 0);
-        playNote(130.81, 0.1, 'square', 0.04, 0.25);
-        // Accent chord on every 4th note
-        if (noteIndex % 4 === 0) {
-            playChord([gameMelody[noteIndex] * 1.25, gameMelody[noteIndex] * 1.5], 0.5, 'square', 0.04, 0);
-        }
-        
-        noteIndex = (noteIndex + 1) % gameMelody.length;
-    }, 250);
-}
-
-function stopAllMusic() {
-    if (menuMusicInterval) {
-        clearInterval(menuMusicInterval);
-        menuMusicInterval = null;
-    }
-    if (gameMusicInterval) {
-        clearInterval(gameMusicInterval);
-        gameMusicInterval = null;
-    }
-}
-
-// Play sound effects
-function playHitSound() {
-    if (!audioCtx || !musicEnabled) return;
-    playNote(200, 0.2, 'sawtooth', 0.15, 0);
-    playNote(150, 0.3, 'sawtooth', 0.1, 0.05);
-}
-
-function playGameOverSound() {
-    if (!audioCtx || !musicEnabled) return;
-    playNote(400, 0.3, 'sine', 0.1, 0);
-    playNote(350, 0.3, 'sine', 0.1, 0.3);
-    playNote(300, 0.3, 'sine', 0.1, 0.6);
-    playNote(200, 0.8, 'sine', 0.1, 0.9);
-}
-
-function playNewHighScoreSound() {
-    if (!audioCtx || !musicEnabled) return;
-    playNote(523.25, 0.2, 'sine', 0.1, 0);
-    playNote(659.25, 0.2, 'sine', 0.1, 0.15);
-    playNote(783.99, 0.2, 'sine', 0.1, 0.3);
-    playNote(1046.50, 0.5, 'sine', 0.15, 0.45);
-}
-
-// Game settings
-let settings = {
-    difficulty: 'normal',
-    playerSize: 'medium',
-    theme: 'neon',
-    language: 'en'
-};
-
-// Translations
-const translations = {
-    en: {
-        survivalGame: 'Survival Game',
-        play: 'Play',
-        settings: 'Settings',
-        howToPlay: 'How to Play',
-        highScores: 'High Scores',
-        back: 'Back',
-        difficulty: 'Difficulty:',
-        playerSize: 'Player Size:',
-        theme: 'Theme:',
-        language: 'Language:',
-        easy: 'Easy',
-        normal: 'Normal',
-        hard: 'Hard',
-        small: 'Small',
-        medium: 'Medium',
-        large: 'Large',
-        neon: 'Neon',
-        dark: 'Dark',
-        retro: 'Retro',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: 'Get Ready!',
-        useWASD: 'Use WASD or Arrow Keys to move',
-        survive: 'Survive as long as you can!',
-        startGame: 'Start Game',
-        backToMenu: 'Back to Menu',
-        paused: 'Paused',
-        resume: 'Resume',
-        mainMenu: 'Main Menu',
-        gameOver: 'Game Over',
-        score: 'Score',
-        time: 'Time',
-        newHighScore: '🏆 New High Score!',
-        playAgain: 'Play Again',
-        noScores: 'No scores yet. Play the game to set a record!',
-        moveUp: 'Move Up',
-        moveDown: 'Move Down',
-        moveLeft: 'Move Left',
-        moveRight: 'Move Right',
-        pauseGame: 'Pause Game',
-        instructionText: 'Survive as long as possible! Enemies will spawn from all sides and get faster over time. Dodge them to stay alive!',
-        health: 'Health',
-        playerName: 'Player Name:',
-        enterName: 'Enter name',
-        lock: '🔒',
-        confirmTitle: 'Change Name?',
-        confirmYes: 'Yes',
-        confirmNo: 'No',
-        delete: 'Delete',
-        deleteConfirm: 'Delete this score?',
-        musicOn: 'Music On',
-        musicOff: 'Music Off',
-        sound: 'Sound:',
-        soundOn: 'On',
-        soundOff: 'Off'
-    },
-    id: {
-        survivalGame: 'Game Bertahan Hidup',
-        play: 'Main',
-        settings: 'Pengaturan',
-        howToPlay: 'Cara Bermain',
-        highScores: 'Skor Tertinggi',
-        back: 'Kembali',
-        difficulty: 'Kesulitan:',
-        playerSize: 'Ukuran Pemain:',
-        theme: 'Tema:',
-        language: 'Bahasa:',
-        easy: 'Mudah',
-        normal: 'Normal',
-        hard: 'Sulit',
-        small: 'Kecil',
-        medium: 'Sedang',
-        large: 'Besar',
-        neon: 'Neon',
-        dark: 'Gelap',
-        retro: 'Retro',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: 'Bersiap!',
-        useWASD: 'Gunakan WASD atau Tombol Panah untuk bergerak',
-        survive: 'Bertahan selama kamu bisa!',
-        startGame: 'Mulai Bermain',
-        backToMenu: 'Kembali ke Menu',
-        paused: 'Jeda',
-        resume: 'Lanjutkan',
-        mainMenu: 'Menu Utama',
-        gameOver: 'Permainan Selesai',
-        score: 'Skor',
-        time: 'Waktu',
-        newHighScore: '🏆 Skor Tertinggi Baru!',
-        playAgain: 'Main Lagi',
-        noScores: 'Belum ada skor. Mainkan game untuk mencetak rekor!',
-        moveUp: 'Gerak ke Atas',
-        moveDown: 'Gerak ke Bawah',
-        moveLeft: 'Gerak ke Kiri',
-        moveRight: 'Gerak ke Kanan',
-        pauseGame: 'Jeda Permainan',
-        instructionText: 'Bertahan selama mungkin! Musuh akan muncul dari semua sisi dan semakin cepat seiring waktu. Hindari mereka untuk tetap hidup!',
-        health: 'Darah',
-        playerName: 'Nama Pemain:',
-        enterName: 'Masukkan nama',
-        lock: '🔒',
-        confirmTitle: 'Ganti Nama?',
-        confirmYes: 'Ya',
-        confirmNo: 'Tidak',
-        delete: 'Hapus',
-        deleteConfirm: 'Hapus skor ini?',
-        musicOn: 'Musik Hidup',
-        musicOff: 'Musik Mati',
-        sound: 'Suara:',
-        soundOn: 'Hidup',
-        soundOff: 'Mati'
-    },
-    it: {
-        survivalGame: 'Gioco di Sopravvivenza',
-        play: 'Gioca',
-        settings: 'Impostazioni',
-        howToPlay: 'Come Giocare',
-        highScores: 'Punteggi Migliori',
-        back: 'Indietro',
-        difficulty: 'Difficoltà:',
-        playerSize: 'Dimensione Giocatore:',
-        theme: 'Tema:',
-        language: 'Lingua:',
-        easy: 'Facile',
-        normal: 'Normale',
-        hard: 'Difficile',
-        small: 'Piccolo',
-        medium: 'Medio',
-        large: 'Grande',
-        neon: 'Neon',
-        dark: 'Scuro',
-        retro: 'Retro',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: 'Preparati!',
-        useWASD: 'Usa WASD o i Tasti Freccia per muoverti',
-        survive: 'Sopravvivi più che puoi!',
-        startGame: 'Inizia a Giocare',
-        backToMenu: 'Torna al Menu',
-        paused: 'In Pausa',
-        resume: 'Riprendi',
-        mainMenu: 'Menu Principale',
-        gameOver: 'Game Over',
-        score: 'Punteggio',
-        time: 'Tempo',
-        newHighScore: '🏆 Nuovo Punteggio Migliore!',
-        playAgain: 'Gioca Ancora',
-        noScores: 'Nessun punteggio ancora. Gioca per stabilire un record!',
-        moveUp: 'Muovi Su',
-        moveDown: 'Muovi Giù',
-        moveLeft: 'Muovi a Sinistra',
-        moveRight: 'Muovi a Destra',
-        pauseGame: 'Metti in Pausa',
-        instructionText: 'Sopravvivi più a lungo possibile! I nemici appariranno da tutti i lati e diventeranno più veloci nel tempo. Evitali per restare in vita!',
-        health: 'Salute',
-        playerName: 'Nome Giocatore:',
-        enterName: 'Inserisci nome',
-        lock: '🔒',
-        confirmTitle: 'Cambiare Nome?',
-        confirmYes: 'Sì',
-        confirmNo: 'No',
-        delete: 'Elimina',
-        deleteConfirm: 'Eliminare questo punteggio?',
-        musicOn: 'Musica Attiva',
-        musicOff: 'Musica Disattivata',
-        sound: 'Suono:',
-        soundOn: 'Acceso',
-        soundOff: 'Spento'
-    },
-    es: {
-        survivalGame: 'Juego de Supervivencia',
-        play: 'Jugar',
-        settings: 'Ajustes',
-        howToPlay: 'Cómo Jugar',
-        highScores: 'Mejores Puntuaciones',
-        back: 'Atrás',
-        difficulty: 'Dificultad:',
-        playerSize: 'Tamaño del Jugador:',
-        theme: 'Tema:',
-        language: 'Idioma:',
-        easy: 'Fácil',
-        normal: 'Normal',
-        hard: 'Difícil',
-        small: 'Pequeño',
-        medium: 'Mediano',
-        large: 'Grande',
-        neon: 'Neón',
-        dark: 'Oscuro',
-        retro: 'Retro',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: '¡Prepárate!',
-        useWASD: 'Usa WASD o las Teclas de Flecha para moverte',
-        survive: '¡Sobrevive todo lo que puedas!',
-        startGame: 'Empezar a Jugar',
-        backToMenu: 'Volver al Menú',
-        paused: 'En Pausa',
-        resume: 'Reanudar',
-        mainMenu: 'Menú Principal',
-        gameOver: 'Fin del Juego',
-        score: 'Puntuación',
-        time: 'Tiempo',
-        newHighScore: '🏆 ¡Nueva Mejor Puntuación!',
-        playAgain: 'Jugar de Nuevo',
-        noScores: '¡Aún no hay puntuaciones. ¡Juega para establecer un récord!',
-        moveUp: 'Mover Arriba',
-        moveDown: 'Mover Abajo',
-        moveLeft: 'Mover a la Izquierda',
-        moveRight: 'Mover a la Derecha',
-        pauseGame: 'Pausar Juego',
-        instructionText: '¡Sobrevive todo lo posible! Los enemigos aparecerán desde todos los lados y se volverán más rápidos con el tiempo. ¡Esquívalos para mantenerte con vida!',
-        health: 'Salud',
-        playerName: 'Nombre del Jugador:',
-        enterName: 'Ingresa nombre',
-        lock: '🔒',
-        confirmTitle: '¿Cambiar Nombre?',
-        confirmYes: 'Sí',
-        confirmNo: 'No',
-        delete: 'Eliminar',
-        deleteConfirm: '¿Eliminar esta puntuación?',
-        musicOn: 'Música Activada',
-        musicOff: 'Música Desactivada',
-        sound: 'Sonido:',
-        soundOn: 'Encendido',
-        soundOff: 'Apagado'
-    },
-    ja: {
-        survivalGame: 'サバイバルゲーム',
-        play: 'プレイ',
-        settings: '設定',
-        howToPlay: '遊び方',
-        highScores: 'ハイスコア',
-        back: '戻る',
-        difficulty: '難易度:',
-        playerSize: 'プレイヤーサイズ:',
-        theme: 'テーマ:',
-        language: '言語:',
-        easy: '簡単',
-        normal: '普通',
-        hard: '難しい',
-        small: '小',
-        medium: '中',
-        large: '大',
-        neon: 'ネオン',
-        dark: 'ダーク',
-        retro: 'レトロ',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: '準備して！',
-        useWASD: 'WASDまたは矢印キーで移動',
-        survive: 'できるだけ長く生き延びよう！',
-        startGame: 'ゲームスタート',
-        backToMenu: 'メニューに戻る',
-        paused: '一時停止',
-        resume: '再開',
-        mainMenu: 'メインメニュー',
-        gameOver: 'ゲームオーバー',
-        score: 'スコア',
-        time: '時間',
-        newHighScore: '🏆 新ハイスコア！',
-        playAgain: 'もう一度プレイ',
-        noScores: 'まだスコアがありません。プレイして記録を樹立しよう！',
-        moveUp: '上に移動',
-        moveDown: '下に移動',
-        moveLeft: '左に移動',
-        moveRight: '右に移動',
-        pauseGame: '一時停止',
-        instructionText: 'できるだけ長く生き延びよう！敵は全方向から出現し、時間とともに速くなります。避けて生き残れ！',
-        health: '体力',
-        playerName: 'プレイヤー名:',
-        enterName: '名前を入力',
-        lock: '🔒',
-        confirmTitle: '名前を変更しますか？',
-        confirmYes: 'はい',
-        confirmNo: 'いいえ',
-        delete: '削除',
-        deleteConfirm: 'このスコアを削除しますか？',
-        musicOn: '音楽オン',
-        musicOff: '音楽オフ',
-        sound: 'サウンド:',
-        soundOn: 'オン',
-        soundOff: 'オフ'
-    },
-    ko: {
-        survivalGame: '서바이벌 게임',
-        play: '플레이',
-        settings: '설정',
-        howToPlay: '플레이 방법',
-        highScores: '최고 점수',
-        back: '뒤로',
-        difficulty: '난이도:',
-        playerSize: '플레이어 크기:',
-        theme: '테마:',
-        language: '언어:',
-        easy: '쉬움',
-        normal: '보통',
-        hard: '어려움',
-        small: '작게',
-        medium: '중간',
-        large: '크게',
-        neon: '네온',
-        dark: '다크',
-        retro: '레트로',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: '준비하세요!',
-        useWASD: 'WASD 또는 화살표 키로 이동',
-        survive: '가능한 한 오래 살아남으세요!',
-        startGame: '게임 시작',
-        backToMenu: '메뉴로 돌아가기',
-        paused: '일시정지',
-        resume: '계속하기',
-        mainMenu: '메인 메뉴',
-        gameOver: '게임 오버',
-        score: '점수',
-        time: '시간',
-        newHighScore: '🏆 새로운 최고 점수!',
-        playAgain: '다시 플레이',
-        noScores: '아직 점수가 없습니다. 플레이하여 기록을 세우세요!',
-        moveUp: '위로 이동',
-        moveDown: '아래로 이동',
-        moveLeft: '왼쪽으로 이동',
-        moveRight: '오른쪽으로 이동',
-        pauseGame: '게임 일시정지',
-        instructionText: '가능한 한 오래 살아남으세요! 적들은 모든 방향에서 나타나 시간이 지날수록 빨라집니다. 피해서 살아남으세요!',
-        health: '체력',
-        playerName: '플레이어 이름:',
-        enterName: '이름 입력',
-        lock: '🔒',
-        confirmTitle: '이름을 변경하시겠습니까?',
-        confirmYes: '예',
-        confirmNo: '아니요',
-        delete: '삭제',
-        deleteConfirm: '이 점수를 삭제하시겠습니까?',
-        musicOn: '음악 켜짐',
-        musicOff: '음악 꺼짐',
-        sound: '사운드:',
-        soundOn: '켜짐',
-        soundOff: '꺼짐'
-    },
-    de: {
-        survivalGame: 'Überlebensspiel',
-        play: 'Spielen',
-        settings: 'Einstellungen',
-        howToPlay: 'Spielanleitung',
-        highScores: 'Bestenliste',
-        back: 'Zurück',
-        difficulty: 'Schwierigkeit:',
-        playerSize: 'Spielergröße:',
-        theme: 'Thema:',
-        language: 'Sprache:',
-        easy: 'Leicht',
-        normal: 'Normal',
-        hard: 'Schwer',
-        small: 'Klein',
-        medium: 'Mittel',
-        large: 'Groß',
-        neon: 'Neon',
-        dark: 'Dunkel',
-        retro: 'Retro',
-        english: 'English',
-        indonesian: 'Bahasa Indonesia',
-        italian: 'Italiano',
-        spanish: 'Español',
-        japanese: '日本語',
-        korean: '한국어',
-        german: 'Deutsch',
-        getReady: 'Mach dich bereit!',
-        useWASD: 'Benutze WASD oder Pfeiltasten zum Bewegen',
-        survive: 'Überlebe so lange du kannst!',
-        startGame: 'Spiel Starten',
-        backToMenu: 'Zurück zum Menü',
-        paused: 'Pausiert',
-        resume: 'Fortsetzen',
-        mainMenu: 'Hauptmenü',
-        gameOver: 'Spiel Vorbei',
-        score: 'Punktzahl',
-        time: 'Zeit',
-        newHighScore: '🏆 Neue Bestpunktzahl!',
-        playAgain: 'Nochmal Spielen',
-        noScores: 'Noch keine Punktzahlen. Spiele, um einen Rekord aufzustellen!',
-        moveUp: 'Nach Oben',
-        moveDown: 'Nach Unten',
-        moveLeft: 'Nach Links',
-        moveRight: 'Nach Rechts',
-        pauseGame: 'Spiel Pausieren',
-        instructionText: 'Überlebe so lange wie möglich! Feinde erscheinen von allen Seiten und werden mit der Zeit schneller. Weiche ihnen aus, um am Leben zu bleiben!',
-        health: 'Gesundheit',
-        playerName: 'Spielername:',
-        enterName: 'Name eingeben',
-        lock: '🔒',
-        confirmTitle: 'Namen ändern?',
-        confirmYes: 'Ja',
-        confirmNo: 'Nein',
-        delete: 'Löschen',
-        deleteConfirm: 'Diesen Punktzahl löschen?',
-        musicOn: 'Musik An',
-        musicOff: 'Musik Aus',
-        sound: 'Ton:',
-        soundOn: 'An',
-        soundOff: 'Aus'
-    }
-};
-
-function t(key) {
-    return translations[settings.language]?.[key] || translations.en[key];
-}
-
-// Load settings from localStorage
-function loadSettings() {
-    const saved = localStorage.getItem('survivalGameSettings');
-    if (saved) {
-        settings = JSON.parse(saved);
-        document.getElementById('difficultySelect').value = settings.difficulty;
-        document.getElementById('playerSizeSelect').value = settings.playerSize;
-        document.getElementById('themeSelect').value = settings.theme;
-        document.getElementById('languageSelect').value = settings.language;
-        applySettings();
-        updateLanguage();
-    }
-}
-
-// Save settings to localStorage
-function saveSettings() {
-    localStorage.setItem('survivalGameSettings', JSON.stringify(settings));
-}
-
-// Apply settings to game
-function applySettings() {
-    // Apply player size
-    const sizeMap = { small: 30, medium: 40, large: 50 };
-    const size = sizeMap[settings.playerSize];
-    player.width = size;
-    player.height = size;
-
-    // Apply difficulty
-    const diffMap = {
-        easy: { spawnRate: 2000, damageMult: 0.7, speedMult: 0.8 },
-        normal: { spawnRate: 1500, damageMult: 1, speedMult: 1 },
-        hard: { spawnRate: 800, damageMult: 1.5, speedMult: 1.3 }
-    };
-    const diff = diffMap[settings.difficulty];
-    enemySpawnRate = diff.spawnRate;
-
-    // Apply theme - update grid color and canvas background
-    const themeMap = {
-        neon: { bg: '#0f0f23', grid: 'rgba(0, 255, 255, 0.1)', playerColor: '#00ffff', enemyHue: 'red-orange' },
-        dark: { bg: '#000000', grid: 'rgba(255, 255, 255, 0.05)', playerColor: '#888888', enemyHue: 'monochrome' },
-        retro: { bg: '#000000', grid: 'rgba(0, 255, 0, 0.15)', playerColor: '#00ff00', enemyHue: 'green' }
-    };
-    const theme = themeMap[settings.theme];
-    gridColor = theme.grid;
-    canvasBgColor = theme.bg;
-    playerColor = theme.playerColor;
-}
-
-// Update language for all UI elements
-function updateLanguage() {
-    // Main Menu
-    document.querySelector('#mainMenu h1').textContent = t('survivalGame');
-    document.getElementById('playBtn').textContent = t('play');
-    document.getElementById('settingsBtn').textContent = t('settings');
-    document.getElementById('howToPlayBtn').textContent = t('howToPlay');
-    document.getElementById('highScoresBtn').textContent = t('highScores');
-    
-    // Settings
-    document.querySelector('#settingsScreen h1').textContent = t('settings');
-    document.querySelector('#settingsScreen .setting-item:nth-child(1) label').textContent = t('playerName');
-    document.querySelector('#settingsScreen .setting-item:nth-child(2) label').textContent = t('difficulty');
-    document.querySelector('#settingsScreen .setting-item:nth-child(3) label').textContent = t('playerSize');
-    document.querySelector('#settingsScreen .setting-item:nth-child(4) label').textContent = t('theme');
-    document.querySelector('#settingsScreen .setting-item:nth-child(5) label').textContent = t('language');
-    document.getElementById('playerNameInput').placeholder = t('enterName');
-    document.querySelector('#difficultySelect option[value="easy"]').textContent = t('easy');
-    document.querySelector('#difficultySelect option[value="normal"]').textContent = t('normal');
-    document.querySelector('#difficultySelect option[value="hard"]').textContent = t('hard');
-    document.querySelector('#playerSizeSelect option[value="small"]').textContent = t('small');
-    document.querySelector('#playerSizeSelect option[value="medium"]').textContent = t('medium');
-    document.querySelector('#playerSizeSelect option[value="large"]').textContent = t('large');
-    document.querySelector('#themeSelect option[value="neon"]').textContent = t('neon');
-    document.querySelector('#themeSelect option[value="dark"]').textContent = t('dark');
-    document.querySelector('#themeSelect option[value="retro"]').textContent = t('retro');
-    document.querySelector('#languageSelect option[value="en"]').textContent = t('english');
-    document.querySelector('#languageSelect option[value="id"]').textContent = t('indonesian');
-    document.querySelector('#languageSelect option[value="it"]').textContent = t('italian');
-    document.querySelector('#languageSelect option[value="es"]').textContent = t('spanish');
-    document.querySelector('#languageSelect option[value="ja"]').textContent = t('japanese');
-    document.querySelector('#languageSelect option[value="ko"]').textContent = t('korean');
-    document.querySelector('#languageSelect option[value="de"]').textContent = t('german');
-    document.getElementById('settingsBackBtn').textContent = t('back');
-    document.getElementById('setNameBtn').textContent = t('lock');
-    
-    // Sound setting
-    try {
-        const soundLabel = document.querySelector('#settingsScreen .setting-item:nth-child(6) label');
-        if (soundLabel) {
-            soundLabel.textContent = t('sound');
-        }
-    } catch (e) {
-        // Ignore if sound label not found
-    }
-    try {
-        const soundBtn = document.getElementById('soundToggle');
-        if (soundBtn) {
-            soundBtn.title = musicEnabled ? t('soundOff') : t('soundOn');
-        }
-    } catch (e) {
-        // Ignore if sound button not found
-    }
-    updateSoundButton();
-    
-    // Name change modal
-    document.querySelector('#nameChangeModal h2').textContent = t('confirmTitle');
-    document.getElementById('confirmNameChange').textContent = t('confirmYes');
-    document.getElementById('cancelNameChange').textContent = t('confirmNo');
-    
-    // How to Play
-    document.querySelector('#howToPlayScreen h1').textContent = t('howToPlay');
-    document.querySelector('#howToPlayScreen .instruction-item:nth-child(1) span:last-child').textContent = t('moveUp');
-    document.querySelector('#howToPlayScreen .instruction-item:nth-child(2) span:last-child').textContent = t('moveDown');
-    document.querySelector('#howToPlayScreen .instruction-item:nth-child(3) span:last-child').textContent = t('moveLeft');
-    document.querySelector('#howToPlayScreen .instruction-item:nth-child(4) span:last-child').textContent = t('moveRight');
-    document.querySelector('#howToPlayScreen .instruction-item:nth-child(5) span:last-child').textContent = t('pauseGame');
-    document.querySelector('#howToPlayScreen .instruction-text').textContent = t('instructionText');
-    document.getElementById('howToPlayBackBtn').textContent = t('back');
-    
-    // High Scores
-    document.querySelector('#highScoresScreen h1').textContent = t('highScores');
-    document.querySelector('#highScoresScreen .no-scores').textContent = t('noScores');
-    document.getElementById('highScoresBackBtn').textContent = t('back');
-    
-    // Start Screen
-    document.querySelector('#startScreen h1').textContent = t('getReady');
-    document.querySelector('#startScreen p:nth-child(2)').textContent = t('useWASD');
-    document.querySelector('#startScreen p:nth-child(3)').textContent = t('survive');
-    document.getElementById('startBtn').textContent = t('startGame');
-    document.getElementById('menuBtn').textContent = t('backToMenu');
-    
-    // Pause Screen
-    document.querySelector('#pauseScreen h1').textContent = t('paused');
-    document.getElementById('resumeBtn').textContent = t('resume');
-    document.getElementById('pauseMenuBtn').textContent = t('mainMenu');
-    
-    // Game Over Screen
-    document.querySelector('#gameOverScreen h1').textContent = t('gameOver');
-    document.getElementById('newHighScore').textContent = t('newHighScore');
-    document.getElementById('restartBtn').textContent = t('playAgain');
-    document.getElementById('gameOverMenuBtn').textContent = t('mainMenu');
-}
-
-let gridColor = 'rgba(0, 255, 255, 0.1)';
-let canvasBgColor = '#0f0f23';
-let playerColor = '#00ffff';
-
-// Game state
-let gameRunning = false;
-let gamePaused = false;
-let score = 0;
-let gameTime = 0;
-let lastTime = 0;
-let enemySpawnTimer = 0;
-let enemySpawnRate = 1500; // ms
-
-// Player
-const player = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    width: 40,
-    height: 40,
-    speed: 300, // pixels per second
-    health: 100,
-    maxHealth: 100,
-    color: '#00ffff',
-    invulnerable: false,
-    invulnerableTime: 0
-};
-
-// High scores
-let highScores = [];
-let playerName = 'Anonymous';
-let nameAutoSaved = false; // Flag to track if name was auto-saved from leaderboard
-let hasExistingScore = false; // Track if player has existing scores
-
-function loadHighScores() {
-    const saved = localStorage.getItem('survivalGameHighScores');
-    if (saved) {
-        highScores = JSON.parse(saved);
-    }
-    
-    // Also load the highest score separately to ensure it's preserved
-    const highestSaved = localStorage.getItem('survivalGameHighestScore');
-    if (highestSaved) {
-        const highest = JSON.parse(highestSaved);
-        // Check if it's not already in the array
-        const exists = highScores.some(entry => 
-            entry.name === highest.name && entry.score === highest.score
-        );
-        if (!exists) {
-            highScores.unshift(highest);
-            highScores.sort((a, b) => b.score - a.score);
-            localStorage.setItem('survivalGameHighScores', JSON.stringify(highScores));
-        }
-    }
-
-    // Load player name
-    const savedName = localStorage.getItem('survivalGamePlayerName');
-    if (savedName) {
-        playerName = savedName;
-        nameAutoSaved = true; // Name already saved before
-    }
-
-    // Check if player has existing scores
-    if (highScores.length > 0 && playerName !== 'Anonymous') {
-        hasExistingScore = highScores.some(entry => entry.name === playerName);
-    }
-
-    // Update name input in settings
-    updateNameInputUI();
-}
-
-function updateNameInputUI() {
-    const nameInput = document.getElementById('playerNameInput');
-    
-    if (nameInput) {
-        nameInput.value = playerName;
-    }
-}
-
-function confirmNameChange() {
-    const nameInput = document.getElementById('playerNameInput');
-    const newName = nameInput.value.trim();
-
-    if (!newName) {
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+        alert('Error: Canvas not found!');
         return;
     }
-
-    // If player has existing scores, warn about name change
-    if (hasExistingScore && playerName !== 'Anonymous') {
-        showNameChangeWarningModal(newName);
-    } else {
-        showNameChangeModal(newName);
+    
+    const ctx = canvas.getContext('2d');
+    console.log('✅ Canvas found');
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
-}
-
-function showNameChangeWarningModal(newName) {
-    const modal = document.getElementById('nameChangeModal');
-    const modalTitle = document.querySelector('#nameChangeModal h2');
-    const confirmBtn = document.getElementById('confirmNameChange');
-    const cancelBtn = document.getElementById('cancelNameChange');
-
-    modalTitle.textContent = `⚠️ Change name from "${playerName}" to "${newName}"? This will affect your saved scores.`;
-    confirmBtn.textContent = t('confirmYes');
-    cancelBtn.textContent = t('confirmNo');
-
-    modal.classList.remove('hidden');
-
-    confirmBtn.onclick = () => {
-        playerName = newName.substring(0, 15);
-        localStorage.setItem('survivalGamePlayerName', playerName);
-        updateNameInputUI();
-        hasExistingScore = false;
-        modal.classList.add('hidden');
-        // Reset modal text
-        modalTitle.textContent = t('confirmTitle');
-        confirmBtn.textContent = t('confirmYes');
-        cancelBtn.textContent = t('confirmNo');
-    };
-
-    cancelBtn.onclick = () => {
-        updateNameInputUI(); // Reset input to current name
-        modal.classList.add('hidden');
-        // Reset modal text
-        modalTitle.textContent = t('confirmTitle');
-        confirmBtn.textContent = t('confirmYes');
-        cancelBtn.textContent = t('confirmNo');
-    };
-}
-
-function showNameChangeModal(newName) {
-    const modal = document.getElementById('nameChangeModal');
-    const confirmBtn = document.getElementById('confirmNameChange');
-    const cancelBtn = document.getElementById('cancelNameChange');
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
     
-    modal.classList.remove('hidden');
+    // ========================================
+    // WEAPONS SYSTEM
+    // ========================================
     
-    confirmBtn.onclick = () => {
-        playerName = newName.substring(0, 15);
-        localStorage.setItem('survivalGamePlayerName', playerName);
-        updateNameInputUI();
-        modal.classList.add('hidden');
-    };
-    
-    cancelBtn.onclick = () => {
-        updateNameInputUI(); // Reset input to current name
-        modal.classList.add('hidden');
-    };
-}
-
-function saveHighScore(score, time) {
-    // Check if entry with same name already exists
-    const existingIndex = highScores.findIndex(entry => entry.name === playerName);
-
-    if (existingIndex !== -1) {
-        // Update only if new score is higher
-        if (score > highScores[existingIndex].score) {
-            highScores[existingIndex].score = score;
-            highScores[existingIndex].time = time;
-            highScores[existingIndex].date = new Date().toLocaleDateString();
-            highScores[existingIndex].difficulty = settings.difficulty;
+    const WEAPONS = {
+        bat: {
+            name: 'Baseball Bat',
+            damage: 10,
+            range: 40,
+            attackSpeed: 0.5, // 1 hit per 2 seconds (melee)
+            price: 0,
+            color: '#8B4513',
+            icon: '🏏',
+            description: 'Tongkat baseball - 1 pukulan/2 detik'
+        },
+        knife: {
+            name: 'Knife',
+            damage: 20,
+            range: 30,
+            attackSpeed: 0.5, // 1 hit per 2 seconds (melee)
+            price: 100,
+            color: '#C0C0C0',
+            icon: '🔪',
+            description: 'Pisau tajam - 1 tusukan/2 detik'
+        },
+        pistol: {
+            name: 'Pistol',
+            damage: 35,
+            range: 200,
+            attackSpeed: 2,
+            price: 300,
+            color: '#333333',
+            icon: '🔫',
+            description: 'Pistol - Damage tinggi, jarak jauh'
+        },
+        rifle: {
+            name: 'Rifle',
+            damage: 50,
+            range: 300,
+            attackSpeed: 3,
+            price: 600,
+            color: '#1a1a1a',
+            icon: '🎯',
+            description: 'Rifle - Damage sangat tinggi'
+        },
+        minigun: {
+            name: 'Minigun',
+            damage: 80,
+            range: 250,
+            attackSpeed: 6,
+            price: 1200,
+            color: '#FF4500',
+            icon: '💥',
+            description: 'Minigun - Senjata paling mematikan!'
         }
-    } else {
-        // Add new entry
-        highScores.push({ name: playerName, score, time, date: new Date().toLocaleDateString(), difficulty: settings.difficulty });
-        hasExistingScore = true;
-    }
+    };
+    
+    let currentWeapon = 'bat';
+    let weaponLevel = 1;
+    let attackCooldown = 0;
+    let bullets = [];
+    
+    // ========================================
+    // CHAPTER SYSTEM
+    // ========================================
+    
+    const chapterTimes = { 1: 60, 2: 90, 3: 120, 4: 150, 5: 180 };
+    let currentChapter = 1;
+    let chapterTimeStart = 0;
+    let chapterCompleted = false;
+    
+    // ========================================
+    // BOSS SYSTEM
+    // ========================================
+    
+    const bosses = {
+        1: { name: 'Training Boss', color: '#ff4444', radius: 35, health: 80, speed: 50 },
+        2: { name: 'Fire Boss', color: '#ff6600', radius: 40, health: 100, speed: 60 },
+        3: { name: 'Ice Boss', color: '#00ffff', radius: 45, health: 150, speed: 70 },
+        4: { name: 'Shadow Boss', color: '#9900ff', radius: 50, health: 200, speed: 80 },
+        5: { name: 'Final Boss', color: '#ff0000', radius: 60, health: 300, speed: 100 }
+    };
+    
+    let currentBoss = null;
+    let bossSpawned = false;
+    let bossWarningShown = false;
+    let bossDefeated = false;
+    let bossWarningTime = 0;
+    
+    // ========================================
+    // GAME STATE
+    // ========================================
+    
+    let gameRunning = false;
+    let gamePaused = false;
+    let score = 0;
+    let gameTime = 0;
+    let lastTime = 0;
+    let soundEnabled = true;
+    let spawnTimer = 0;
+    
+    const player = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 20,
+        speed: 300,
+        health: 100,
+        maxHealth: 100,
+        color: '#00ffff',
+        invulnerable: false,
+        invulnerableTime: 0,
+        facing: { x: 0, y: 1 }
+    };
+    
+    let enemies = [];
+    const keys = {};
+    let highScores = [];
+    let playerName = 'Anonymous';
+    
+    let settings = {
+        difficulty: 'normal',
+        playerSize: 'medium',
+        theme: 'neon'
+    };
+    
+    let shopUpgrades = {
+        speedLevel: 0,
+        healLevel: 0
+    };
 
-    // Auto-save highest score to top position
-    highScores.sort((a, b) => b.score - a.score);
-
-    // Save highest score separately for persistence
-    if (highScores.length > 0) {
-        localStorage.setItem('survivalGameHighestScore', JSON.stringify(highScores[0]));
-    }
-
-    highScores = highScores.slice(0, 10); // Keep top 10
-    localStorage.setItem('survivalGameHighScores', JSON.stringify(highScores));
-}
-
-function isNewHighScore(score) {
-    if (highScores.length < 10) return true;
-    return score > highScores[highScores.length - 1].score;
-}
-
-function displayHighScores() {
-    // Auto-save name from leaderboard if not already set
-    if (!nameAutoSaved && highScores.length > 0) {
-        // Find first non-Anonymous entry to auto-save
-        for (const entry of highScores) {
-            if (entry.name && entry.name !== 'Anonymous') {
-                playerName = entry.name;
-                localStorage.setItem('survivalGamePlayerName', playerName);
-                nameAutoSaved = true;
-                updateNameInputUI();
-                break;
+    const speedPrices = [150, 200, 250, 300, 400];
+    const speedBoostPerLevel = 50;
+    
+    const healPrices = [50, 50, 50];
+    const healAmounts = [5, 10, 20]; // HP healed per tick
+    const healIntervals = [2, 1.5, 1]; // Seconds between heals
+    
+    let healTimer = 0;
+    
+    console.log('✅ Game state initialized');
+    
+    // ========================================
+    // UTILITY FUNCTIONS
+    // ========================================
+    
+    function showScreen(screenId) {
+        const allScreens = [
+            'mainMenu', 'settingsScreen', 'howToPlayScreen', 'highScoresScreen',
+            'startScreen', 'shopScreen', 'pauseScreen', 'gameOverScreen',
+            'chapterCompleteScreen', 'chapterListScreen'
+        ];
+        
+        allScreens.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (screenId === 'none') {
+                    el.classList.add('hidden');
+                } else if (id === screenId) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
             }
-        }
-    }
-    
-    // Ensure scores are sorted by highest first
-    highScores.sort((a, b) => b.score - a.score);
-    localStorage.setItem('survivalGameHighScores', JSON.stringify(highScores));
-
-    const scoresList = document.getElementById('scoresList');
-    if (highScores.length === 0) {
-        scoresList.innerHTML = `<p class="no-scores">${t('noScores')}</p>`;
-        return;
-    }
-
-    // Get the highest score
-    const highestScore = highScores.length > 0 ? highScores[0].score : 0;
-    
-    // Find player's highest score
-    let playerHighestScore = -1;
-    highScores.forEach(entry => {
-        if (entry.name === playerName && entry.score > playerHighestScore) {
-            playerHighestScore = entry.score;
-        }
-    });
-
-    let html = '';
-    
-    // Display highest score first (highlighted)
-    highScores.forEach((entry, index) => {
-        const isOwnScore = entry.name === playerName;
-        const isHighest = entry.score === highestScore;
-        const deleteButton = isOwnScore ? `<button class="delete-btn" data-index="${index}">🗑️</button>` : '';
-        const difficultyText = entry.difficulty ? t(entry.difficulty) : '';
-        
-        const entryClass = isHighest ? 'score-entry score-top' : 'score-entry';
-        const crownIcon = isHighest ? '👑 ' : '';
-
-        html += `
-        <div class="${entryClass}">
-            <span class="score-rank">${crownIcon}#${index + 1}</span>
-            <span class="score-name">${entry.name || 'Anonymous'}</span>
-            <span class="score-value">${t('score')}: ${entry.score}</span>
-            <span class="score-time">${entry.time}s - ${entry.date}</span>
-            ${difficultyText ? `<span class="score-difficulty">${difficultyText}</span>` : ''}
-            ${deleteButton}
-        </div>
-    `;
-    });
-
-    scoresList.innerHTML = html;
-
-    // Add event listeners to delete buttons
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const index = parseInt(e.target.dataset.index);
-            deleteHighScore(index);
         });
-    });
-}
-
-function deleteHighScore(index) {
-    // Show confirmation modal
-    const modal = document.getElementById('nameChangeModal');
-    const modalTitle = document.querySelector('#nameChangeModal h2');
-    const confirmBtn = document.getElementById('confirmNameChange');
-    const cancelBtn = document.getElementById('cancelNameChange');
-    
-    modalTitle.textContent = t('deleteConfirm');
-    confirmBtn.textContent = t('confirmYes');
-    cancelBtn.textContent = t('confirmNo');
-    
-    modal.classList.remove('hidden');
-    
-    confirmBtn.onclick = () => {
-        highScores.splice(index, 1);
-        localStorage.setItem('survivalGameHighScores', JSON.stringify(highScores));
-        displayHighScores();
-        modal.classList.add('hidden');
-        
-        // Reset modal text
-        modalTitle.textContent = t('confirmTitle');
-        confirmBtn.textContent = t('confirmYes');
-        cancelBtn.textContent = t('confirmNo');
-    };
-    
-    cancelBtn.onclick = () => {
-        modal.classList.add('hidden');
-        
-        // Reset modal text
-        modalTitle.textContent = t('confirmTitle');
-        confirmBtn.textContent = t('confirmYes');
-        cancelBtn.textContent = t('confirmNo');
-    };
-}
-
-// Input handling
-const keys = {};
-window.addEventListener('keydown', (e) => {
-    keys[e.key.toLowerCase()] = true;
-    
-    // Pause with space
-    if (e.key === ' ' && gameRunning) {
-        e.preventDefault();
-        togglePause();
     }
-});
-window.addEventListener('keyup', (e) => {
-    keys[e.key.toLowerCase()] = false;
-});
-
-// Enemies array
-let enemies = [];
-
-// Particles array for effects
-let particles = [];
-
-// Enemy class
-class Enemy {
-    constructor() {
-        this.width = 30 + Math.random() * 20;
-        this.height = this.width;
+    
+    function playSound(type) {
+        if (!soundEnabled) return;
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (type === 'hit') {
+                osc.frequency.value = 200;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'kill') {
+                osc.frequency.value = 400;
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'buy') {
+                osc.frequency.value = 600;
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'gameover') {
+                osc.frequency.value = 400;
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime + 0.6);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            } else if (type === 'boss') {
+                osc.frequency.value = 100;
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.6);
+            } else if (type === 'shoot') {
+                osc.frequency.value = 800;
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            }
+        } catch (e) {}
+    }
+    
+    // ========================================
+    // LOAD/SAVE DATA
+    // ========================================
+    
+    function loadSettings() {
+        try {
+            const saved = localStorage.getItem('survivalGameSettings');
+            if (saved) {
+                settings = JSON.parse(saved);
+                const diff = document.getElementById('difficultySelect');
+                const size = document.getElementById('playerSizeSelect');
+                const theme = document.getElementById('themeSelect');
+                if (diff) diff.value = settings.difficulty;
+                if (size) size.value = settings.playerSize;
+                if (theme) theme.value = settings.theme;
+            }
+        } catch (e) {}
+    }
+    
+    function saveSettings() {
+        try {
+            const diff = document.getElementById('difficultySelect');
+            const size = document.getElementById('playerSizeSelect');
+            const theme = document.getElementById('themeSelect');
+            
+            if (diff) settings.difficulty = diff.value;
+            if (size) settings.playerSize = size.value;
+            if (theme) settings.theme = theme.value;
+            
+            localStorage.setItem('survivalGameSettings', JSON.stringify(settings));
+            
+            const sizeMap = { small: 15, medium: 20, large: 25 };
+            player.radius = sizeMap[settings.playerSize] || 20;
+        } catch (e) {}
+    }
+    
+    function loadHighScores() {
+        try {
+            const saved = localStorage.getItem('survivalGameHighScores');
+            if (saved) highScores = JSON.parse(saved);
+            
+            const savedName = localStorage.getItem('survivalGamePlayerName');
+            if (savedName) {
+                playerName = savedName;
+                const nameInput = document.getElementById('playerNameInput');
+                if (nameInput) nameInput.value = playerName;
+            }
+        } catch (e) {}
+    }
+    
+    function saveHighScore() {
+        try {
+            highScores.push({
+                name: playerName,
+                score: score,
+                time: Math.floor(gameTime),
+                difficulty: settings.difficulty,
+                chapter: currentChapter,
+                weapon: WEAPONS[currentWeapon].name,
+                date: new Date().toLocaleDateString()
+            });
+            highScores.sort((a, b) => b.score - a.score);
+            highScores = highScores.slice(0, 10);
+            localStorage.setItem('survivalGameHighScores', JSON.stringify(highScores));
+        } catch (e) {}
+    }
+    
+    function displayHighScores() {
+        const scoresList = document.getElementById('scoresList');
+        if (!scoresList) return;
         
-        // Spawn from random edge
-        const side = Math.floor(Math.random() * 4);
-        switch(side) {
-            case 0: // top
-                this.x = Math.random() * canvas.width;
-                this.y = -this.height;
-                break;
-            case 1: // right
-                this.x = canvas.width + this.width;
-                this.y = Math.random() * canvas.height;
-                break;
-            case 2: // bottom
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + this.height;
-                break;
-            case 3: // left
-                this.x = -this.width;
-                this.y = Math.random() * canvas.height;
-                break;
+        if (highScores.length === 0) {
+            scoresList.innerHTML = '<p class="no-scores">No scores yet. Play the game to set a record!</p>';
+            return;
         }
         
-        // Calculate direction towards player
-        const dx = player.x - this.x;
-        const dy = player.y - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        let html = '';
+        highScores.forEach((entry, index) => {
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '#' + (index + 1);
+            
+            html += '<div class="score-entry">' +
+                '<span class="score-rank">' + medal + '</span>' +
+                '<span class="score-name">' + entry.name + '</span>' +
+                '<span class="score-value">' + entry.score + '</span>' +
+                '<span class="score-time">' + entry.time + 's</span>' +
+                '<span class="score-weapon">' + (entry.weapon || 'Bat') + '</span>' +
+                '<span class="score-chapter">Ch.' + (entry.chapter || 1) + '</span>' +
+                '<span class="score-difficulty">' + entry.difficulty + '</span>' +
+                '<button class="delete-btn" data-index="' + index + '">🗑️</button>' +
+            '</div>';
+        });
         
-        // Get difficulty multiplier
-        const diffMap = {
-            easy: { damageMult: 0.7, speedMult: 0.8 },
-            normal: { damageMult: 1, speedMult: 1 },
-            hard: { damageMult: 1.5, speedMult: 1.3 }
-        };
-        const diff = diffMap[settings.difficulty];
+        scoresList.innerHTML = html;
         
-        // Speed increases with game time
-        const speedMultiplier = (1 + (gameTime / 60) * 0.5) * diff.speedMult;
-        this.speed = (100 + Math.random() * 100) * speedMultiplier;
-        
-        this.vx = (dx / distance) * this.speed;
-        this.vy = (dy / distance) * this.speed;
-        
-        this.damage = (10 + Math.floor(Math.random() * 10)) * diff.damageMult;
-        // Use theme-appropriate colors
-        const hueRanges = {
-            neon: [0, 60],      // Red-orange
-            dark: [0, 30],      // Dark reds
-            retro: [90, 140]    // Green tones
-        };
-        const range = hueRanges[settings.theme] || hueRanges.neon;
-        const hue = Math.random() * (range[1] - range[0]) + range[0];
-        this.color = `hsl(${hue}, 100%, 50%)`;
+        scoresList.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const idx = parseInt(this.dataset.index);
+                if (confirm('Delete this score?')) {
+                    highScores.splice(idx, 1);
+                    try {
+                        localStorage.setItem('survivalGameHighScores', JSON.stringify(highScores));
+                    } catch (e) {}
+                    displayHighScores();
+                }
+            });
+        });
     }
     
-    update(deltaTime) {
-        this.x += this.vx * deltaTime;
-        this.y += this.vy * deltaTime;
+    // ========================================
+    // SHOP FUNCTIONS
+    // ========================================
+    
+    function updateShopUI() {
+        try {
+            const el = id => document.getElementById(id);
+            
+            if (el('shopCurrency')) el('shopCurrency').textContent = 'Score: ' + Math.floor(score);
+            
+            // Weapon shop
+            const weaponInfo = WEAPONS[currentWeapon];
+            const weaponOrder = ['bat', 'knife', 'pistol', 'rifle', 'minigun'];
+            const currentIdx = weaponOrder.indexOf(currentWeapon);
+            const nextWeapon = weaponOrder[currentIdx + 1];
+            
+            if (el('weaponLevel')) el('weaponLevel').textContent = 'Level ' + (currentIdx + 1) + '/5';
+            if (el('weaponDesc')) el('weaponDesc').textContent = weaponInfo.icon + ' ' + weaponInfo.name + ' - ' + weaponInfo.description;
+            if (el('weaponStats')) el('weaponStats').textContent = 'DMG: ' + weaponInfo.damage + ' | Range: ' + weaponInfo.range + ' | Speed: ' + weaponInfo.attackSpeed;
+            
+            if (el('weaponNextStat')) {
+                if (!nextWeapon) {
+                    el('weaponNextStat').textContent = 'MAX LEVEL - Minigun is the ultimate weapon!';
+                } else {
+                    const nextInfo = WEAPONS[nextWeapon];
+                    el('weaponNextStat').textContent = 'Next: ' + nextInfo.icon + ' ' + nextInfo.name + ' - DMG: ' + nextInfo.damage;
+                }
+            }
+            
+            if (el('weaponUpgradeBtn')) {
+                const btn = el('weaponUpgradeBtn');
+                if (!nextWeapon) {
+                    btn.textContent = 'MAX LEVEL';
+                    btn.disabled = true;
+                } else {
+                    const nextInfo = WEAPONS[nextWeapon];
+                    btn.textContent = 'Upgrade to ' + nextInfo.name + ' - ' + nextInfo.price + ' pts';
+                    btn.disabled = score < nextInfo.price;
+                }
+            }
+            
+            // Speed shop
+            if (el('speedLevel')) el('speedLevel').textContent = 'Level ' + shopUpgrades.speedLevel + '/5';
+            
+            if (el('speedStat')) {
+                el('speedStat').textContent = shopUpgrades.speedLevel === 0 
+                    ? 'Current: Base speed (300)' 
+                    : 'Current: ' + (300 + shopUpgrades.speedLevel * speedBoostPerLevel) + ' speed';
+            }
+            
+            if (el('speedNextStat')) {
+                el('speedNextStat').textContent = shopUpgrades.speedLevel >= 5 
+                    ? 'MAX LEVEL' 
+                    : 'Next: ' + (300 + (shopUpgrades.speedLevel + 1) * speedBoostPerLevel) + ' speed (+' + speedBoostPerLevel + ')';
+            }
+            
+            if (el('speedBuyBtn')) {
+                const btn = el('speedBuyBtn');
+                if (shopUpgrades.speedLevel >= 5) {
+                    btn.textContent = 'MAX LEVEL';
+                    btn.disabled = true;
+                } else {
+                    const price = speedPrices[shopUpgrades.speedLevel];
+                    btn.textContent = 'Buy - ' + price + ' pts';
+                    btn.disabled = score < price;
+                }
+            }
+            
+            // Heal shop
+            if (el('healLevel')) el('healLevel').textContent = 'Level ' + shopUpgrades.healLevel + '/3';
+            
+            if (el('healStat')) {
+                if (shopUpgrades.healLevel === 0) {
+                    el('healStat').textContent = 'Current: No auto-heal';
+                } else {
+                    el('healStat').textContent = 'Current: +' + healAmounts[shopUpgrades.healLevel - 1] + ' HP/' + healIntervals[shopUpgrades.healLevel - 1] + 's';
+                }
+            }
+            
+            if (el('healNextStat')) {
+                if (shopUpgrades.healLevel >= 3) {
+                    el('healNextStat').textContent = 'MAX LEVEL';
+                } else {
+                    const nextAmount = healAmounts[shopUpgrades.healLevel];
+                    const nextInterval = healIntervals[shopUpgrades.healLevel];
+                    el('healNextStat').textContent = 'Next: +' + nextAmount + ' HP/' + nextInterval + 's';
+                }
+            }
+            
+            if (el('healBuyBtn')) {
+                const btn = el('healBuyBtn');
+                if (shopUpgrades.healLevel >= 3) {
+                    btn.textContent = 'MAX LEVEL';
+                    btn.disabled = true;
+                } else {
+                    const price = healPrices[shopUpgrades.healLevel];
+                    btn.textContent = 'Buy - ' + price + ' pts';
+                    btn.disabled = score < price;
+                }
+            }
+        } catch (e) {
+            console.error('Shop UI error:', e);
+        }
     }
     
-    draw() {
-        ctx.fillStyle = this.color;
+    function upgradeWeapon() {
+        const weaponOrder = ['bat', 'knife', 'pistol', 'rifle', 'minigun'];
+        const currentIdx = weaponOrder.indexOf(currentWeapon);
+
+        if (currentIdx >= weaponOrder.length - 1) return;
+
+        const nextWeapon = weaponOrder[currentIdx + 1];
+        const nextInfo = WEAPONS[nextWeapon];
+
+        if (score < nextInfo.price) {
+            alert('Not enough score! Need ' + nextInfo.price + ', have ' + Math.floor(score));
+            return;
+        }
+
+        score -= nextInfo.price;
+        currentWeapon = nextWeapon;
+        weaponLevel = currentIdx + 2;
+
+        console.log('🔫 Upgraded to ' + nextInfo.name + '! Score: ' + Math.floor(score));
+        updateShopUI();
+        updateUI();
+        playSound('buy');
+        alert('🎉 Upgraded to ' + nextInfo.name + '!');
+    }
+    
+    function buySpeed() {
+        if (shopUpgrades.speedLevel >= 5) return;
+        const price = speedPrices[shopUpgrades.speedLevel];
+        if (score < price) {
+            alert('Not enough score! Need ' + price + ', have ' + Math.floor(score));
+            return;
+        }
+        score -= price;
+        shopUpgrades.speedLevel++;
+        player.speed = 300 + shopUpgrades.speedLevel * speedBoostPerLevel;
+        console.log('💨 Speed upgraded! Level: ' + shopUpgrades.speedLevel + ', Score: ' + Math.floor(score));
+        updateShopUI();
+        updateUI();
+        playSound('buy');
+    }
+    
+    function buyHeal() {
+        if (shopUpgrades.healLevel >= 3) return;
+        const price = healPrices[shopUpgrades.healLevel];
+        if (score < price) {
+            alert('Not enough score! Need ' + price + ', have ' + Math.floor(score));
+            return;
+        }
+        score -= price;
+        shopUpgrades.healLevel++;
+        console.log('❤️ Heal upgraded! Level: ' + shopUpgrades.healLevel + ', Score: ' + Math.floor(score));
+        updateShopUI();
+        updateUI();
+        playSound('buy');
+        alert('❤️ Heal upgraded to Level ' + shopUpgrades.healLevel + '!');
+    }
+    
+    // ========================================
+    // CHAPTER FUNCTIONS
+    // ========================================
+    
+    function updateChapterSelect() {
+        const chapterSelect = document.getElementById('chapterSelect');
+        if (!chapterSelect) return;
+        
+        chapterSelect.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = 'Chapter ' + i;
+            option.disabled = i > 1 && !isChapterUnlocked(i - 1);
+            chapterSelect.appendChild(option);
+        }
+        chapterSelect.value = currentChapter;
+    }
+    
+    function isChapterUnlocked(chapterNum) {
+        if (chapterNum === 1) return true;
+        try {
+            const saved = localStorage.getItem('survivalGameUnlockedChapters');
+            if (saved) {
+                const unlocked = JSON.parse(saved);
+                return unlocked.includes(chapterNum);
+            }
+        } catch (e) {}
+        return false;
+    }
+    
+    function unlockChapter(chapterNum) {
+        try {
+            let unlocked = [];
+            const saved = localStorage.getItem('survivalGameUnlockedChapters');
+            if (saved) unlocked = JSON.parse(saved);
+            
+            if (!unlocked.includes(chapterNum)) {
+                unlocked.push(chapterNum);
+                localStorage.setItem('survivalGameUnlockedChapters', JSON.stringify(unlocked));
+            }
+        } catch (e) {}
+    }
+    
+    function showMainMenuChapters() {
+        showScreen('chapterListScreen');
+        renderChapterList();
+    }
+    
+    function renderChapterList() {
+        const titleEl = document.getElementById('chapterListTitle');
+        const contentEl = document.getElementById('chapterListContent');
+        
+        if (!titleEl || !contentEl) return;
+        
+        titleEl.textContent = '📚 Chapter List';
+        
+        let completedCount = 0;
+        try {
+            const saved = localStorage.getItem('survivalGameUnlockedChapters');
+            if (saved) completedCount = JSON.parse(saved).length;
+        } catch (e) {}
+        
+        const totalCount = 5;
+        const progressPercent = Math.round((completedCount / totalCount) * 100);
+        
+        let html = '<div class="completion-board">' +
+            '<div class="completion-title">' + completedCount + '/' + totalCount + ' Chapters Completed</div>' +
+            '<div class="completion-bar-container">' +
+                '<div class="completion-bar" style="width: ' + progressPercent + '%">' + progressPercent + '%</div>' +
+            '</div>' +
+            '<div class="completion-stars">';
+        
+        for (let i = 0; i < 5; i++) {
+            html += '<span class="star ' + (i < completedCount ? '' : 'empty') + '">' + 
+                    (i < completedCount ? '⭐' : '☆') + '</span>';
+        }
+        
+        html += '</div></div>';
+        
+        for (let i = 1; i <= 5; i++) {
+            const unlocked = i === 1 || isChapterUnlocked(i);
+            const completed = isChapterUnlocked(i + 1) || (i === 5 && isChapterUnlocked(5));
+            const isCurrent = i === currentChapter && !completed;
+            
+            let status = '🔒';
+            let itemClass = 'locked';
+            let timeText = '';
+            
+            if (completed) {
+                status = '✅';
+                itemClass = 'completed';
+                timeText = 'Survive ' + chapterTimes[i] + 's ✓';
+            } else if (unlocked) {
+                status = '▶️';
+                itemClass = 'current';
+                timeText = 'Survive ' + chapterTimes[i] + 's';
+            } else {
+                timeText = 'Complete Ch.' + (i - 1) + ' to unlock';
+            }
+            
+            html += '<div class="chapter-item ' + itemClass + '">' +
+                '<span class="chapter-status">' + status + '</span>' +
+                '<span class="chapter-name">Chapter ' + i + '</span>' +
+                '<span class="chapter-time">' + timeText + '</span>' +
+            '</div>';
+        }
+        
+        contentEl.innerHTML = html;
+    }
+    
+    function showChapterCompleteScreen() {
+        showScreen('chapterCompleteScreen');
+        
+        const titleEl = document.getElementById('chapterCompleteTitle');
+        const textEl = document.getElementById('chapterCompleteText');
+        const nextTextEl = document.getElementById('chapterNextText');
+        const continueBtn = document.getElementById('chapterContinueBtn');
+        
+        if (titleEl) titleEl.textContent = '🎉 Chapter ' + currentChapter + ' Complete!';
+        if (textEl) textEl.textContent = 'Congratulations! You survived!';
+        
+        if (currentChapter < 5) {
+            unlockChapter(currentChapter + 1);
+            if (nextTextEl) nextTextEl.textContent = 'Continue to Chapter ' + (currentChapter + 1) + '?';
+            if (continueBtn) continueBtn.style.display = 'block';
+        } else {
+            if (nextTextEl) nextTextEl.textContent = '🏆 You completed all chapters!';
+            if (continueBtn) continueBtn.style.display = 'none';
+        }
+    }
+    
+    function continueToNextChapter() {
+        if (currentChapter < 5) {
+            currentChapter++;
+            startGame();
+        }
+    }
+    
+    function showChapterList() {
+        showScreen('chapterListScreen');
+        renderChapterList();
+    }
+    
+    // ========================================
+    // BOSS FUNCTIONS
+    // ========================================
+    
+    function spawnBoss() {
+        if (bossSpawned) return;
+
+        const bossData = bosses[currentChapter];
+        if (!bossData) return;
+        
+        currentBoss = {
+            x: canvas.width / 2,
+            y: -100,
+            name: bossData.name,
+            color: bossData.color,
+            radius: bossData.radius,
+            health: bossData.health,
+            maxHealth: bossData.health,
+            speed: bossData.speed,
+            attackTimer: 0,
+            entering: true
+        };
+        
+        bossSpawned = true;
+        bossWarningShown = false;
+        bossDefeated = false;
+        bossWarningTime = 3;
+        
+        playSound('boss');
+    }
+    
+    function updateBoss(dt) {
+        if (!currentBoss) return;
+        
+        const boss = currentBoss;
+        
+        if (!bossWarningShown) {
+            bossWarningTime -= dt;
+            if (bossWarningTime <= 0) {
+                bossWarningShown = true;
+            }
+            return;
+        }
+        
+        if (boss.entering) {
+            boss.y += 100 * dt;
+            if (boss.y >= 150) {
+                boss.entering = false;
+            }
+            return;
+        }
+        
+        const dx = player.x - boss.x;
+        const dy = player.y - boss.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > 0) {
+            boss.x += (dx / dist) * boss.speed * dt;
+            boss.y += (dy / dist) * boss.speed * dt;
+        }
+        
+        boss.x = Math.max(boss.radius, Math.min(canvas.width - boss.radius, boss.x));
+        boss.y = Math.max(boss.radius, Math.min(canvas.height - boss.radius, boss.y));
+        
+        boss.attackTimer -= dt;
+        if (boss.attackTimer <= 0) {
+            for (let i = 0; i < 3; i++) {
+                const angle = (Math.PI * 2 / 3) * i;
+                enemies.push({
+                    x: boss.x + Math.cos(angle) * 60,
+                    y: boss.y + Math.sin(angle) * 60,
+                    radius: 10,
+                    speed: 150,
+                    color: boss.color
+                });
+            }
+            boss.attackTimer = Math.max(1, 2 - (currentChapter * 0.2));
+        }
+    }
+    
+    function damageBoss(damage) {
+        if (!currentBoss) return;
+        
+        currentBoss.health -= damage;
+        
+        if (currentBoss.health <= 0) {
+            bossDefeated = true;
+            score += 100 * currentChapter;
+            currentBoss = null;
+            bossSpawned = false;
+        }
+    }
+    
+    function renderBoss() {
+        if (!currentBoss || !bossWarningShown) return;
+
+        const boss = currentBoss;
+
+        ctx.fillStyle = boss.color;
         ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+        ctx.arc(boss.x, boss.y, boss.radius, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(boss.x - boss.radius * 0.3, boss.y - boss.radius * 0.2, boss.radius * 0.2, 0, Math.PI * 2);
+        ctx.arc(boss.x + boss.radius * 0.3, boss.y - boss.radius * 0.2, boss.radius * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath();
+        ctx.arc(boss.x - boss.radius * 0.3, boss.y - boss.radius * 0.2, boss.radius * 0.1, 0, Math.PI * 2);
+        ctx.arc(boss.x + boss.radius * 0.3, boss.y - boss.radius * 0.2, boss.radius * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(boss.x, boss.y + boss.radius * 0.2, boss.radius * 0.4, 0, Math.PI);
+        ctx.stroke();
+
+        // Boss health bar with numbers
+        const barWidth = 150;
+        const barHeight = 15;
+        const healthPercent = boss.health / boss.maxHealth;
+
+        // Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(boss.x - barWidth / 2 - 2, boss.y - boss.radius - 32, barWidth + 4, barHeight + 4);
         
-        // Glow effect
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = this.color;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-    }
-    
-    isOffScreen() {
-        return this.x < -100 || this.x > canvas.width + 100 || 
-               this.y < -100 || this.y > canvas.height + 100;
-    }
-}
+        // Health bar
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(boss.x - barWidth / 2, boss.y - boss.radius - 30, barWidth, barHeight);
 
-// Particle class
-class Particle {
-    constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.vx = (Math.random() - 0.5) * 200;
-        this.vy = (Math.random() - 0.5) * 200;
-        this.size = Math.random() * 5 + 2;
-        this.color = color;
-        this.life = 1;
-        this.decay = Math.random() * 0.02 + 0.02;
-    }
-    
-    update(deltaTime) {
-        this.x += this.vx * deltaTime;
-        this.y += this.vy * deltaTime;
-        this.life -= this.decay;
-    }
-    
-    draw() {
-        ctx.globalAlpha = this.life;
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-        ctx.globalAlpha = 1;
-    }
-}
+        ctx.fillStyle = healthPercent > 0.5 ? '#44ff44' : healthPercent > 0.25 ? '#ffaa00' : '#ff4444';
+        ctx.fillRect(boss.x - barWidth / 2, boss.y - boss.radius - 30, barWidth * healthPercent, barHeight);
+        
+        // Border
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(boss.x - barWidth / 2, boss.y - boss.radius - 30, barWidth, barHeight);
 
-// Update player
-function updatePlayer(deltaTime) {
-    let dx = 0;
-    let dy = 0;
-    
-    if (keys['w'] || keys['arrowup']) dy = -1;
-    if (keys['s'] || keys['arrowdown']) dy = 1;
-    if (keys['a'] || keys['arrowleft']) dx = -1;
-    if (keys['d'] || keys['arrowright']) dx = 1;
-    
-    // Normalize diagonal movement
-    if (dx !== 0 && dy !== 0) {
-        dx *= 0.707;
-        dy *= 0.707;
+        // HP text
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('❤️ ' + Math.ceil(boss.health) + '/' + boss.maxHealth, boss.x, boss.y - boss.radius - 19);
+
+        // Boss name
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = boss.color;
+        ctx.fillText(boss.name, boss.x, boss.y - boss.radius - 40);
     }
     
-    player.x += dx * player.speed * deltaTime;
-    player.y += dy * player.speed * deltaTime;
+    function renderBossWarning() {
+        if (!currentBoss || bossWarningShown) return;
+        
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#ff0000';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚠️ BOSS INCOMING! ⚠️', canvas.width / 2, canvas.height / 2);
+        
+        ctx.font = '24px Arial';
+        ctx.fillStyle = '#fff';
+        ctx.fillText('Prepare yourself!', canvas.width / 2, canvas.height / 2 + 40);
+    }
     
-    // Keep player in bounds
-    player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-    player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+    // ========================================
+    // GAME FUNCTIONS
+    // ========================================
     
-    // Update invulnerability
-    if (player.invulnerable) {
-        player.invulnerableTime -= deltaTime;
-        if (player.invulnerableTime <= 0) {
-            player.invulnerable = false;
+    function resetGame() {
+        player.x = canvas.width / 2;
+        player.y = canvas.height / 2;
+        player.health = 100;
+        player.maxHealth = 100;
+        player.invulnerable = false;
+        player.invulnerableTime = 0;
+        player.facing = { x: 0, y: 1 };
+
+        // Reset shop upgrades
+        shopUpgrades = {
+            speedLevel: 0,
+            healLevel: 0
+        };
+        
+        // Reset player stats based on upgrades (which are now 0)
+        player.speed = 300;
+
+        score = 0;
+        gameTime = 0;
+        chapterTimeStart = 0;
+        spawnTimer = 0;
+        healTimer = 0;
+        enemies = [];
+        bullets = [];
+        attackCooldown = 0;
+
+        // Clear all keys to prevent stuck movement
+        for (let key in keys) {
+            keys[key] = false;
         }
+
+        currentBoss = null;
+        bossSpawned = false;
+        bossWarningShown = false;
+        bossDefeated = false;
     }
-}
-
-// Draw player
-function drawPlayer() {
-    // Flicker when invulnerable
-    if (player.invulnerable && Math.floor(Date.now() / 100) % 2 === 0) {
-        return;
-    }
-
-    ctx.fillStyle = playerColor;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-
-    // Glow effect
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = playerColor;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    ctx.shadowBlur = 0;
-
-    // Inner detail
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(player.x + 10, player.y + 10, player.width - 20, player.height - 20);
-}
-
-// Check collision between two rectangles
-function checkCollision(rect1, rect2) {
-    return rect1.x < rect2.x + rect2.width &&
-           rect1.x + rect1.width > rect2.x &&
-           rect1.y < rect2.y + rect2.height &&
-           rect1.y + rect1.height > rect2.y;
-}
-
-// Spawn enemies
-function spawnEnemy(deltaTime) {
-    enemySpawnTimer -= deltaTime * 1000;
     
-    if (enemySpawnTimer <= 0) {
-        enemies.push(new Enemy());
-        
-        // Decrease spawn rate over time (minimum 400ms)
-        const spawnRateDecrease = (gameTime / 60) * 200;
-        enemySpawnTimer = Math.max(400, enemySpawnRate - spawnRateDecrease);
-    }
-}
-
-// Create explosion effect
-function createExplosion(x, y, color, count = 10) {
-    for (let i = 0; i < count; i++) {
-        particles.push(new Particle(x, y, color));
-    }
-}
-
-// Update UI
-function updateUI() {
-    const healthFill = document.getElementById('healthFill');
-    const healthText = document.getElementById('healthText');
-    const scoreEl = document.getElementById('score');
-    const timeEl = document.getElementById('time');
-
-    const healthPercent = (player.health / player.maxHealth) * 100;
-    healthFill.style.width = healthPercent + '%';
-    healthText.textContent = `${t('health')}: ${Math.ceil(player.health)}`;
-
-    // Change health bar color based on health percentage
-    if (healthPercent > 60) {
-        healthFill.style.background = '#44ff44'; // Green
-    } else if (healthPercent > 30) {
-        healthFill.style.background = '#ffaa00'; // Orange
-    } else {
-        healthFill.style.background = '#ff4444'; // Red
-    }
-
-    scoreEl.textContent = `${t('score')}: ${score}`;
-    timeEl.textContent = `${t('time')}: ${Math.floor(gameTime)}s`;
-}
-
-// Game over
-function gameOver() {
-    gameRunning = false;
-    stopAllMusic();
-    playGameOverSound();
-
-    // Check and save high score
-    const wasNewHighScore = isNewHighScore(score);
-    if (wasNewHighScore) {
-        saveHighScore(score, Math.floor(gameTime));
-        document.getElementById('newHighScore').classList.remove('hidden');
-        playNewHighScoreSound();
-    } else {
-        document.getElementById('newHighScore').classList.add('hidden');
-    }
-
-    document.getElementById('finalScore').textContent = `${t('score')}: ${score}`;
-    document.getElementById('finalTime').textContent = `${t('time')}: ${Math.floor(gameTime)}s`;
-    document.getElementById('gameOverScreen').classList.remove('hidden');
-}
-
-// Toggle pause
-function togglePause() {
-    if (!gameRunning) return;
-    
-    gamePaused = !gamePaused;
-    
-    if (gamePaused) {
-        document.getElementById('pauseScreen').classList.remove('hidden');
-    } else {
-        document.getElementById('pauseScreen').classList.add('hidden');
+    function startGame() {
+        resetGame();
+        gameRunning = true;
+        gamePaused = false;
         lastTime = performance.now();
+        showScreen('none');
+        updateUI();
+        updateChapterSelect();
         requestAnimationFrame(gameLoop);
     }
-}
-
-// Show screen helper
-function showScreen(screenId) {
-    const screens = ['mainMenu', 'settingsScreen', 'howToPlayScreen', 'highScoresScreen', 'startScreen', 'pauseScreen', 'gameOverScreen'];
-    screens.forEach(id => {
-        const el = document.getElementById(id);
-        if (screenId === 'none') {
-            el.classList.add('hidden');
-        } else if (id === screenId) {
-            el.classList.remove('hidden');
+    
+    function restartGame() {
+        startGame();
+    }
+    
+    function togglePause() {
+        if (!gameRunning) return;
+        gamePaused = !gamePaused;
+        if (!gamePaused) {
+            lastTime = performance.now();
+            showScreen('none');
+            requestAnimationFrame(gameLoop);
         } else {
-            el.classList.add('hidden');
+            showScreen('pauseScreen');
+        }
+    }
+    
+    function gameOver() {
+        gameRunning = false;
+        saveHighScore();
+        playSound('gameover');
+        showScreen('gameOverScreen');
+        document.getElementById('finalScore').textContent = 'Score: ' + Math.floor(score);
+        document.getElementById('finalTime').textContent = 'Time: ' + Math.floor(gameTime) + 's | Chapter: ' + currentChapter;
+    }
+    
+    function completeChapter() {
+        if (chapterCompleted) return;
+        chapterCompleted = true;
+        
+        gameRunning = false;
+        unlockChapter(currentChapter);
+        showChapterCompleteScreen();
+    }
+    
+    function updateUI() {
+        try {
+            const el = id => document.getElementById(id);
+            
+            const healthPct = (player.health / player.maxHealth * 100);
+            if (el('healthFill')) {
+                el('healthFill').style.width = healthPct + '%';
+                el('healthFill').style.background = healthPct > 60 ? '#44ff44' : healthPct > 30 ? '#ffaa00' : '#ff4444';
+            }
+            if (el('healthText')) el('healthText').textContent = 'Health: ' + Math.ceil(player.health);
+            if (el('score')) el('score').textContent = 'Score: ' + Math.floor(score);
+            if (el('time')) el('time').textContent = 'Time: ' + Math.floor(gameTime) + 's';
+            if (el('chapter')) el('chapter').textContent = 'Chapter: ' + currentChapter;
+            
+            const weaponInfo = WEAPONS[currentWeapon];
+            if (el('weaponDisplay')) {
+                el('weaponDisplay').textContent = weaponInfo.icon + ' Lv.' + weaponLevel;
+            }
+            if (el('speedDisplay')) {
+                const bonus = shopUpgrades.speedLevel * speedBoostPerLevel;
+                el('speedDisplay').textContent = '💨 +' + bonus;
+            }
+            if (el('healDisplay')) {
+                if (shopUpgrades.healLevel === 0) {
+                    el('healDisplay').textContent = '❤️ None';
+                } else {
+                    const amount = healAmounts[shopUpgrades.healLevel - 1];
+                    const interval = healIntervals[shopUpgrades.healLevel - 1];
+                    el('healDisplay').textContent = '❤️ +' + amount + '/' + interval + 's';
+                }
+            }
+        } catch (e) {
+            console.error('UI update error:', e);
+        }
+    }
+    
+    // ========================================
+    // GAME LOOP
+    // ========================================
+    
+    function gameLoop(timestamp) {
+        if (!gameRunning) return;
+        
+        if (gamePaused) {
+            requestAnimationFrame(gameLoop);
+            return;
+        }
+        
+        try {
+            const deltaTime = Math.min((timestamp - lastTime) / 1000, 0.1);
+            lastTime = timestamp;
+            
+            gameTime += deltaTime;
+            chapterTimeStart += deltaTime;
+
+            // Score increases over time (5 points per 2 seconds = 2.5 points per second)
+            score += deltaTime * 2.5;
+            score = Math.max(0, score); // Ensure score never goes negative
+            
+            // Auto-heal logic
+            if (shopUpgrades.healLevel > 0 && player.health < player.maxHealth) {
+                healTimer += deltaTime;
+                const healInterval = healIntervals[shopUpgrades.healLevel - 1];
+                const healAmount = healAmounts[shopUpgrades.healLevel - 1];
+                
+                if (healTimer >= healInterval) {
+                    healTimer = 0;
+                    player.health = Math.min(player.maxHealth, player.health + healAmount);
+                    console.log('❤️ Healed +' + healAmount + ' HP. Current:', Math.ceil(player.health));
+                }
+            }
+            
+            const chapterTime = chapterTimes[currentChapter] || 60;
+            if (chapterTimeStart >= chapterTime && !bossSpawned) {
+                spawnBoss();
+            }
+            
+            updatePlayer(deltaTime);
+            updateBullets(deltaTime);
+            updateBoss(deltaTime);
+            spawnEnemies(deltaTime);
+            updateEnemies(deltaTime);
+            checkCollisions();
+            attack();
+            render();
+            updateUI();
+            
+            requestAnimationFrame(gameLoop);
+        } catch (e) {
+            console.error('Game loop error:', e);
+            gameRunning = false;
+            alert('Game error: ' + e.message);
+        }
+    }
+    
+    function updatePlayer(dt) {
+        const speed = player.speed * dt;
+        let moved = false;
+        
+        if (keys['KeyW'] || keys['ArrowUp']) { player.y -= speed; player.facing = { x: 0, y: -1 }; moved = true; }
+        if (keys['KeyS'] || keys['ArrowDown']) { player.y += speed; player.facing = { x: 0, y: 1 }; moved = true; }
+        if (keys['KeyA'] || keys['ArrowLeft']) { player.x -= speed; player.facing = { x: -1, y: 0 }; moved = true; }
+        if (keys['KeyD'] || keys['ArrowRight']) { player.x += speed; player.facing = { x: 1, y: 0 }; moved = true; }
+        
+        player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
+        player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
+        
+        if (player.invulnerable) {
+            player.invulnerableTime -= dt;
+            if (player.invulnerableTime <= 0) {
+                player.invulnerable = false;
+            }
+        }
+        
+        attackCooldown -= dt;
+    }
+    
+    function attack() {
+        if (attackCooldown > 0) return;
+        
+        const weapon = WEAPONS[currentWeapon];
+        
+        // Ranged weapons shoot bullets
+        if (currentWeapon === 'pistol' || currentWeapon === 'rifle' || currentWeapon === 'minigun') {
+            bullets.push({
+                x: player.x + player.facing.x * (player.radius + 10),
+                y: player.y + player.facing.y * (player.radius + 10),
+                vx: player.facing.x * 400,
+                vy: player.facing.y * 400,
+                damage: weapon.damage,
+                radius: 4,
+                color: weapon.color,
+                life: weapon.range / 400
+            });
+            
+            playSound('shoot');
+            attackCooldown = 1 / weapon.attackSpeed;
+        }
+    }
+    
+    function updateBullets(dt) {
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            const bullet = bullets[i];
+            bullet.x += bullet.vx * dt;
+            bullet.y += bullet.vy * dt;
+            bullet.life -= dt;
+            
+            if (bullet.life <= 0 || bullet.x < 0 || bullet.x > canvas.width || 
+                bullet.y < 0 || bullet.y > canvas.height) {
+                bullets.splice(i, 1);
+            }
+        }
+    }
+    
+    function spawnEnemies(dt) {
+        spawnTimer += dt;
+
+        const spawnRate = settings.difficulty === 'easy' ? 0.5 :
+                          settings.difficulty === 'hard' ? 1.0 : 0.7;
+        const spawnInterval = 1 / spawnRate;
+
+        if (spawnTimer >= spawnInterval) {
+            spawnTimer = 0;
+
+            const side = Math.floor(Math.random() * 4);
+            let x, y;
+
+            switch(side) {
+                case 0: x = Math.random() * canvas.width; y = -30; break;
+                case 1: x = canvas.width + 30; y = Math.random() * canvas.height; break;
+                case 2: x = Math.random() * canvas.width; y = canvas.height + 30; break;
+                case 3: x = -30; y = Math.random() * canvas.height; break;
+            }
+
+            const speedMult = settings.difficulty === 'easy' ? 0.8 :
+                              settings.difficulty === 'hard' ? 1.3 : 1;
+
+            const enemyHealth = 15 + (currentChapter * 5);
+
+            enemies.push({
+                x: x,
+                y: y,
+                radius: 15,
+                speed: (80 + gameTime * 0.8) * speedMult,
+                color: '#ff4444',
+                health: enemyHealth,
+                maxHealth: enemyHealth
+            });
+        }
+    }
+    
+    function updateEnemies(dt) {
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            const dx = player.x - enemy.x;
+            const dy = player.y - enemy.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+                enemy.x += (dx / dist) * enemy.speed * dt;
+                enemy.y += (dy / dist) * enemy.speed * dt;
+            }
+            
+            if (enemy.x < -100 || enemy.x > canvas.width + 100 || 
+                enemy.y < -100 || enemy.y > canvas.height + 100) {
+                enemies.splice(i, 1);
+            }
+        }
+    }
+    
+    function checkCollisions() {
+        // Player vs enemies
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            const dx = player.x - enemy.x;
+            const dy = player.y - enemy.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < player.radius + enemy.radius) {
+                if (currentWeapon === 'bat' || currentWeapon === 'knife') {
+                    // Melee weapon - attack enemy on contact
+                    if (attackCooldown <= 0) {
+                        const weapon = WEAPONS[currentWeapon];
+                        enemy.health -= weapon.damage;
+                        attackCooldown = 1 / weapon.attackSpeed;
+                        playSound('hit');
+
+                        // Did we kill the enemy?
+                        if (enemy.health <= 0) {
+                            const scoreGain = 10 + currentChapter * 5;
+                            score += scoreGain;
+                            console.log('💀 Enemy killed! Score: +', scoreGain, 'Total:', score);
+                            enemies.splice(i, 1);
+                            playSound('kill');
+                            continue; // Enemy dead, move to next enemy
+                        } else {
+                            // Enemy still alive - player takes reduced damage
+                            if (!player.invulnerable) {
+                                const dmgMult = settings.difficulty === 'easy' ? 0.7 :
+                                                settings.difficulty === 'hard' ? 1.5 : 1;
+                                player.health -= 5 * dmgMult; // Reduced damage for melee block
+                                player.invulnerable = true;
+                                player.invulnerableTime = 0.5;
+                                console.log('🛡️ Melee block! Player takes reduced damage');
+                            }
+                        }
+                    } else {
+                        // Attack on cooldown - player takes damage
+                        if (!player.invulnerable) {
+                            const dmgMult = settings.difficulty === 'easy' ? 0.7 :
+                                            settings.difficulty === 'hard' ? 1.5 : 1;
+                            player.health -= 10 * dmgMult;
+                            player.invulnerable = true;
+                            player.invulnerableTime = 1;
+                            enemies.splice(i, 1); // Remove enemy
+
+                            if (player.health <= 0) {
+                                gameOver();
+                                return;
+                            }
+                        }
+                    }
+                } else {
+                    // Ranged weapons (pistol, rifle, minigun) - no melee attack
+                    // Player takes damage and enemy is removed
+                    if (!player.invulnerable) {
+                        const dmgMult = settings.difficulty === 'easy' ? 0.7 :
+                                        settings.difficulty === 'hard' ? 1.5 : 1;
+                        player.health -= 10 * dmgMult;
+                        player.invulnerable = true;
+                        player.invulnerableTime = 1;
+                        enemies.splice(i, 1); // Remove enemy
+
+                        if (player.health <= 0) {
+                            gameOver();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Bullets vs enemies
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            const bullet = bullets[i];
+            
+            for (let j = enemies.length - 1; j >= 0; j--) {
+                const enemy = enemies[j];
+                const dx = bullet.x - enemy.x;
+                const dy = bullet.y - enemy.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < bullet.radius + enemy.radius) {
+                    enemy.health -= bullet.damage;
+                    bullets.splice(i, 1);
+                    
+                    if (enemy.health <= 0) {
+                        score += 10 + currentChapter * 5;
+                        enemies.splice(j, 1);
+                        playSound('kill');
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // Player vs boss
+        if (currentBoss && bossWarningShown && !currentBoss.entering) {
+            const dx = player.x - currentBoss.x;
+            const dy = player.y - currentBoss.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < player.radius + currentBoss.radius) {
+                // Melee vs boss - with cooldown check
+                if (currentWeapon === 'bat' || currentWeapon === 'knife') {
+                    if (attackCooldown <= 0) {
+                        const weapon = WEAPONS[currentWeapon];
+                        damageBoss(weapon.damage);
+                        attackCooldown = 1 / weapon.attackSpeed; // 2 seconds for melee
+                        playSound('hit');
+                    } else {
+                        // On cooldown - player takes damage
+                        if (!player.invulnerable) {
+                            player.health -= 20;
+                            player.invulnerable = true;
+                            player.invulnerableTime = 1;
+                            playSound('hit');
+
+                            if (player.health <= 0) {
+                                gameOver();
+                                return;
+                            }
+                        }
+                    }
+                } else if (!player.invulnerable) {
+                    // Ranged weapons - player takes damage from boss contact
+                    player.health -= 20;
+                    player.invulnerable = true;
+                    player.invulnerableTime = 1;
+                    playSound('hit');
+
+                    if (player.health <= 0) {
+                        gameOver();
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // Bullets vs boss
+        if (currentBoss && bossWarningShown && !currentBoss.entering) {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+                const dx = bullet.x - currentBoss.x;
+                const dy = bullet.y - currentBoss.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < bullet.radius + currentBoss.radius) {
+                    damageBoss(bullet.damage);
+                    bullets.splice(i, 1);
+                    
+                    if (currentBoss && currentBoss.health <= 0) {
+                        if (currentChapter < 5) {
+                            setTimeout(() => completeChapter(), 1000);
+                        } else {
+                            setTimeout(() => {
+                                gameRunning = false;
+                                alert('🏆 You defeated the Final Boss!');
+                                showScreen('gameOverScreen');
+                                document.getElementById('finalScore').textContent = 'Score: ' + Math.floor(score);
+                                document.getElementById('finalTime').textContent = 'Time: ' + Math.floor(gameTime) + 's | All Chapters Complete!';
+                            }, 1000);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    
+    function render() {
+        try {
+            ctx.fillStyle = '#0f0f23';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Player
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.fillStyle = player.invulnerable ? 'rgba(0, 255, 255, 0.5)' : player.color;
+            ctx.beginPath();
+            ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(-player.radius * 0.3, -player.radius * 0.2, player.radius * 0.15, 0, Math.PI * 2);
+            ctx.arc(player.radius * 0.3, -player.radius * 0.2, player.radius * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Smile
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, player.radius * 0.5, 0.2, Math.PI - 0.2);
+            ctx.stroke();
+
+            // Weapon rendering
+            const weapon = WEAPONS[currentWeapon];
+            const weaponX = player.facing.x * (player.radius + 10);
+            const weaponY = player.facing.y * (player.radius + 10);
+            
+            ctx.save();
+            ctx.translate(weaponX, weaponY);
+            
+            // Calculate weapon angle based on facing direction
+            const angle = Math.atan2(player.facing.y, player.facing.x);
+            ctx.rotate(angle);
+            
+            // Draw weapon based on type
+            if (currentWeapon === 'bat') {
+                // Baseball Bat - brown wooden bat
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-15, -3, 30, 6);
+                ctx.fillStyle = '#A0522D';
+                ctx.fillRect(-12, -2, 25, 4);
+                // Handle
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(-15, -2, 8, 4);
+                // Barrel
+                ctx.fillStyle = '#8B4513';
+                ctx.beginPath();
+                ctx.ellipse(12, 0, 8, 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (currentWeapon === 'knife') {
+                // Knife - silver blade with handle
+                ctx.fillStyle = '#C0C0C0';
+                ctx.beginPath();
+                ctx.moveTo(-12, -2);
+                ctx.lineTo(15, 0);
+                ctx.lineTo(-12, 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#808080';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                // Handle
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-18, -3, 8, 6);
+                // Blade shine
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.beginPath();
+                ctx.moveTo(-8, -1);
+                ctx.lineTo(10, 0);
+                ctx.lineTo(-8, 0);
+                ctx.closePath();
+                ctx.fill();
+            } else if (currentWeapon === 'pistol') {
+                // Pistol - black handgun
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(-8, -4, 20, 8);
+                // Barrel
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(12, -2, 10, 4);
+                // Handle
+                ctx.fillStyle = '#2a2a2a';
+                ctx.fillRect(-10, 4, 8, 8);
+                // Trigger guard
+                ctx.strokeStyle = '#1a1a1a';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(-2, 4, 4, 0, Math.PI);
+                ctx.stroke();
+                // Sight
+                ctx.fillStyle = '#000';
+                ctx.fillRect(20, -3, 2, 2);
+            } else if (currentWeapon === 'rifle') {
+                // Rifle - long gun with scope
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(-20, -3, 45, 6);
+                // Stock
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-25, -2, 10, 4);
+                // Barrel
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(25, -2, 15, 4);
+                // Scope
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, -8, 15, 4);
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(2, -7, 2, 2);
+                // Magazine
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(5, 3, 8, 5);
+            } else if (currentWeapon === 'minigun') {
+                // Minigun - multiple barrels
+                ctx.fillStyle = '#FF4500';
+                ctx.fillRect(-15, -5, 35, 10);
+                // Barrels (multiple)
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillStyle = '#cc3700';
+                    ctx.fillRect(20, -4 + i * 3, 15, 2);
+                }
+                // Motor housing
+                ctx.fillStyle = '#cc3700';
+                ctx.fillRect(-20, -3, 10, 6);
+                // Ammo belt
+                ctx.fillStyle = '#ffd700';
+                ctx.fillRect(-25, 5, 15, 3);
+                // Muzzle flash
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.6)';
+                ctx.beginPath();
+                ctx.arc(38, 0, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+            
+            ctx.restore();
+            
+            renderBossWarning();
+            renderBoss();
+            
+            // Bullets
+            bullets.forEach(bullet => {
+                ctx.save();
+                const bulletAngle = Math.atan2(bullet.vy, bullet.vx);
+                ctx.translate(bullet.x, bullet.y);
+                ctx.rotate(bulletAngle);
+                
+                // Bullet trail
+                ctx.fillStyle = 'rgba(255, 200, 50, 0.4)';
+                ctx.fillRect(-12, -1, 10, 2);
+                
+                // Bullet core
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, bullet.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Bullet glow
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.beginPath();
+                ctx.arc(0, 0, bullet.radius * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            });
+            
+            // Enemies
+            enemies.forEach(enemy => {
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(enemy.x - 5, enemy.y - 3, 4, 0, Math.PI * 2);
+                ctx.arc(enemy.x + 5, enemy.y - 3, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Enemy health bar
+                const barWidth = 30;
+                const barHeight = 4;
+                const healthPercent = enemy.health / enemy.maxHealth;
+                
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                ctx.fillRect(enemy.x - barWidth / 2, enemy.y - enemy.radius - 10, barWidth, barHeight);
+                
+                ctx.fillStyle = healthPercent > 0.5 ? '#44ff44' : healthPercent > 0.25 ? '#ffaa00' : '#ff4444';
+                ctx.fillRect(enemy.x - barWidth / 2, enemy.y - enemy.radius - 10, barWidth * healthPercent, barHeight);
+                
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(enemy.x - barWidth / 2, enemy.y - enemy.radius - 10, barWidth, barHeight);
+            });
+        } catch (e) {
+            console.error('Render error:', e);
+        }
+    }
+    
+    // ========================================
+    // INPUT
+    // ========================================
+    
+    window.addEventListener('keydown', e => {
+        keys[e.code] = true;
+        if (e.code === 'Space' && gameRunning) {
+            e.preventDefault();
+            togglePause();
+        }
+        // Prevent arrow keys from scrolling
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+            e.preventDefault();
         }
     });
-}
-
-// Reset game
-function resetGame() {
-    player.x = canvas.width / 2 - player.width / 2;
-    player.y = canvas.height / 2 - player.height / 2;
-    player.health = player.maxHealth;
-    player.invulnerable = false;
-    player.invulnerableTime = 0;
-    score = 0;
-    gameTime = 0;
-    enemies = [];
-    particles = [];
-    enemySpawnTimer = 0;
-    enemySpawnRate = 1500;
-    applySettings();
-}
-
-// Main game loop
-function gameLoop(timestamp) {
-    if (!gameRunning || gamePaused) return;
     
-    const deltaTime = Math.min((timestamp - lastTime) / 1000, 0.1); // Cap delta time
-    lastTime = timestamp;
+    window.addEventListener('keyup', e => {
+        keys[e.code] = false;
+    });
     
-    // Update game time
-    gameTime += deltaTime;
+    // ========================================
+    // SETUP ALL EVENT LISTENERS
+    // ========================================
     
-    // Score increases over time
-    score = Math.floor(gameTime * 10);
-
-    // Clear canvas and draw background
-    ctx.fillStyle = canvasBgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid background
-    ctx.strokeStyle = gridColor;
-    ctx.lineWidth = 1;
-    for (let x = 0; x < canvas.width; x += 50) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
-    for (let y = 0; y < canvas.height; y += 50) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-    
-    // Update and draw player
-    updatePlayer(deltaTime);
-    drawPlayer();
-    
-    // Spawn and update enemies
-    spawnEnemy(deltaTime);
-    
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        enemy.update(deltaTime);
-        enemy.draw();
-        
-        // Check collision with player
-        if (!player.invulnerable && checkCollision(player, enemy)) {
-            player.health -= enemy.damage;
-            playHitSound();
-            player.invulnerable = true;
-            player.invulnerableTime = 0.5; // 500ms invulnerability
-            
-            createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, enemy.color, 15);
-            
-            enemies.splice(i, 1);
-            
-            // Screen shake effect
-            canvas.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
-            setTimeout(() => {
-                canvas.style.transform = 'translate(0, 0)';
-            }, 100);
-            
-            if (player.health <= 0) {
-                player.health = 0;
-                createExplosion(player.x + player.width / 2, player.y + player.height / 2, playerColor, 30);
-                gameOver();
-            }
-            continue;
-        }
-        
-        // Remove off-screen enemies
-        if (enemy.isOffScreen()) {
-            enemies.splice(i, 1);
-            score += 5; // Bonus for surviving
+    function setupButton(id, handler) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', handler);
         }
     }
     
-    // Update and draw particles
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const particle = particles[i];
-        particle.update(deltaTime);
-        particle.draw();
-        
-        if (particle.life <= 0) {
-            particles.splice(i, 1);
+    setupButton('playBtn', () => showScreen('startScreen'));
+    setupButton('chaptersBtn', showMainMenuChapters);
+    setupButton('settingsBtn', () => showScreen('settingsScreen'));
+    setupButton('howToPlayBtn', () => showScreen('howToPlayScreen'));
+    setupButton('highScoresBtn', () => { displayHighScores(); showScreen('highScoresScreen'); });
+    setupButton('settingsBackBtn', () => { saveSettings(); showScreen('mainMenu'); });
+    setupButton('closeSettingsBtn', () => { saveSettings(); showScreen('mainMenu'); });
+    setupButton('setNameBtn', () => {
+        const nameInput = document.getElementById('playerNameInput');
+        if (nameInput) {
+            playerName = nameInput.value.trim().substring(0, 15) || 'Anonymous';
+            try { localStorage.setItem('survivalGamePlayerName', playerName); } catch (e) {}
+            alert('Name saved: ' + playerName);
         }
+    });
+    setupButton('soundToggle', () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+    });
+    setupButton('howToPlayBackBtn', () => showScreen('mainMenu'));
+    setupButton('highScoresBackBtn', () => showScreen('mainMenu'));
+    
+    const chapterSelect = document.getElementById('chapterSelect');
+    if (chapterSelect) {
+        chapterSelect.addEventListener('change', () => {
+            currentChapter = parseInt(chapterSelect.value);
+        });
     }
     
-    // Update UI
-    updateUI();
-    
-    requestAnimationFrame(gameLoop);
-}
-
-// Start game
-function startGame() {
-    initAudio();
-    resetGame();
-    gameRunning = true;
-    gamePaused = false;
-    lastTime = performance.now();
-    showScreen('none');
-    startGameMusic();
-    requestAnimationFrame(gameLoop);
-}
-
-// Event listeners
-document.getElementById('playBtn').addEventListener('click', () => {
-    showScreen('startScreen');
-});
-
-document.getElementById('settingsBtn').addEventListener('click', () => {
-    showScreen('settingsScreen');
-});
-
-document.getElementById('howToPlayBtn').addEventListener('click', () => {
-    showScreen('howToPlayScreen');
-});
-
-document.getElementById('highScoresBtn').addEventListener('click', () => {
-    displayHighScores();
-    showScreen('highScoresScreen');
-});
-
-document.getElementById('settingsBackBtn').addEventListener('click', closeSettings);
-
-document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
-
-function closeSettings() {
-    // Always save settings, even if some fail
-    try {
-        settings.difficulty = document.getElementById('difficultySelect').value;
-        settings.playerSize = document.getElementById('playerSizeSelect').value;
-        settings.theme = document.getElementById('themeSelect').value;
-        settings.language = document.getElementById('languageSelect').value;
-        saveSettings();
-        applySettings();
-        updateLanguage();
-    } catch (e) {
-        console.error('Error applying settings:', e);
-    }
-    
-    stopAllMusic();
-    startMenuMusic();
-    showScreen('mainMenu');
-}
-
-document.getElementById('setNameBtn').addEventListener('click', confirmNameChange);
-
-// Sound toggle in settings
-document.getElementById('soundToggle').addEventListener('click', () => {
-    initAudio();
-    musicEnabled = !musicEnabled;
-    updateSoundButton();
-    
-    if (musicEnabled) {
-        if (gameRunning) {
-            startGameMusic();
+    setupButton('startBtn', startGame);
+    setupButton('shopBtn', () => { updateShopUI(); showScreen('shopScreen'); });
+    setupButton('menuBtn', () => showScreen('mainMenu'));
+    setupButton('shopBackBtn', () => {
+        if (gameRunning && gamePaused) {
+            gamePaused = false;
+            showScreen('none');
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
         } else {
-            startMenuMusic();
+            showScreen('startScreen');
         }
-    } else {
-        stopAllMusic();
-    }
-});
-
-function updateSoundButton() {
-    const soundBtn = document.getElementById('soundToggle');
-    if (soundBtn) {
-        soundBtn.textContent = musicEnabled ? '🔊' : '🔇';
-    }
-    
-    // Immediately mute/unmute all audio
-    if (masterGain && audioCtx) {
-        masterGain.gain.setValueAtTime(musicEnabled ? 1 : 0, audioCtx.currentTime);
-    }
-}
-
-document.getElementById('howToPlayBackBtn').addEventListener('click', () => {
-    showScreen('mainMenu');
-});
-
-document.getElementById('highScoresBackBtn').addEventListener('click', () => {
-    showScreen('mainMenu');
-});
-
-document.getElementById('startBtn').addEventListener('click', startGame);
-
-document.getElementById('menuBtn').addEventListener('click', () => {
-    showScreen('mainMenu');
-});
-
-document.getElementById('resumeBtn').addEventListener('click', () => {
-    togglePause();
-});
-
-document.getElementById('pauseMenuBtn').addEventListener('click', () => {
-    gameRunning = false;
-    gamePaused = false;
-    stopAllMusic();
-    startMenuMusic();
-    showScreen('mainMenu');
-});
-
-document.getElementById('restartBtn').addEventListener('click', startGame);
-
-document.getElementById('gameOverMenuBtn').addEventListener('click', () => {
-    stopAllMusic();
-    startMenuMusic();
-    showScreen('mainMenu');
-});
-
-// Music toggle
-document.getElementById('musicToggle').addEventListener('click', () => {
-    initAudio();
-    musicEnabled = !musicEnabled;
-    const musicBtn = document.getElementById('musicToggle');
-    musicBtn.textContent = musicEnabled ? '🔊' : '🔇';
-    musicBtn.title = musicEnabled ? t('musicOff') : t('musicOn');
-    updateSoundButton();
-    
-    if (musicEnabled) {
-        if (gameRunning) {
-            startGameMusic();
-        } else {
-            startMenuMusic();
+    });
+    setupButton('weaponUpgradeBtn', upgradeWeapon);
+    setupButton('speedBuyBtn', buySpeed);
+    setupButton('healBuyBtn', buyHeal);
+    setupButton('shopBtnGame', () => {
+        if (gameRunning && !gamePaused) {
+            gamePaused = true;
+            updateShopUI();
+            showScreen('shopScreen');
         }
-    } else {
-        stopAllMusic();
-    }
-});
-
-// Initialize
-loadSettings();
-loadHighScores();
-showScreen('mainMenu');
-updateSoundButton();
-
-// Start menu music when page loads (will initialize audio on first user interaction)
-document.addEventListener('click', function initAudioOnce() {
-    initAudio();
-    startMenuMusic();
-    document.removeEventListener('click', initAudioOnce);
+    });
+    setupButton('musicToggle', () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById('musicToggle').textContent = soundEnabled ? '🔊' : '🔇';
+    });
+    setupButton('resumeBtn', togglePause);
+    setupButton('pauseShopBtn', () => { updateShopUI(); showScreen('shopScreen'); });
+    setupButton('pauseMenuBtn', () => { gameRunning = false; gamePaused = false; showScreen('mainMenu'); });
+    setupButton('restartBtn', restartGame);
+    setupButton('gameOverMenuBtn', () => { gameRunning = false; gamePaused = false; showScreen('mainMenu'); });
+    setupButton('chapterContinueBtn', continueToNextChapter);
+    setupButton('chapterViewBtn', showChapterList);
+    setupButton('chapterMenuBtn', () => { gameRunning = false; gamePaused = false; showScreen('mainMenu'); });
+    setupButton('chapterListBackBtn', () => showScreen('mainMenu'));
+    
+    // ========================================
+    // INIT
+    // ========================================
+    
+    loadSettings();
+    loadHighScores();
+    updateChapterSelect();
+    showScreen('mainMenu');
+    console.log('✅ Game ready to play!');
 });

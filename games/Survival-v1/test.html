@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Game.js Loading</title>
+</head>
+<body>
+    <h1>Testing Game.js Loading...</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('=== TEST PAGE STARTED ===');
+        document.getElementById('status').innerHTML = 'Loading game.js...';
+    </script>
+    
+    <script src="game.js?v=test23"></script>
+    
+    <script>
+        console.log('=== AFTER GAME.JS LOADED ===');
+        console.log('startGame exists:', typeof startGame);
+        console.log('showScreen exists:', typeof showScreen);
+        console.log('player exists:', typeof player);
+        
+        const statusDiv = document.getElementById('status');
+        if (typeof startGame === 'function' && typeof showScreen === 'function') {
+            statusDiv.innerHTML = '✅ Game.js loaded successfully!<br>startGame: ' + typeof startGame + '<br>showScreen: ' + typeof showScreen;
+            statusDiv.style.color = 'green';
+        } else {
+            statusDiv.innerHTML = '❌ Game.js failed to load!<br>startGame: ' + typeof startGame + '<br>showScreen: ' + typeof showScreen;
+            statusDiv.style.color = 'red';
+        }
+    </script>
+</body>
+</html>

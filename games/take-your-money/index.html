@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Your Money</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Menu -->
+    <div id="mainMenu" class="screen active">
+        <div class="menu-container">
+            <h1 class="game-title" data-i18n="gameTitle">💰 Take Your Money 💰</h1>
+            <p class="subtitle" data-i18n="subtitle">Collect all the money before time runs out!</p>
+            <div class="menu-buttons">
+                <button id="startBtn" class="menu-btn" data-i18n="startGame">🎮 Start Game</button>
+                <button id="settingsBtn" class="menu-btn" data-i18n="settings">⚙️ Settings</button>
+                <button id="howToPlayBtn" class="menu-btn" data-i18n="howToPlay">📖 How to Play</button>
+            </div>
+            <div class="high-score">
+                <p>🏆 <span data-i18n="highScore">High Score</span>: <span id="highScoreDisplay">0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div id="settingsMenu" class="screen">
+        <div class="menu-container">
+            <h2 data-i18n="settingsTitle">⚙️ Settings</h2>
+            <div class="settings-options">
+                <div class="setting">
+                    <label for="soundToggle" data-i18n="soundEffects">Sound Effects</label>
+                    <input type="checkbox" id="soundToggle" checked>
+                </div>
+                <div class="setting">
+                    <label for="musicToggle" data-i18n="bgMusic">Background Music</label>
+                    <input type="checkbox" id="musicToggle" checked>
+                </div>
+                <div class="setting">
+                    <label for="difficultySelect" data-i18n="startingDifficulty">Starting Difficulty</label>
+                    <select id="difficultySelect">
+                        <option value="easy" data-i18n="easy">Easy</option>
+                        <option value="medium" selected data-i18n="medium">Medium</option>
+                        <option value="hard" data-i18n="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="languageSelect" data-i18n="language">Language</label>
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="de">Deutsch</option>
+                        <option value="fr">Français</option>
+                        <option value="it">Italiano</option>
+                        <option value="ko">한국어</option>
+                        <option value="ja">日本語</option>
+                        <option value="pt-BR">Português (Brasil)</option>
+                        <option value="pt">Português</option>
+                    </select>
+                </div>
+            </div>
+            <button id="settingsBackBtn" class="menu-btn" data-i18n="back">🔙 Back</button>
+        </div>
+    </div>
+
+    <!-- How to Play -->
+    <div id="howToPlayMenu" class="screen">
+        <div class="menu-container">
+            <h2 data-i18n="howToPlayTitle">📖 How to Play</h2>
+            <div class="instructions">
+                <p>🎯 <strong data-i18n="goal">Goal:</strong> <span data-i18n="goalDesc">Collect all the money 💵 on the grid before time runs out!</span></p>
+                <p>🖱️ <strong data-i18n="controls">Controls:</strong> <span data-i18n="controlsDesc">Click on money tiles to collect them</span></p>
+                <p>⏱️ <strong data-i18n="time">Time:</strong> <span data-i18n="timeDesc">You have limited time - collect money quickly!</span></p>
+                <p>📈 <strong data-i18n="difficulty">Difficulty:</strong> <span data-i18n="difficultyDesc">Each level gets harder:</span></p>
+                <ul>
+                    <li data-i18n="diffItem1">Grid gets bigger (3x3 → 4x4 → 5x5 → etc.)</li>
+                    <li data-i18n="diffItem2">Time gets shorter</li>
+                    <li data-i18n="diffItem3">Bomb tiles appear (don't click them! 💣)</li>
+                    <li data-i18n="diffItem4">Money tiles move after a certain level</li>
+                </ul>
+                <p>💣 <strong data-i18n="bombs">Bombs:</strong> <span data-i18n="bombsDesc">Clicking a bomb loses time!</span></p>
+                <p>⭐ <strong data-i18n="bonus">Bonus:</strong> <span data-i18n="bonusDesc">Collect combo multipliers for speed!</span></p>
+            </div>
+            <button id="howToPlayBackBtn" class="menu-btn" data-i18n="back">🔙 Back</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <div class="game-container">
+            <div class="game-header">
+                <div class="stat">
+                    <span data-i18n="level">📊 Level:</span>
+                    <span id="levelDisplay">1</span>
+                </div>
+                <div class="stat">
+                    <span data-i18n="score">💰 Score:</span>
+                    <span id="scoreDisplay">0</span>
+                </div>
+                <div class="stat">
+                    <span data-i18n="timeLabel">⏱️ Time:</span>
+                    <span id="timeDisplay">30</span>
+                </div>
+                <div class="stat">
+                    <span data-i18n="remaining">💵 Remaining:</span>
+                    <span id="remainingDisplay">0</span>
+                </div>
+            </div>
+            <div id="gameGrid" class="game-grid"></div>
+            <button id="pauseBtn" class="pause-btn" data-i18n="pause">⏸️ Pause</button>
+        </div>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pauseMenu" class="screen">
+        <div class="menu-container">
+            <h2 data-i18n="pausedTitle">⏸️ Paused</h2>
+            <div class="menu-buttons">
+                <button id="resumeBtn" class="menu-btn" data-i18n="resume">▶️ Resume</button>
+                <button id="restartBtn" class="menu-btn" data-i18n="restartLevel">🔄 Restart Level</button>
+                <button id="quitToMenuBtn" class="menu-btn" data-i18n="quitToMenu">🏠 Quit to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen">
+        <div class="menu-container">
+            <h2 class="game-over-title" data-i18n="timesUp">💥 Time's Up!</h2>
+            <div class="results">
+                <p><span data-i18n="levelReached">Level Reached</span>: <span id="finalLevel">1</span></p>
+                <p><span data-i18n="finalScore">Final Score</span>: <span id="finalScore">0</span></p>
+                <p><span data-i18n="moneyCollected">Money Collected</span>: <span id="moneyCollected">0</span></p>
+            </div>
+            <div class="menu-buttons">
+                <button id="retryBtn" class="menu-btn" data-i18n="retry">🔄 Retry</button>
+                <button id="gameOverMenuBtn" class="menu-btn" data-i18n="mainMenu">🏠 Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Complete Screen -->
+    <div id="levelCompleteScreen" class="screen">
+        <div class="menu-container">
+            <h2 class="level-complete-title" data-i18n="levelComplete">🎉 Level Complete!</h2>
+            <div class="results">
+                <p><span data-i18n="levelLabel">Level</span>: <span id="completedLevel">1</span></p>
+                <p><span data-i18n="scoreLabel">Score</span>: <span id="completedScore">0</span></p>
+                <p><span data-i18n="timeBonus">Time Bonus</span>: <span id="timeBonus">0</span></p>
+                <p><span data-i18n="comboBonus">Combo Bonus</span>: <span id="comboBonus">0</span></p>
+            </div>
+            <div class="menu-buttons">
+                <button id="nextLevelBtn" class="menu-btn" data-i18n="nextLevel">➡️ Next Level</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

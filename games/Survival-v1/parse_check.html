@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Parse Check game.js</title>
+    <style>
+        body { font-family: monospace; background: #1a1a2e; color: #fff; padding: 20px; }
+        .success { color: #44ff44; font-size: 24px; font-weight: bold; }
+        .error { color: #ff4444; font-size: 24px; font-weight: bold; }
+        #output { background: #000; padding: 15px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; max-height: 500px; overflow-y: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Parse Checking game.js</h1>
+    <div id="status">Reading game.js...</div>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        
+        function log(msg) {
+            console.log(msg);
+            output.textContent += msg + '\n';
+        }
+        
+        // Use XMLHttpRequest to read the file
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'game.js?v=' + Date.now(), true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200 || xhr.status === 0) {
+                    const code = xhr.responseText;
+                    log('✅ File loaded: ' + code.length + ' bytes, ' + code.split('\n').length + ' lines');
+                    log('\nAttempting to parse JavaScript...');
+                    
+                    try {
+                        // Try to create a function from the code
+                        new Function(code);
+                        log('✅ SYNTAX IS VALID!');
+                        log('\n✅ game.js should work fine!');
+                        status.innerHTML = '<span class="success">✅ game.js syntax is valid!</span>';
+                    } catch (e) {
+                        log('❌ SYNTAX ERROR:');
+                        log(e.message);
+                        log('\nFull error:');
+                        log(e.toString());
+                        status.innerHTML = '<span class="error">❌ Syntax error found!</span>';
+                    }
+                } else {
+                    log('❌ HTTP Error: ' + xhr.status);
+                    status.innerHTML = '<span class="error">❌ Cannot load file</span>';
+                }
+            }
+        };
+        xhr.onerror = function() {
+            log('❌ Network error - cannot load game.js');
+            log('This is normal for file:// protocol');
+            log('\nTrying alternative method...');
+            
+            // If XHR fails (file:// protocol), just try to load it directly
+            const script = document.createElement('script');
+            script.src = 'game.js?v=' + Date.now();
+            script.onload = function() {
+                log('✅ Script loaded via script tag!');
+                if (typeof startGame === 'function') {
+                    log('✅ startGame function exists');
+                    status.innerHTML = '<span class="success">✅ game.js loaded successfully!</span>';
+                } else {
+                    log('⚠️ startGame not found');
+                    status.innerHTML = '<span class="error">⚠️ Loaded but startGame missing</span>';
+                }
+            };
+            script.onerror = function() {
+                log('❌ Script tag also failed to load');
+                status.innerHTML = '<span class="error">❌ game.js failed to load</span>';
+            };
+            document.head.appendChild(script);
+        };
+        xhr.send();
+    </script>
+</body>
+</html>

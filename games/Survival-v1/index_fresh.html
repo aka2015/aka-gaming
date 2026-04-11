@@ -6,8 +6,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>2D Survival Game</title>
-    <link rel="stylesheet" href="style.css?v=52">
+    <title>2D Survival Game - FRESH v2</title>
+    <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
     <div id="gameContainer">
@@ -21,15 +21,12 @@
             <div id="time">Time: 0s</div>
             <div id="chapter">Chapter: 1</div>
             <div id="shopUpgradesDisplay" class="shop-upgrades-display">
-                <div id="weaponDisplay" class="upgrade-display">🏏 Baseball Bat</div>
+                <div id="swordDisplay" class="upgrade-display">⚔️ 0</div>
                 <div id="speedDisplay" class="upgrade-display">💨 0</div>
-                <div id="healDisplay" class="upgrade-display">❤️ None</div>
             </div>
             <button id="shopBtnGame" class="shop-btn-game" title="Shop">🛒</button>
             <button id="musicToggle" class="music-toggle-btn">🔊</button>
         </div>
-
-        <!-- MAIN MENU -->
         <div id="mainMenu" class="screen">
             <h1>Survival Game</h1>
             <div class="menu-buttons">
@@ -40,8 +37,6 @@
                 <button id="highScoresBtn" class="menu-btn">High Scores</button>
             </div>
         </div>
-
-        <!-- SETTINGS SCREEN -->
         <div id="settingsScreen" class="screen hidden">
             <div class="settings-header">
                 <h1>Settings</h1>
@@ -52,9 +47,10 @@
                     <label>Player Name:</label>
                     <div class="name-input-container">
                         <input type="text" id="playerNameInput" maxlength="15" placeholder="Enter name">
-                        <button id="setNameBtn" class="lock-btn" title="Save name">💾</button>
+                        <button id="setNameBtn" class="lock-btn" title="Lock/Change name">🔒</button>
                     </div>
                 </div>
+                <p class="scroll-hint">⬇️ Scroll ke bawah</p>
                 <div class="setting-item">
                     <label>Difficulty:</label>
                     <select id="difficultySelect">
@@ -80,14 +76,24 @@
                     </select>
                 </div>
                 <div class="setting-item">
+                    <label>Language:</label>
+                    <select id="languageSelect">
+                        <option value="en" selected>English</option>
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="it">Italiano</option>
+                        <option value="es">Español</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+                <div class="setting-item">
                     <label>Sound:</label>
                     <button id="soundToggle" class="sound-toggle-btn">🔊</button>
                 </div>
             </div>
             <button id="settingsBackBtn" class="menu-btn">Back</button>
         </div>
-
-        <!-- HOW TO PLAY SCREEN -->
         <div id="howToPlayScreen" class="screen hidden">
             <h1>How to Play</h1>
             <div class="instructions">
@@ -111,12 +117,10 @@
                     <span class="key">Space</span>
                     <span>Pause Game</span>
                 </div>
-                <p class="instruction-text">Survive as long as possible! Dodge enemies and defeat bosses to complete chapters!</p>
+                <p class="instruction-text">Survive as long as possible! Enemies will spawn from all sides and get faster over time. Dodge them to stay alive!</p>
             </div>
             <button id="howToPlayBackBtn" class="menu-btn">Back</button>
         </div>
-
-        <!-- HIGH SCORES SCREEN -->
         <div id="highScoresScreen" class="screen hidden">
             <h1>High Scores</h1>
             <div id="scoresList" class="scores-list">
@@ -124,108 +128,94 @@
             </div>
             <button id="highScoresBackBtn" class="menu-btn">Back</button>
         </div>
-
-        <!-- START SCREEN -->
+        <div id="nameChangeModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Change Name?</h2>
+                <div class="modal-buttons">
+                    <button id="confirmNameChange" class="modal-btn confirm">Yes</button>
+                    <button id="cancelNameChange" class="modal-btn cancel">No</button>
+                </div>
+            </div>
+        </div>
         <div id="startScreen" class="screen hidden">
-            <h1>Get Ready!</h1>
-            <p>Use WASD or Arrow Keys to move</p>
-            <p>Survive as long as you can!</p>
+            <h1 id="startScreenTitle">Get Ready!</h1>
+            <p id="startScreenControls">Use WASD or Arrow Keys to move</p>
+            <p id="startScreenSurvive">Survive as long as you can!</p>
             <div class="chapter-select-container">
-                <label>Chapter:</label>
+                <label id="chapterSelectLabel">Chapter:</label>
                 <select id="chapterSelect">
                     <option value="1">Chapter 1</option>
-                    <option value="2" disabled>Chapter 2</option>
-                    <option value="3" disabled>Chapter 3</option>
-                    <option value="4" disabled>Chapter 4</option>
-                    <option value="5" disabled>Chapter 5</option>
+                    <option value="2">Chapter 2</option>
+                    <option value="3">Chapter 3</option>
+                    <option value="4">Chapter 4</option>
+                    <option value="5">Chapter 5</option>
                 </select>
             </div>
             <button id="startBtn" class="menu-btn">Start Game</button>
             <button id="shopBtn" class="menu-btn">🛒 Shop</button>
             <button id="menuBtn" class="menu-btn">Back to Menu</button>
         </div>
-
-        <!-- SHOP SCREEN -->
         <div id="shopScreen" class="screen hidden">
-            <h1>🛒 Shop</h1>
+            <h1 id="shopTitle">🛒 Shop</h1>
             <div id="shopCurrency" class="shop-currency">Score: 0</div>
             <div class="shop-container">
-                <div class="shop-item" id="weaponShop">
+                <div class="shop-item" id="swordShop">
                     <div class="shop-item-header">
-                        <h2>⚔️ Weapon Upgrade</h2>
-                        <span id="weaponLevel" class="shop-level">Level 1/5</span>
+                        <h2 id="shopSwordTitle">⚔️ Sword</h2>
+                        <span id="shopSwordLevel" class="shop-level">Level 0/3</span>
                     </div>
-                    <p class="shop-item-desc" id="weaponDesc">🏏 Baseball Bat - Default weapon</p>
+                    <p id="shopSwordDesc" class="shop-item-desc">Deflects enemies! Auto-refills 1 charge/2 seconds</p>
                     <div class="shop-item-stats">
-                        <div id="weaponStats" class="shop-stat">DMG: 10 | Range: 40</div>
-                        <div id="weaponNextStat" class="shop-stat">Next: 🔪 Knife - DMG: 20</div>
+                        <div id="shopSwordStat" class="shop-stat">Current: No sword</div>
+                        <div id="shopSwordNextStat" class="shop-stat">Next: +1 deflection</div>
                     </div>
-                    <button id="weaponUpgradeBtn" class="shop-buy-btn">Upgrade to Knife - 100 pts</button>
+                    <button id="shopSwordBuyBtn" class="shop-buy-btn">Buy - 100 pts</button>
                 </div>
                 <div class="shop-item" id="speedShop">
                     <div class="shop-item-header">
-                        <h2>💨 Speed Boost</h2>
-                        <span id="speedLevel" class="shop-level">Level 0/5</span>
+                        <h2 id="shopSpeedTitle">💨 Speed Boost</h2>
+                        <span id="shopSpeedLevel" class="shop-level">Level 0/5</span>
                     </div>
-                    <p class="shop-item-desc">Increase movement speed!</p>
+                    <p id="shopSpeedDesc" class="shop-item-desc">Increase movement speed! (Resets each game)</p>
                     <div class="shop-item-stats">
-                        <div id="speedStat" class="shop-stat">Current: Base speed</div>
-                        <div id="speedNextStat" class="shop-stat">Next: +50 speed</div>
+                        <div id="shopSpeedStat" class="shop-stat">Current: Base speed</div>
+                        <div id="shopSpeedNextStat" class="shop-stat">Next: +50 speed</div>
                     </div>
-                    <button id="speedBuyBtn" class="shop-buy-btn">Buy - 150 pts</button>
-                </div>
-                <div class="shop-item" id="healShop">
-                    <div class="shop-item-header">
-                        <h2>❤️ Auto Heal</h2>
-                        <span id="healLevel" class="shop-level">Level 0/3</span>
-                    </div>
-                    <p class="shop-item-desc">Auto-regenerate health over time!</p>
-                    <div class="shop-item-stats">
-                        <div id="healStat" class="shop-stat">Current: No auto-heal</div>
-                        <div id="healNextStat" class="shop-stat">Next: +5 HP/5s</div>
-                    </div>
-                    <button id="healBuyBtn" class="shop-buy-btn">Buy - 200 pts</button>
+                    <button id="shopSpeedBuyBtn" class="shop-buy-btn">Buy - 150 pts</button>
                 </div>
             </div>
             <button id="shopBackBtn" class="menu-btn">Back</button>
         </div>
-
-        <!-- PAUSE SCREEN -->
         <div id="pauseScreen" class="screen hidden">
             <h1>Paused</h1>
             <button id="resumeBtn" class="menu-btn">Resume</button>
             <button id="pauseShopBtn" class="menu-btn">🛒 Shop</button>
             <button id="pauseMenuBtn" class="menu-btn">Main Menu</button>
         </div>
-
-        <!-- GAME OVER SCREEN -->
         <div id="gameOverScreen" class="screen hidden">
             <h1>Game Over</h1>
             <p id="finalScore">Score: 0</p>
             <p id="finalTime">Time: 0s</p>
-            <button id="restartBtn" class="menu-btn">Play Again</button>
+            <p id="newHighScore" class="high-score-msg hidden">🏆 New High Score!</p>
+            <button id="restartBtn">Play Again</button>
             <button id="gameOverMenuBtn" class="menu-btn">Main Menu</button>
         </div>
-
-        <!-- CHAPTER COMPLETE SCREEN -->
         <div id="chapterCompleteScreen" class="screen hidden">
-            <h1 id="chapterCompleteTitle">🎉 Chapter Complete!</h1>
-            <p id="chapterCompleteText">Congratulations! You survived!</p>
-            <p id="chapterNextText">Continue to next chapter?</p>
+            <h1 id="chapterCompleteTitle">🎉 Chapter 1 Complete!</h1>
+            <p id="chapterCompleteText">Selamat! Kamu berhasil bertahan!</p>
+            <p id="chapterNextText">Lanjut ke Chapter 2?</p>
             <div class="chapter-buttons">
-                <button id="chapterContinueBtn" class="menu-btn">Continue</button>
-                <button id="chapterViewBtn" class="menu-btn secondary">View Chapters</button>
+                <button id="chapterContinueBtn" class="menu-btn">Lanjut Chapter Berikutnya</button>
+                <button id="chapterViewBtn" class="menu-btn secondary">Lihat Chapter</button>
                 <button id="chapterMenuBtn" class="menu-btn">Main Menu</button>
             </div>
         </div>
-
-        <!-- CHAPTER LIST SCREEN -->
         <div id="chapterListScreen" class="screen hidden">
             <h1 id="chapterListTitle">📚 Chapter List</h1>
             <div id="chapterListContent" class="chapter-list"></div>
             <button id="chapterListBackBtn" class="menu-btn">Back</button>
         </div>
     </div>
-    <script src="game.js?v=52"></script>
+    <script src="game.js?v=23"></script>
 </body>
 </html>

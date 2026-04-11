@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Survival Game - NO CACHE VERSION</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div id="healthBar">
+                <div id="healthFill"></div>
+                <span id="healthText">Health: 100</span>
+            </div>
+            <div id="score">Score: 0</div>
+            <div id="time">Time: 0s</div>
+        </div>
+        
+        <!-- MAIN MENU -->
+        <div id="mainMenu" class="screen">
+            <h1>Survival Game</h1>
+            <div class="menu-buttons">
+                <button id="playBtn" class="menu-btn">Play</button>
+            </div>
+        </div>
+        
+        <!-- START SCREEN -->
+        <div id="startScreen" class="screen hidden">
+            <h1>Get Ready!</h1>
+            <p>Use WASD or Arrow Keys to move</p>
+            <p>Survive as long as you can!</p>
+            <button id="startBtn" class="menu-btn">Start Game</button>
+            <button id="menuBtn" class="menu-btn">Back to Menu</button>
+        </div>
+        
+        <!-- PAUSE SCREEN -->
+        <div id="pauseScreen" class="screen hidden">
+            <h1>Paused</h1>
+            <button id="resumeBtn" class="menu-btn">Resume</button>
+            <button id="pauseMenuBtn" class="menu-btn">Main Menu</button>
+        </div>
+        
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="screen hidden">
+            <h1>Game Over</h1>
+            <p id="finalScore">Score: 0</p>
+            <p id="finalTime">Time: 0s</p>
+            <button id="restartBtn" class="menu-btn">Play Again</button>
+            <button id="gameOverMenuBtn" class="menu-btn">Main Menu</button>
+        </div>
+    </div>
+    
+    <!-- INLINE JAVASCRIPT - NO EXTERNAL FILE NEEDED -->
+    <script>
+    // ========================================
+    // 2D SURVIVAL GAME - INLINE VERSION (NO CACHE ISSUES)
+    // ========================================
+    
+    console.log('🎮 Game starting to load (INLINE VERSION)...');
+    
+    // Get canvas
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    console.log('✅ Canvas initialized');
+    
+    // ========================================
+    // GAME STATE
+    // ========================================
+    
+    let gameRunning = false;
+    let gamePaused = false;
+    let score = 0;
+    let gameTime = 0;
+    let lastTime = 0;
+    
+    const player = {
+        x: 0,
+        y: 0,
+        width: 40,
+        height: 40,
+        speed: 300,
+        health: 100,
+        maxHealth: 100,
+        color: '#00ffff',
+        invulnerable: false
+    };
+    
+    const enemies = [];
+    const keys = {};
+    
+    console.log('✅ Game state initialized');
+    
+    // ========================================
+    // SCREEN MANAGEMENT
+    // ========================================
+    
+    function showScreen(screenId) {
+        const screens = ['mainMenu', 'startScreen', 'pauseScreen', 'gameOverScreen'];
+        
+        screens.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            
+            if (screenId === 'none') {
+                el.classList.add('hidden');
+            } else if (id === screenId) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        });
+    }
+    
+    console.log('✅ showScreen function created');
+    
+    // ========================================
+    // GAME FUNCTIONS
+    // ========================================
+    
+    function resetGame() {
+        player.x = canvas.width / 2 - player.width / 2;
+        player.y = canvas.height / 2 - player.height / 2;
+        player.health = player.maxHealth;
+        player.invulnerable = false;
+        score = 0;
+        gameTime = 0;
+        enemies.length = 0;
+    }
+    
+    function startGame() {
+        console.log('🎮 startGame() called!');
+        resetGame();
+        gameRunning = true;
+        gamePaused = false;
+        lastTime = performance.now();
+        showScreen('none');
+        console.log('✅ Game started!');
+        requestAnimationFrame(gameLoop);
+    }
+    
+    function restartGame() {
+        startGame();
+    }
+    
+    function togglePause() {
+        gamePaused = !gamePaused;
+        if (!gamePaused) {
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        } else {
+            showScreen('pauseScreen');
+        }
+    }
+    
+    function gameOver() {
+        gameRunning = false;
+        showScreen('gameOverScreen');
+        document.getElementById('finalScore').textContent = 'Score: ' + score;
+        document.getElementById('finalTime').textContent = 'Time: ' + Math.floor(gameTime) + 's';
+    }
+    
+    console.log('✅ Game functions created');
+    
+    // ========================================
+    // GAME LOOP
+    // ========================================
+    
+    function gameLoop(timestamp) {
+        if (!gameRunning || gamePaused) return;
+        
+        const deltaTime = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+        
+        gameTime += deltaTime;
+        score += Math.floor(deltaTime * 10);
+        
+        updatePlayer(deltaTime);
+        spawnEnemies(deltaTime);
+        updateEnemies(deltaTime);
+        checkCollisions();
+        render();
+        updateUI();
+        
+        requestAnimationFrame(gameLoop);
+    }
+    
+    function updatePlayer(dt) {
+        const speed = player.speed * dt;
+        
+        if (keys['KeyW'] || keys['ArrowUp']) player.y -= speed;
+        if (keys['KeyS'] || keys['ArrowDown']) player.y += speed;
+        if (keys['KeyA'] || keys['ArrowLeft']) player.x -= speed;
+        if (keys['KeyD'] || keys['ArrowRight']) player.x += speed;
+        
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+    }
+    
+    function spawnEnemies(dt) {
+        if (Math.random() < dt * 2) {
+            const side = Math.floor(Math.random() * 4);
+            let x, y;
+            
+            switch(side) {
+                case 0: x = Math.random() * canvas.width; y = -30; break;
+                case 1: x = canvas.width + 30; y = Math.random() * canvas.height; break;
+                case 2: x = Math.random() * canvas.width; y = canvas.height + 30; break;
+                case 3: x = -30; y = Math.random() * canvas.height; break;
+            }
+            
+            enemies.push({
+                x: x,
+                y: y,
+                width: 30,
+                height: 30,
+                speed: 100 + gameTime * 2,
+                color: '#ff4444'
+            });
+        }
+    }
+    
+    function updateEnemies(dt) {
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            const dx = player.x - enemy.x;
+            const dy = player.y - enemy.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+                enemy.x += (dx / dist) * enemy.speed * dt;
+                enemy.y += (dy / dist) * enemy.speed * dt;
+            }
+            
+            if (enemy.x < -100 || enemy.x > canvas.width + 100 || 
+                enemy.y < -100 || enemy.y > canvas.height + 100) {
+                enemies.splice(i, 1);
+            }
+        }
+    }
+    
+    function checkCollisions() {
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            
+            if (player.x < enemy.x + enemy.width &&
+                player.x + player.width > enemy.x &&
+                player.y < enemy.y + enemy.height &&
+                player.y + player.height > enemy.y) {
+                
+                if (!player.invulnerable) {
+                    player.health -= 10;
+                    player.invulnerable = true;
+                    setTimeout(() => { player.invulnerable = false; }, 1000);
+                    
+                    if (player.health <= 0) {
+                        gameOver();
+                        return;
+                    }
+                }
+                
+                enemies.splice(i, 1);
+            }
+        }
+    }
+    
+    function render() {
+        ctx.fillStyle = '#0f0f23';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 50) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+        
+        ctx.fillStyle = player.invulnerable ? 'rgba(0, 255, 255, 0.5)' : player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+        
+        enemies.forEach(enemy => {
+            ctx.fillStyle = enemy.color;
+            ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+        });
+    }
+    
+    function updateUI() {
+        const healthFill = document.getElementById('healthFill');
+        const healthText = document.getElementById('healthText');
+        const scoreEl = document.getElementById('score');
+        const timeEl = document.getElementById('time');
+        
+        if (healthFill) healthFill.style.width = (player.health / player.maxHealth * 100) + '%';
+        if (healthText) healthText.textContent = 'Health: ' + player.health;
+        if (scoreEl) scoreEl.textContent = 'Score: ' + score;
+        if (timeEl) timeEl.textContent = 'Time: ' + Math.floor(gameTime) + 's';
+    }
+    
+    console.log('✅ Game loop created');
+    
+    // ========================================
+    // INPUT HANDLING
+    // ========================================
+    
+    window.addEventListener('keydown', e => {
+        keys[e.code] = true;
+        
+        if (e.code === 'Space' && gameRunning) {
+            e.preventDefault();
+            togglePause();
+        }
+    });
+    
+    window.addEventListener('keyup', e => {
+        keys[e.code] = false;
+    });
+    
+    console.log('✅ Input handlers created');
+    
+    // ========================================
+    // EVENT LISTENERS
+    // ========================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🟢 DOMContentLoaded - Setting up buttons...');
+        
+        const playBtn = document.getElementById('playBtn');
+        if (playBtn) {
+            playBtn.addEventListener('click', () => {
+                showScreen('startScreen');
+            });
+        }
+        
+        const startBtn = document.getElementById('startBtn');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                console.log('✅ Start button clicked!');
+                startGame();
+            });
+        }
+        
+        const menuBtn = document.getElementById('menuBtn');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+        }
+        
+        const resumeBtn = document.getElementById('resumeBtn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', () => {
+                togglePause();
+            });
+        }
+        
+        const pauseMenuBtn = document.getElementById('pauseMenuBtn');
+        if (pauseMenuBtn) {
+            pauseMenuBtn.addEventListener('click', () => {
+                gameRunning = false;
+                showScreen('mainMenu');
+            });
+        }
+        
+        const restartBtn = document.getElementById('restartBtn');
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                restartGame();
+            });
+        }
+        
+        const gameOverMenuBtn = document.getElementById('gameOverMenuBtn');
+        if (gameOverMenuBtn) {
+            gameOverMenuBtn.addEventListener('click', () => {
+                showScreen('mainMenu');
+            });
+        }
+        
+        console.log('✅ All buttons set up!');
+        console.log('🟢 Game initialization complete!');
+        console.log('✅ Showing main menu...');
+        
+        showScreen('mainMenu');
+    });
+    
+    console.log('🎮 Game.js loaded successfully!');
+    console.log('✅ All functions defined');
+    console.log('🎮 Game ready to play!');
+    </script>
+</body>
+</html>

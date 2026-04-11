@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Find game.js Error</title>
+    <style>
+        body { font-family: monospace; background: #1a1a2e; color: #fff; padding: 20px; }
+        .success { color: #44ff44; font-size: 24px; font-weight: bold; }
+        .error { color: #ff4444; font-size: 24px; font-weight: bold; }
+        #output { background: #000; padding: 15px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnosing game.js...</h1>
+    <div id="status">Loading...</div>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        
+        function log(msg) {
+            console.log(msg);
+            output.textContent += msg + '\n';
+        }
+        
+        log('=== GAME.JS ERROR DIAGNOSTIC ===\n');
+        
+        // Try to fetch game.js
+        log('Step 1: Fetching game.js...');
+        fetch('game.js?v=' + Date.now())
+            .then(response => {
+                log('✅ Fetch successful - Status: ' + response.status);
+                log('✅ Content-Type: ' + response.headers.get('content-type'));
+                return response.text();
+            })
+            .then(text => {
+                log('\n✅ File read successfully!');
+                log('📊 File size: ' + text.length + ' bytes');
+                log('📊 Lines: ' + text.split('\n').length);
+                
+                log('\nStep 2: Checking for common syntax errors...');
+                
+                // Check for common errors
+                const errors = [];
+                
+                // Check for unclosed brackets
+                const openBraces = (text.match(/\{/g) || []).length;
+                const closeBraces = (text.match(/\}/g) || []).length;
+                log(`  - Opening braces {: ${openBraces}`);
+                log(`  - Closing braces }: ${closeBraces}`);
+                if (openBraces !== closeBraces) {
+                    errors.push(`⚠️  Mismatched braces! Open: ${openBraces}, Close: ${closeBraces}`);
+                }
+                
+                const openParens = (text.match(/\(/g) || []).length;
+                const closeParens = (text.match(/\)/g) || []).length;
+                log(`  - Opening parens (: ${openParens}`);
+                log(`  - Closing parens ): ${closeParens}`);
+                if (openParens !== closeParens) {
+                    errors.push(`⚠️  Mismatched parens! Open: ${openParens}, Close: ${closeParens}`);
+                }
+                
+                // Try to evaluate
+                log('\nStep 3: Attempting to parse JavaScript...');
+                try {
+                    // This will catch syntax errors
+                    new Function(text);
+                    log('✅ JavaScript syntax is VALID!');
+                    
+                    if (errors.length > 0) {
+                        log('\n⚠️  WARNING - File has warnings:');
+                        errors.forEach(e => log('  ' + e));
+                    } else {
+                        log('\n✅ No issues found - file should work!');
+                    }
+                    
+                    status.innerHTML = '<span class="success">✅ game.js is VALID and should work!</span>';
+                    status.innerHTML += '<br><br>Try refreshing index.html with Ctrl+Shift+R';
+                    
+                } catch (e) {
+                    log('❌ SYNTAX ERROR FOUND!');
+                    log('\nError message:');
+                    log(e.message);
+                    
+                    if (e.stack) {
+                        log('\nStack trace:');
+                        log(e.stack);
+                    }
+                    
+                    status.innerHTML = '<span class="error">❌ Syntax error in game.js!</span>';
+                    status.innerHTML += '<br><br>Check the error below';
+                }
+            })
+            .catch(err => {
+                log('❌ Failed to fetch game.js!');
+                log('Error: ' + err.message);
+                status.innerHTML = '<span class="error">❌ Cannot load game.js file!</span>';
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SUPER SIMPLE TEST</title>
+</head>
+<body>
+    <h1 id="status">❌ JavaScript NOT loaded</h1>
+    <p>If you see this text in GREEN below, JavaScript is working!</p>
+    
+    <button id="testBtn" onclick="alert('Button works!')">CLICK ME TEST</button>
+    
+    <script>
+        console.log('=== INLINE SCRIPT WORKS ===');
+        document.getElementById('status').textContent = '✅ JavaScript IS working!';
+        document.getElementById('status').style.color = 'green';
+        document.getElementById('status').style.fontSize = '40px';
+    </script>
+    
+    <script src="game_minimal.js"></script>
+    
+    <script>
+        console.log('=== AFTER EXTERNAL SCRIPT ===');
+        console.log('startGame type:', typeof startGame);
+        
+        if (typeof startGame === 'function') {
+            document.body.innerHTML += '<h2 style="color:green">✅ game_minimal.js LOADED!</h2>';
+        } else {
+            document.body.innerHTML += '<h2 style="color:red">❌ game_minimal.js FAILED to load!</h2>';
+        }
+    </script>
+</body>
+</html>
