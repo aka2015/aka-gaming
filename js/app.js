@@ -31,6 +31,7 @@ const catBtns        = document.querySelectorAll(".cat-btn");
 //  AUTH
 // ────────────────────────────────────────────────────────────
 const provider = new GoogleAuthProvider();
+let pendingGameUrl = null;
 
 async function loginWithGoogle() {
   try { await signInWithPopup(auth, provider); }
@@ -52,6 +53,11 @@ let gamesReady  = false;
 onAuthStateChanged(auth, user => {
   currentUser = user;
   updateAuthUI(user);
+  // Setelah login, redirect ke game yang dituju (jika ada)
+  if (user && pendingGameUrl) {
+    window.location.href = pendingGameUrl;
+    return;
+  }
   // Kalau game sudah diload, cukup render ulang (jangan reload dari awal)
   if (gamesReady) {
     renderGames();
@@ -183,7 +189,7 @@ function buildGameCard(game) {
   // Click → go to game page (login required)
   card.addEventListener("click", () => {
     if (!currentUser) {
-      showLoginModal();
+      showLoginModal(`game.html?id=${game.id}`);
       return;
     }
     window.location.href = `game.html?id=${game.id}`;
@@ -192,7 +198,7 @@ function buildGameCard(game) {
   card.querySelector(".btn-play").addEventListener("click", e => {
     e.stopPropagation();
     if (!currentUser) {
-      showLoginModal();
+      showLoginModal(`game.html?id=${game.id}`);
       return;
     }
     window.location.href = `game.html?id=${game.id}`;
@@ -230,7 +236,8 @@ searchInput?.addEventListener("input", () => {
 // ────────────────────────────────────────────────────────────
 //  LOGIN MODAL
 // ────────────────────────────────────────────────────────────
-function showLoginModal() {
+function showLoginModal(gameUrl = null) {
+  pendingGameUrl = gameUrl;
   const existing = document.getElementById("login-modal");
   if (existing) { existing.classList.remove("hidden"); return; }
 
