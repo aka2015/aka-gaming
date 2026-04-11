@@ -605,6 +605,69 @@ body {
 .login-prompt-card h3 { font-family: var(--font-head); font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; }
 .login-prompt-card p  { color: var(--text-muted); margin-bottom: 24px; }
 
+/* ===== LOGIN MODAL ===== */
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.login-modal-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 48px 36px 40px;
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  position: relative;
+  animation: modal-pop .25s ease;
+}
+
+@keyframes modal-pop {
+  from { transform: scale(.9); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+.login-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+}
+
+.login-modal-close:hover { background: var(--bg); }
+
+.login-modal-card h3 {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin: 8px 0;
+}
+
+.login-modal-card p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  font-size: .95rem;
+}
+
 /* ===== FOOTER ===== */
 .footer {
   background: var(--primary);

@@ -178,7 +178,7 @@ function buildGameCard(game) {
   // Click → go to game page (login required)
   card.addEventListener("click", () => {
     if (!currentUser) {
-      loginPrompt?.scrollIntoView({ behavior: "smooth" });
+      showLoginModal();
       return;
     }
     window.location.href = `game.html?id=${game.id}`;
@@ -187,7 +187,7 @@ function buildGameCard(game) {
   card.querySelector(".btn-play").addEventListener("click", e => {
     e.stopPropagation();
     if (!currentUser) {
-      loginPrompt?.scrollIntoView({ behavior: "smooth" });
+      showLoginModal();
       return;
     }
     window.location.href = `game.html?id=${game.id}`;
@@ -200,14 +200,8 @@ function showGamesState(state) {
   gamesLoading.classList.toggle("hidden", state !== "loading");
   gamesGrid.classList.toggle("hidden",    state !== "grid");
   gamesEmpty.classList.toggle("hidden",   state !== "empty");
-
-  if (!currentUser && state !== "loading") {
-    loginPrompt?.classList.remove("hidden");
-    gamesGrid.classList.add("hidden");
-    gamesEmpty.classList.add("hidden");
-  } else {
-    loginPrompt?.classList.add("hidden");
-  }
+  // Login prompt tidak lagi menyembunyikan daftar game
+  loginPrompt?.classList.add("hidden");
 }
 
 // ────────────────────────────────────────────────────────────
@@ -227,6 +221,35 @@ searchInput?.addEventListener("input", () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(renderGames, 250);
 });
+
+// ────────────────────────────────────────────────────────────
+//  LOGIN MODAL
+// ────────────────────────────────────────────────────────────
+function showLoginModal() {
+  const existing = document.getElementById("login-modal");
+  if (existing) { existing.classList.remove("hidden"); return; }
+
+  const modal = document.createElement("div");
+  modal.id = "login-modal";
+  modal.className = "login-modal-overlay";
+  modal.innerHTML = `
+    <div class="login-modal-card">
+      <button class="login-modal-close" id="btn-close-modal">✕</button>
+      <div class="empty-icon">🎮</div>
+      <h3>Login untuk Bermain!</h3>
+      <p>Masuk dengan akun Google kamu untuk memainkan game ini.</p>
+      <button id="btn-login-modal" class="btn-primary btn-big">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" />
+        Masuk dengan Google
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById("btn-login-modal").addEventListener("click", loginWithGoogle);
+  document.getElementById("btn-close-modal").addEventListener("click", () => modal.classList.add("hidden"));
+  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
+}
 
 // ────────────────────────────────────────────────────────────
 //  HELPERS
