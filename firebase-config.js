@@ -1,10 +1,7 @@
 // ============================================================
-// KONFIGURASI FIREBASE - Ganti dengan config Firebase kamu!
-// Cara dapat config:
-// 1. Buka console.firebase.google.com
-// 2. Buat project baru
-// 3. Tambah Web App
-// 4. Salin firebaseConfig di bawah
+// FIREBASE CONFIGURATION (Auto-generated from .env)
+// ⚠️  JANGAN EDIT FILE INI SECARA MANUAL!
+// Edit file: .env kemudian jalankan: npm run build:config
 // ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBAEWUD-B5cF1ac1COTxKVoCks9s6tzUzQ",

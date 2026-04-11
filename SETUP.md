@@ -16,20 +16,44 @@
 
 ---
 
-## Langkah 3: Isi Config di Kode
+## Langkah 3: Konfigurasi Firebase (AMAN!) 🔒
 
-Buka file **`js/firebase.js`** dan ganti:
+Kami menggunakan sistem environment variables agar config Firebase **tidak terekspos di Git**.
 
-```js
-const firebaseConfig = {
-  apiKey:            "ISI_SINI",
-  authDomain:        "ISI_SINI",
-  projectId:         "ISI_SINI",
-  storageBucket:     "ISI_SINI",
-  messagingSenderId: "ISI_SINI",
-  appId:             "ISI_SINI"
-};
-```
+### Cara setup:
+
+1. **Copy file .env.example menjadi .env**
+   ```bash
+   npm run setup:env
+   ```
+
+2. **Edit file `.env`** dan isi dengan config Firebase kamu:
+   ```env
+   VITE_FIREBASE_API_KEY=your_api_key_here
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
+   ```
+
+3. **Generate file firebase-config.js**
+   ```bash
+   npm run build:config
+   ```
+
+✅ **Selesai!** File `firebase-config.js` akan otomatis dibuat dan **tidak akan ter-commit ke Git** (sudah ada di `.gitignore`).
+
+---
+
+### ⚠️ Penting saat publish ke website:
+
+- File `.env` dan `firebase-config.js` **TIDAK BOLEH** di-upload ke repository
+- Saat deploy ke hosting, pastikan:
+  - **Vercel/Netlify**: Upload file `.env` atau set environment variables di dashboard
+  - **Firebase Hosting**: Jalankan `npm run build:config` sebelum deploy
+  - **Static hosting biasa**: Pastikan `firebase-config.js` ada di folder deploy (tapi jangan commit ke Git)
 
 ---
 
@@ -133,18 +157,25 @@ npx serve .
 ## Struktur File
 
 ```
-game-portal/
+aka-gaming/
 ├── index.html          ← Halaman utama portal
 ├── game.html           ← Halaman main game + komentar
 ├── admin.html          ← Panel admin
+├── .env                ← Firebase config (JANGAN COMMIT!)
+├── .env.example        ← Template .env
+├── firebase-config.js  ← Auto-generated (JANGAN COMMIT!)
+├── package.json        ← NPM scripts
+├── build-config.js     ← Script build config
 ├── css/
 │   ├── style.css       ← Style utama (portal + game)
 │   └── admin.css       ← Style khusus admin
-└── js/
-    ├── firebase.js     ← Inisialisasi Firebase (isi config di sini!)
-    ├── app.js          ← Logic halaman utama
-    ├── game.js         ← Logic halaman game
-    └── admin.js        ← Logic admin panel
+├── js/
+│   ├── firebase.js     ← Inisialisasi Firebase (import config)
+│   ├── app.js          ← Logic halaman utama
+│   ├── game.js         ← Logic halaman game
+│   └── admin.js        ← Logic admin panel
+└── games/
+    └── index.json      ← Daftar game ID
 ```
 
 ---

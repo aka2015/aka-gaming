@@ -1,2 +1,8 @@
+# Firebase config (contains secrets)
 firebase-config.js
+.env
+.env.local
+.env.*.local
+
+# Other
 .claude

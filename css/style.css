@@ -876,10 +876,10 @@ body {
   flex-wrap: wrap;
 }
 
-.comment-author { font-weight: 800; font-size: .9rem; }
+.comment-author { font-weight: 800; font-size: .9rem; color: var(--text); }
 .comment-time   { font-size: .78rem; color: var(--text-muted); }
 
-.comment-text { font-size: .9rem; line-height: 1.6; word-break: break-word; }
+.comment-text { font-size: .9rem; line-height: 1.6; word-break: break-word; color: var(--text); }
 
 .load-more-area { text-align: center; margin-top: 24px; }
 

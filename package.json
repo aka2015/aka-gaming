@@ -1,0 +1,13 @@
+{
+  "name": "aka-gaming",
+  "version": "1.0.0",
+  "description": "Portal gaming untuk anak-anak",
+  "type": "module",
+  "scripts": {
+    "build:config": "node build-config.js",
+    "setup:env": "cp .env.example .env && echo '✅ .env file created. Please update with your Firebase config.'"
+  },
+  "keywords": ["gaming", "portal", "firebase"],
+  "author": "",
+  "license": "ISC"
+}
