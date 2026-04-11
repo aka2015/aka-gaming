@@ -236,31 +236,17 @@ searchInput?.addEventListener("input", () => {
 // ────────────────────────────────────────────────────────────
 //  LOGIN MODAL
 // ────────────────────────────────────────────────────────────
+const loginModal    = document.getElementById("login-modal");
+const btnLoginModal = document.getElementById("btn-login-modal");
+const btnCloseModal = document.getElementById("btn-close-modal");
+
+btnLoginModal?.addEventListener("click", loginWithGoogle);
+btnCloseModal?.addEventListener("click", () => loginModal?.classList.add("hidden"));
+loginModal?.addEventListener("click", e => { if (e.target === loginModal) loginModal.classList.add("hidden"); });
+
 function showLoginModal(gameUrl = null) {
   pendingGameUrl = gameUrl;
-  const existing = document.getElementById("login-modal");
-  if (existing) { existing.classList.remove("hidden"); return; }
-
-  const modal = document.createElement("div");
-  modal.id = "login-modal";
-  modal.className = "login-modal-overlay";
-  modal.innerHTML = `
-    <div class="login-modal-card">
-      <button class="login-modal-close" id="btn-close-modal">✕</button>
-      <div class="empty-icon">🎮</div>
-      <h3>Login untuk Bermain!</h3>
-      <p>Masuk dengan akun Google kamu untuk memainkan game ini.</p>
-      <button id="btn-login-modal" class="btn-primary btn-big">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" />
-        Masuk dengan Google
-      </button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  document.getElementById("btn-login-modal").addEventListener("click", loginWithGoogle);
-  document.getElementById("btn-close-modal").addEventListener("click", () => modal.classList.add("hidden"));
-  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
+  loginModal?.classList.remove("hidden");
 }
 
 // ────────────────────────────────────────────────────────────
