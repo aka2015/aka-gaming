@@ -18,6 +18,9 @@ function checkWaveProgress() {
                 gameState = 'wave_rest';
                 restTimer = restDuration;
                 showWarning(`⏰ Wave ${currentWave} selesai! Siap ke wave berikutnya...`, 2);
+                
+                // Update background music for wave rest
+                updateBackgroundMusicForGameState();
             }
             waveTimer = 0; // Reset timer untuk mencegah trigger berulang
         } else {
@@ -33,8 +36,10 @@ function checkWaveProgress() {
     }
 
     // Spawn enemies (only if wave timer hasn't exceeded duration)
+    // INCREASED: 5x faster spawn rate
     const currentTime = performance.now();
-    if (currentTime - lastSpawnTime >= spawnRate && waveTimer < waveDuration) {
+    const adjustedSpawnRate = spawnRate / 5; // 5x faster
+    if (currentTime - lastSpawnTime >= adjustedSpawnRate && waveTimer < waveDuration) {
         spawnEnemy();
         lastSpawnTime = currentTime;
     }
@@ -175,4 +180,7 @@ function spawnBoss(wave) {
     showBossHpBar(boss);
     showWarning(`⚠️ BOSS: ${boss.name}! ⚠️`, 3);
     playSound(100, 1, 'sawtooth', 0.2);
+    
+    // Update background music for boss fight
+    updateBackgroundMusicForGameState();
 }

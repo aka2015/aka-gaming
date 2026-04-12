@@ -12,16 +12,14 @@ let pendingPurchase = null;
 function openShop() {
     gameState = 'shop';
 
-    // Jangan hide all screens, cukup hide menu screens saja
+    // Hide only menu screens, NOT the HUD
     document.querySelectorAll('.screen').forEach(screen => {
-        if (!screen.id.includes('ui') && !screen.id.includes('weaponDisplay')) {
-            screen.classList.add('hidden');
-        }
+        screen.classList.add('hidden');
     });
 
     document.getElementById('shopScreen').classList.remove('hidden');
 
-    // Pastikan HUD tetap visible
+    // Keep HUD visible
     document.getElementById('ui').classList.remove('hidden');
     document.getElementById('weaponDisplay').classList.remove('hidden');
 
@@ -41,7 +39,7 @@ function closeShop() {
         gameState = 'playing';
         document.getElementById('shopScreen').classList.add('hidden');
 
-        // Pastikan HUD tetap visible
+        // Keep HUD visible
         document.getElementById('ui').classList.remove('hidden');
         document.getElementById('weaponDisplay').classList.remove('hidden');
 
@@ -142,10 +140,18 @@ function completePurchase() {
 function applyShopUpgrade(item, level) {
     const effect = item.effect(level);
 
-    if (effect.damageMultiplier) {
+    if (item.weaponType) {
         const weapon = player.weapons.find(w => w.type === item.weaponType);
         if (weapon) {
-            weapon.damage *= (1 + effect.damageMultiplier);
+            // Update weapon level
+            weapon.level = level;
+            
+            // Apply damage multiplier
+            if (effect.damageMultiplier) {
+                // Recalculate from base damage to avoid compounding
+                const baseWeaponData = WEAPONS[item.weaponType];
+                weapon.damage = baseWeaponData.damage * (1 + effect.damageMultiplier * level);
+            }
         }
     }
 

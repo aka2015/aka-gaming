@@ -12,6 +12,11 @@ function updatePlayer(deltaTime) {
     if (keys['a'] || keys['arrowleft']) dx -= 1;
     if (keys['d'] || keys['arrowright']) dx += 1;
 
+    // Update facing direction based on input
+    if (dx !== 0 || dy !== 0) {
+        player.facingDirection = { x: dx, y: dy };
+    }
+
     // Normalize diagonal movement
     if (dx !== 0 && dy !== 0) {
         dx *= 0.7071;
@@ -30,9 +35,28 @@ function updatePlayer(deltaTime) {
         player.invincibleTimer -= deltaTime;
     }
 
+    // Update attack timer
+    if (player.attackTimer > 0) {
+        player.attackTimer -= deltaTime;
+        if (player.attackTimer <= 0) {
+            player.isAttacking = false;
+            player.attackTimer = 0;
+        }
+    }
+
     // HP regeneration
     if (player.hpRegen > 0 && player.hp < player.maxHp) {
         player.hp = Math.min(player.maxHp, player.hp + player.hpRegen * deltaTime);
+        
+        // Activate HP regen visual effect
+        if (!hpRegenEffect.active) {
+            hpRegenEffect.active = true;
+            hpRegenEffect.timer = 0;
+        }
+    } else {
+        // Deactivate HP regen visual effect
+        hpRegenEffect.active = false;
+        hpRegenEffect.timer = 0;
     }
 
     // Update player trail

@@ -153,6 +153,31 @@ function setupGame() {
         soundEnabled = !soundEnabled;
         document.getElementById('soundToggle').textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
     });
+    
+    // Background music toggle
+    const bgMusicToggle = document.getElementById('bgMusicToggle');
+    if (bgMusicToggle) {
+        bgMusicToggle.addEventListener('click', () => {
+            const isEnabled = toggleBackgroundMusic();
+            bgMusicToggle.textContent = isEnabled ? '🎵 ON' : '🔇 OFF';
+        });
+    }
+
+    // Background music volume slider
+    const bgMusicVolumeSlider = document.getElementById('bgMusicVolume');
+    const bgMusicVolumeValue = document.getElementById('bgMusicVolumeValue');
+    if (bgMusicVolumeSlider) {
+        // Set initial volume value
+        const currentVolume = Math.round(getBgMusicVolume() * 100);
+        bgMusicVolumeSlider.value = currentVolume;
+        bgMusicVolumeValue.textContent = currentVolume + '%';
+
+        bgMusicVolumeSlider.addEventListener('input', () => {
+            const volume = parseInt(bgMusicVolumeSlider.value) / 100;
+            setBgMusicVolume(volume);
+            bgMusicVolumeValue.textContent = Math.round(volume * 100) + '%';
+        });
+    }
 }
 
 function showMainMenu() {
@@ -166,10 +191,11 @@ function showCharacterSelect() {
     hideAllScreens();
     document.getElementById('characterSelectScreen').classList.remove('hidden');
 
-    // Render character previews
+    // Render character previews for all 4 characters
     renderCharacterPreview('warrior');
     renderCharacterPreview('mage');
     renderCharacterPreview('ranger');
+    renderCharacterPreview('orc');
 }
 
 function renderCharacterPreview(characterId) {
@@ -184,7 +210,11 @@ function renderCharacterPreview(characterId) {
     const ctx = canvas.getContext('2d');
 
     const charData = CHARACTERS[characterId];
-    drawCharacter(ctx, 75, 100, characterId, charData.colors, Date.now());
+    
+    // Use larger scale for preview (all characters now use TinySword assets)
+    const previewScale = 2.0;
+    
+    drawCharacter(ctx, 75, 90, characterId, charData.colors, Date.now(), { x: 0, y: 1 }, 'preview', previewScale);
 
     previewDiv.appendChild(canvas);
 }

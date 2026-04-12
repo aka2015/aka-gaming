@@ -36,7 +36,11 @@ let player = {
     xpMultiplier: 1.0,
     hasExtraLife: false,
     weaponIndex: 0,
-    lastAttackTime: 0
+    lastAttackTime: 0,
+    isAttacking: false,
+    attackTimer: 0,
+    attackIndex: 0, // Track which attack animation to use (alternates between attack01, attack02)
+    facingDirection: { x: 0, y: 1 } // Default facing down
 };
 
 // Game objects
@@ -75,3 +79,23 @@ let mouseY = 0;
 // Audio
 let audioCtx = null;
 let soundEnabled = true;
+let bgMusicEnabled = true;
+let bgMusicGainNode = null;
+let bgMusicOscillators = [];
+let bgMusicInterval = null;
+let bgMusicPlaying = false;
+let bgMusicAudio = null; // HTML5 Audio element for background music
+
+// Utility functions
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+}
+
+// HP Regen effect state
+let hpRegenEffect = {
+    active: false,
+    timer: 0,
+    spriteSheet: null,
+    animation: null
+};

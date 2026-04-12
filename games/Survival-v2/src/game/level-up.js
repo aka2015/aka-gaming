@@ -34,6 +34,10 @@ function renderUpgradeChoices(choices) {
             document.getElementById('levelUpScreen').classList.add('hidden');
             gameState = 'playing';
             lastTime = performance.now();
+            
+            // Keep HUD visible
+            document.getElementById('ui').classList.remove('hidden');
+            document.getElementById('weaponDisplay').classList.remove('hidden');
         });
 
         container.appendChild(card);
@@ -46,5 +50,14 @@ function applyUpgrade(upgrade) {
 }
 
 function showLevelUpScreen() {
+    // Hide only menu screens, NOT the HUD
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.add('hidden');
+    });
+    
     document.getElementById('levelUpScreen').classList.remove('hidden');
+    
+    // Keep HUD visible during level up
+    document.getElementById('ui').classList.remove('hidden');
+    document.getElementById('weaponDisplay').classList.remove('hidden');
 }

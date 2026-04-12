@@ -2,11 +2,29 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Survival Game - Survival.io Style</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
+        <div class="loading-container">
+            <div class="loading-logo">
+                <canvas id="loadingCanvas" width="200" height="200"></canvas>
+            </div>
+            <h1 class="loading-title">Survival Game</h1>
+            <p class="loading-subtitle">Loading assets...</p>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+            <p class="loading-percent" id="loadingPercent">0%</p>
+            <div class="loading-tips" id="loadingTips">
+                <p>💡 Tip: Use WASD or Arrow Keys to move</p>
+            </div>
+        </div>
+    </div>
+
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         
@@ -107,6 +125,24 @@
                         </div>
                     </div>
                     <button class="select-btn" data-character="ranger">PILIH RANGER</button>
+                </div>
+
+                <!-- Orc Card -->
+                <div class="character-card" data-character="orc">
+                    <div class="character-preview" id="orcPreview"></div>
+                    <h2 class="character-name orc">👹 Orc</h2>
+                    <p class="character-desc">Makhluk kuat dengan damage tinggi dan HP besar</p>
+                    <div class="character-info">
+                        <div class="info-item">
+                            <span class="info-label">Senjata:</span>
+                            <span class="info-value">Pedang (Melee)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gaya:</span>
+                            <span class="info-value">Tanky & High Damage</span>
+                        </div>
+                    </div>
+                    <button class="select-btn" data-character="orc">PILIH ORC</button>
                 </div>
             </div>
             <button id="backToMenuFromCharSelect" class="menu-btn">⬅️ Kembali ke Menu</button>
@@ -210,6 +246,15 @@
                     <label>Sound:</label>
                     <button id="soundToggle" class="sound-toggle-btn">🔊 ON</button>
                 </div>
+                <div class="setting-item">
+                    <label>Background Music:</label>
+                    <button id="bgMusicToggle" class="sound-toggle-btn">🎵 ON</button>
+                </div>
+                <div class="setting-item">
+                    <label>Volume Backsound:</label>
+                    <input type="range" id="bgMusicVolume" min="0" max="100" value="35" class="volume-slider">
+                    <span id="bgMusicVolumeValue">35%</span>
+                </div>
             </div>
             <button id="settingsBackBtn" class="menu-btn">⬅️ Kembali</button>
         </div>
@@ -290,38 +335,50 @@
         
         <!-- Warnings -->
         <div id="warnings"></div>
+
+        <!-- Mobile Joystick & Controls -->
+        <div id="joystickContainer">
+            <div id="joystickBase">
+                <div id="joystickStick"></div>
+            </div>
+        </div>
+
+        <button id="mobileAttackBtn" class="mobile-btn">⚔️</button>
+        <button id="mobileShopBtn" class="mobile-btn">🛒</button>
     </div>
     
     <!-- Load game modules in correct order -->
     <!-- 1. Data definitions -->
-    <script src="src/data/game-data.js"></script>
-    
+    <script src="src/data/game-data.js?v=3"></script>
+
     <!-- 2. System modules -->
-    <script src="src/system/game-state.js"></script>
-    <script src="src/system/audio.js"></script>
-    
+    <script src="src/system/sprite-loader.js?v=3"></script>
+    <script src="src/system/game-state.js?v=3"></script>
+    <script src="src/system/audio.js?v=3"></script>
+    <script src="src/system/joystick.js?v=3"></script>
+
     <!-- 3. Rendering modules -->
-    <script src="src/render/character-render.js"></script>
-    <script src="src/render/rendering.js"></script>
-    
+    <script src="src/render/character-render.js?v=3"></script>
+    <script src="src/render/rendering.js?v=3"></script>
+
     <!-- 4. UI modules -->
-    <script src="src/ui/ui-functions.js"></script>
-    
+    <script src="src/ui/ui-functions.js?v=3"></script>
+
     <!-- 5. Game logic modules -->
-    <script src="src/game/game-setup.js"></script>
-    <script src="src/game/game-start.js"></script>
-    <script src="src/game/player.js"></script>
-    <script src="src/game/weapons.js"></script>
-    <script src="src/game/enemies.js"></script>
-    <script src="src/game/projectiles.js"></script>
-    <script src="src/game/wave-system.js"></script>
-    <script src="src/game/collisions.js"></script>
-    <script src="src/game/collectibles.js"></script>
-    <script src="src/game/level-up.js"></script>
-    <script src="src/game/shop.js"></script>
-    <script src="src/game/wave-rest.js"></script>
-    
+    <script src="src/game/game-setup.js?v=3"></script>
+    <script src="src/game/game-start.js?v=3"></script>
+    <script src="src/game/player.js?v=3"></script>
+    <script src="src/game/weapons.js?v=3"></script>
+    <script src="src/game/enemies.js?v=3"></script>
+    <script src="src/game/projectiles.js?v=3"></script>
+    <script src="src/game/wave-system.js?v=3"></script>
+    <script src="src/game/collisions.js?v=3"></script>
+    <script src="src/game/collectibles.js?v=3"></script>
+    <script src="src/game/level-up.js?v=3"></script>
+    <script src="src/game/shop.js?v=3"></script>
+    <script src="src/game/wave-rest.js?v=3"></script>
+
     <!-- 6. Main entry point -->
-    <script src="src/main.js"></script>
+    <script src="src/main.js?v=3"></script>
 </body>
 </html>

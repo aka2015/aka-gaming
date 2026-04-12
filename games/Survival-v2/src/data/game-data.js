@@ -43,6 +43,21 @@ const CHARACTERS = {
             hair: '#DC2626',
             outline: '#14532D'
         }
+    },
+    orc: {
+        id: 'orc',
+        name: 'Orc',
+        description: 'Makhluk kuat dengan damage tinggi dan HP besar',
+        startingWeapon: 'basic_sword',
+        baseDefense: 5,
+        baseHpBonus: 20, // Orc punya HP tambahan
+        colors: {
+            primary: '#15803D',
+            secondary: '#78350F',
+            skin: '#4ADE80',
+            hair: '#1F2937',
+            outline: '#14532D'
+        }
     }
 };
 

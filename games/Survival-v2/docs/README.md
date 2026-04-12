@@ -1,6 +1,60 @@
-# Survival Game - Modular Structure
+# Survival Game - Documentation Index
 
-This game has been refactored into a modular structure for better maintainability and code organization.
+Welcome to the Survival Game documentation! This folder contains all documentation and reference materials for the game.
+
+## 📚 Documentation Files
+
+### Design & Planning
+- **[CHARACTER_DESIGN.md](./CHARACTER_DESIGN.md)** - Character designs and visual concepts
+- **[DESIGN_DOC.md](./DESIGN_DOC.md)** - Main design document (English)
+- **[DESIGN_DOC_ID.md](./DESIGN_DOC_ID.md)** - Design document (Indonesian)
+
+### Gameplay & Mechanics
+- **[GAMEPLAY_DOC.md](./GAMEPLAY_DOC.md)** - Complete gameplay mechanics documentation
+- **[MODULAR_STRUCTURE.md](./MODULAR_STRUCTURE.md)** - Code structure and module organization
+
+### Features
+- **[BACKGROUND-MUSIC.md](./BACKGROUND-MUSIC.md)** 🆕 - Background music system documentation
+  - Dynamic adaptive music based on game state
+  - Technical implementation details
+  - Usage guide for players and developers
+
+### Bug Fixes
+- **[BUGFIX-HUD-VISIBILITY.md](./BUGFIX-HUD-VISIBILITY.md)** 🆕 - HUD disappearing fix
+  - Fixed HP, XP, coins, and weapon display hiding during pause/shop/level-up
+  - Detailed root cause analysis and solution
+
+## 📁 Additional Files
+
+### Testing
+- **[test-bg-music.html](./test-bg-music.html)** - Standalone test file for the background music system
+
+---
+
+## 🎮 Quick Links
+
+- **Main Game**: Go back to [`index.html`](../index.html)
+- **Source Code**: See [`src/`](../src/) directory for game code
+- **Styles**: See [`style.css`](../style.css) for game styling
+
+---
+
+## 📊 Documentation Overview
+
+| Document | Purpose | Language |
+|----------|---------|----------|
+| CHARACTER_DESIGN.md | Character concepts & art direction | English |
+| DESIGN_DOC.md | Game design specifications | English |
+| DESIGN_DOC_ID.md | Spesifikasi desain game | Indonesian |
+| GAMEPLAY_DOC.md | Gameplay mechanics & systems | English |
+| MODULAR_STRUCTURE.md | Code architecture guide | English |
+| BACKGROUND-MUSIC.md | BGM system guide | English |
+| CHARACTER-ENHANCEMENT.md | Character enhancements & balance | English |
+| BUGFIX-HUD-VISIBILITY.md | HUD visibility bug fix | English |
+
+---
+
+*Last updated: 2026*
 
 ## 📁 Folder Structure
 

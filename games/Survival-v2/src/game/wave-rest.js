@@ -19,6 +19,11 @@ function updateWaveRest(deltaTime) {
 
         showWarning(`Wave ${currentWave} dimulai!`, 2);
         playSound(440, 0.3, 'sine', 0.12);
+
+        // Resume background music for new wave
+        if (bgMusicEnabled) {
+            playFileBackgroundMusic();
+        }
     } else if (aliveEnemies.length > 0) {
         // If enemies are still alive during rest, show message
         // Don't proceed to next wave until all enemies are dead
@@ -32,18 +37,43 @@ function updateWaveRest(deltaTime) {
 
 function pauseGame() {
     gameState = 'paused';
-    hideAllScreens();
+    
+    // Hide only menu screens, NOT the HUD
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.add('hidden');
+    });
     document.getElementById('pauseScreen').classList.remove('hidden');
+
+    // Keep HUD visible
+    document.getElementById('ui').classList.remove('hidden');
+    document.getElementById('weaponDisplay').classList.remove('hidden');
+
+    // Stop background music when paused
+    stopBackgroundMusic();
 }
 
 function resumeGame() {
     gameState = 'playing';
-    hideAllScreens();
+
+    // Hide pause screen
+    document.getElementById('pauseScreen').classList.add('hidden');
     lastTime = performance.now();
+
+    // Keep HUD visible
+    document.getElementById('ui').classList.remove('hidden');
+    document.getElementById('weaponDisplay').classList.remove('hidden');
+
+    // Resume background music
+    if (bgMusicEnabled) {
+        playFileBackgroundMusic();
+    }
 }
 
 function gameOver() {
     gameState = 'game_over';
+
+    // Stop background music
+    stopBackgroundMusic();
 
     // Calculate final score
     const finalScore = score + Math.floor(survivalTime);

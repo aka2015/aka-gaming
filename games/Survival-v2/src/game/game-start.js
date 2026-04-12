@@ -8,14 +8,17 @@ function startGame() {
         return;
     }
 
+    // Initialize audio
+    initAudio();
+
     // Initialize player
     const charData = CHARACTERS[selectedCharacter];
     player.character = selectedCharacter;
     player.colors = charData.colors;
     player.x = canvas.width / 2;
     player.y = canvas.height / 2;
-    player.hp = 100;
-    player.maxHp = 100;
+    player.hp = 100 + (charData.baseHpBonus || 0); // Orc has HP bonus
+    player.maxHp = 100 + (charData.baseHpBonus || 0);
     player.speed = 200;
     player.defense = charData.baseDefense || 0; // Use character's base defense
     player.damageReduction = 0;
@@ -36,6 +39,10 @@ function startGame() {
     player.hasExtraLife = false;
     player.weaponIndex = 0;
     player.lastAttackTime = 0;
+    player.isAttacking = false;
+    player.attackTimer = 0;
+    player.attackIndex = 0; // Reset attack animation index
+    player.facingDirection = { x: 0, y: 1 }; // Default facing down
 
     // Reset game state
     enemies = [];
@@ -69,6 +76,14 @@ function startGame() {
     document.getElementById('weaponDisplay').classList.remove('hidden');
     updateWeaponDisplay();
 
+    // Initialize joystick for mobile
+    if (isMobileDevice()) {
+        showJoystick();
+        initJoystick();
+    } else {
+        hideJoystick();
+    }
+
     // Start countdown
     gameState = 'countdown';
     countdownValue = 3;
@@ -84,6 +99,11 @@ function startGame() {
             playSound(880, 0.3, 'sine', 0.15);
             gameState = 'playing';
             countdownValue = 0;
+            
+            // Start background music
+            if (bgMusicEnabled) {
+                playFileBackgroundMusic();
+            }
         }
     }, 1000);
 }
@@ -103,6 +123,13 @@ function createWeapon(weaponType) {
 function resetGame() {
     selectedCharacter = null;
     gameState = 'menu';
+
+    // Stop background music
+    stopBackgroundMusic();
+
+    // Hide joystick
+    hideJoystick();
+
     hideAllScreens();
     showMainMenu();
 }

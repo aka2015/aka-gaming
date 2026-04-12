@@ -9,16 +9,34 @@ function updateWeapons(deltaTime) {
     const weapon = player.weapons[player.weaponIndex];
     const weaponData = WEAPONS[weapon.type];
 
-    // Check if can attack
-    const attackCooldown = 1000 / (weaponData.attackSpeed * player.attackSpeedMult);
+    // Character-specific attack speed multipliers
+    // Warrior: 10x (melee needs to be fast)
+    // Mage: 5x (ranged, homing projectiles)
+    // Ranger: 5x (ranged, piercing projectiles)
+    let speedMultiplier = 10; // Default for Warrior
 
-    if (currentTime - player.lastAttackTime >= attackCooldown) {
+    if (player.character === 'mage' || player.character === 'ranger') {
+        speedMultiplier = 5;
+    }
+
+    // Check if can attack
+    const attackCooldown = 1000 / (weaponData.attackSpeed * player.attackSpeedMult * speedMultiplier);
+    const timeSinceLastAttack = currentTime - player.lastAttackTime;
+
+    if (timeSinceLastAttack >= attackCooldown) {
         // Find target
         const target = findNearestEnemy(weaponData.range);
 
         if (target) {
             fireWeapon(weapon, weaponData, target);
             player.lastAttackTime = currentTime;
+            
+            // Set attack animation flag with longer duration to show full animation
+            player.isAttacking = true;
+            player.attackTimer = 0.7; // Longer duration to show full attack animation (8 frames at 12fps = ~0.67s)
+            
+            // DEBUG LOG
+            console.log(`🔫 ATTACK! Weapon: ${weapon.name}, Target: enemy at ${Math.round(target.x)},${Math.round(target.y)}, AttackTimer: ${player.attackTimer}s`);
 
             // Cycle to next weapon
             player.weaponIndex = (player.weaponIndex + 1) % player.weapons.length;
@@ -131,14 +149,16 @@ function firePiercingProjectile(weapon, weaponData, target) {
         y: player.y,
         vx: Math.cos(angle) * weaponData.speed,
         vy: Math.sin(angle) * weaponData.speed,
+        angle: angle,
         damage: weapon.damage,
         range: weaponData.range,
         traveled: 0,
-        type: 'piercing',
+        type: player.character === 'ranger' ? 'arrow' : 'piercing',
+        owner: 'player',
         hitEnemies: [],
         speed: weaponData.speed,
-        color: '#92400E',
-        size: 5,
+        color: player.character === 'ranger' ? '#22C55E' : '#92400E',
+        size: player.character === 'ranger' ? 12 : 5,
         trail: [],
         weaponType: weapon.type
     });

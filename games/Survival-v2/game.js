@@ -656,35 +656,6 @@ const keys = {};
 let mouseX = 0;
 let mouseY = 0;
 
-// Audio
-let audioCtx = null;
-let soundEnabled = true;
-
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-}
-
-function playSound(frequency, duration, type = 'sine', volume = 0.1) {
-    if (!audioCtx || !soundEnabled) return;
-    
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    
-    gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    
-    oscillator.start(audioCtx.currentTime);
-    oscillator.stop(audioCtx.currentTime + duration);
-}
-
 // ========================================
 // CHARACTER RENDERING FUNCTIONS
 // ========================================

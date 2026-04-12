@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Music Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #1a1a2e;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: #16213e;
+            border-radius: 10px;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #c23a51;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background: #0f3460;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Background Music System Test</h1>
+        <div class="status">
+            <p>Click "Start" to test the background music</p>
+        </div>
+        <button id="startBtn">Start Music</button>
+        <button id="stopBtn">Stop Music</button>
+        <button id="toggleBtn">Toggle Music</button>
+    </div>
+
+    <script>
+        // Import the audio system variables
+        let audioCtx = null;
+        let bgMusicEnabled = true;
+        let bgMusicGainNode = null;
+        let bgMusicOscillators = [];
+        let bgMusicInterval = null;
+        let bgMusicPlaying = false;
+        let currentPatternIndex = 0;
+        let currentNoteIndex = 0;
+        let currentBassIndex = 0;
+
+        const NOTES = {
+            'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+            'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+            'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99
+        };
+
+        const BG_PATTERNS = [
+            [
+                { notes: ['A3', 'E4', 'A4'], duration: 800, type: 'sine' },
+                { notes: ['A3', 'E4', 'A4'], duration: 800, type: 'sine' },
+                { notes: ['G3', 'D4', 'G4'], duration: 800, type: 'sine' },
+                { notes: ['F3', 'C4', 'F4'], duration: 800, type: 'sine' },
+            ],
+            [
+                { notes: ['E3', 'B3', 'E4'], duration: 600, type: 'sine' },
+                { notes: ['E3', 'B3', 'E4'], duration: 600, type: 'sine' },
+                { notes: ['F3', 'C4', 'F4'], duration: 600, type: 'sine' },
+                { notes: ['G3', 'D4', 'G4'], duration: 600, type: 'sine' },
+            ]
+        ];
+
+        const BASS_PATTERNS = [
+            ['A3', 'A3', 'G3', 'F3'],
+            ['E3', 'E3', 'F3', 'G3']
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                bgMusicGainNode = audioCtx.createGain();
+                bgMusicGainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                bgMusicGainNode.connect(audioCtx.destination);
+            }
+        }
+
+        function playBackgroundMusic() {
+            if (!audioCtx || !bgMusicEnabled || bgMusicPlaying) return;
+            
+            bgMusicPlaying = true;
+            
+            const patternIndex = 0;
+            const pattern = BG_PATTERNS[patternIndex];
+            const bassPattern = BASS_PATTERNS[patternIndex];
+            
+            const chord = pattern[currentNoteIndex % pattern.length];
+            chord.notes.forEach(note => {
+                if (NOTES[note]) {
+                    const oscillator = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    
+                    oscillator.connect(noteGain);
+                    noteGain.connect(bgMusicGainNode);
+                    
+                    oscillator.type = chord.type;
+                    oscillator.frequency.setValueAtTime(NOTES[note], audioCtx.currentTime);
+                    
+                    noteGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                    noteGain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.05);
+                    noteGain.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + chord.duration / 2000);
+                    noteGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + chord.duration / 1000);
+                    
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + chord.duration / 1000);
+                    
+                    bgMusicOscillators.push(oscillator);
+                }
+            });
+            
+            if (NOTES[bassPattern[currentBassIndex % bassPattern.length]]) {
+                const bassOsc = audioCtx.createOscillator();
+                const bassGain = audioCtx.createGain();
+                
+                bassOsc.connect(bassGain);
+                bassGain.connect(bgMusicGainNode);
+                
+                bassOsc.type = 'triangle';
+                const bassNote = bassPattern[currentBassIndex % bassPattern.length];
+                bassOsc.frequency.setValueAtTime(NOTES[bassNote] / 2, audioCtx.currentTime);
+                
+                bassGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                bassGain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.05);
+                bassGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + chord.duration / 1000);
+                
+                bassOsc.start(audioCtx.currentTime);
+                bassOsc.stop(audioCtx.currentTime + chord.duration / 1000);
+                
+                bgMusicOscillators.push(bassOsc);
+            }
+            
+            bgMusicInterval = setTimeout(() => {
+                currentNoteIndex++;
+                currentBassIndex++;
+                
+                if (currentNoteIndex >= pattern.length) {
+                    currentNoteIndex = 0;
+                }
+                if (currentBassIndex >= bassPattern.length) {
+                    currentBassIndex = 0;
+                }
+                
+                playBackgroundMusic();
+            }, chord.duration);
+        }
+
+        function stopBackgroundMusic() {
+            bgMusicPlaying = false;
+            if (bgMusicInterval) {
+                clearTimeout(bgMusicInterval);
+                bgMusicInterval = null;
+            }
+            
+            bgMusicOscillators.forEach(osc => {
+                try {
+                    osc.stop();
+                } catch (e) {}
+            });
+            bgMusicOscillators = [];
+            
+            currentPatternIndex = 0;
+            currentNoteIndex = 0;
+            currentBassIndex = 0;
+        }
+
+        function toggleBackgroundMusic() {
+            bgMusicEnabled = !bgMusicEnabled;
+            
+            if (bgMusicEnabled) {
+                playBackgroundMusic();
+            } else {
+                stopBackgroundMusic();
+            }
+            
+            return bgMusicEnabled;
+        }
+
+        // Button event listeners
+        document.getElementById('startBtn').addEventListener('click', () => {
+            initAudio();
+            playBackgroundMusic();
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            stopBackgroundMusic();
+        });
+
+        document.getElementById('toggleBtn').addEventListener('click', () => {
+            initAudio();
+            const isEnabled = toggleBackgroundMusic();
+            console.log('Music enabled:', isEnabled);
+        });
+    </script>
+</body>
+</html>

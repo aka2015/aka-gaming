@@ -28,6 +28,9 @@ function render() {
     // Draw player
     drawPlayer();
 
+    // Draw HP Regen effect
+    drawHpRegenEffect();
+
     // Draw countdown (if in countdown state)
     if (gameState === 'countdown' && countdownValue > 0) {
         drawCountdown();
@@ -151,7 +154,7 @@ function drawPlayer() {
         ctx.shadowBlur = 20;
     }
 
-    drawCharacter(ctx, player.x, player.y, player.character, player.colors, performance.now());
+    drawCharacter(ctx, player.x, player.y, player.character, player.colors, performance.now(), player.facingDirection);
 
     ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
@@ -239,6 +242,14 @@ function drawDyingEnemy(enemy) {
 
 function drawProjectiles() {
     projectiles.forEach(proj => {
+        // Try to draw arrow sprite for Ranger's piercing projectiles
+        if (proj.owner === 'player' && player.character === 'ranger' && proj.type === 'arrow') {
+            const angle = proj.angle || Math.atan2(proj.vy || 0, proj.vx || 0);
+            if (drawArrowProjectile(ctx, proj.x, proj.y, angle, proj.size / 10)) {
+                return; // Arrow sprite drawn, skip default rendering
+            }
+        }
+        
         // Draw trail
         proj.trail.forEach(t => {
             const alpha = t.timer / 0.3;
@@ -377,5 +388,93 @@ function drawParticles() {
             ctx.fill();
             ctx.globalAlpha = 1;
         }
+    }
+}
+
+// ========================================
+// HP REGEN EFFECT
+// ========================================
+
+function drawHpRegenEffect() {
+    if (!hpRegenEffect.active || player.hpRegen <= 0) {
+        return;
+    }
+
+    // Update timer
+    hpRegenEffect.timer += 0.016; // ~60fps
+
+    // Load heal effect sprite if not loaded
+    if (!hpRegenEffect.spriteSheet && CharacterSpriteManager.isLoaded('monk_heal')) {
+        const healData = CharacterSpriteManager.characters['monk_heal'];
+        if (healData && healData.animations.idle) {
+            hpRegenEffect.spriteSheet = healData.animations.idle.spriteSheet;
+            hpRegenEffect.animation = new SpriteAnimation(
+                healData.animations.idle.spriteSheet,
+                healData.animations.idle.frameWidth,
+                healData.animations.idle.frameHeight,
+                healData.animations.idle.frameCount,
+                healData.animations.idle.frameRate,
+                healData.animations.idle.isHorizontalStrip
+            );
+            hpRegenEffect.animation.loop = true;
+        }
+    }
+
+    // Draw heal effect around player
+    if (hpRegenEffect.spriteSheet && hpRegenEffect.animation) {
+        // Update animation
+        hpRegenEffect.animation.update(0.016);
+
+        // Calculate effect count based on player level (max 3)
+        let effectCount;
+        if (player.level >= 5) {
+            effectCount = 3; // Max 3 effects at level 5+
+        } else if (player.level >= 3) {
+            effectCount = 2; // 2 effects at level 3-4
+        } else {
+            effectCount = 1; // 1 effect at level 1-2
+        }
+
+        const time = Date.now() / 1000;
+        const radius = 35;
+        const scale = 1.2;
+        const opacity = 0.75; // 75% opacity
+
+        for (let i = 0; i < effectCount; i++) {
+            const angle = (time * 1.5) + (i * Math.PI * 2 / effectCount);
+            const effectX = player.x + Math.cos(angle) * radius;
+            const effectY = player.y + Math.sin(angle) * radius - 10;
+
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.translate(effectX, effectY);
+
+            // Glow effect
+            ctx.shadowColor = '#06B6D4';
+            ctx.shadowBlur = 15;
+
+            // Draw heal sprite animation
+            hpRegenEffect.animation.draw(ctx, 0, 0, scale);
+
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+
+        // Add floating "+HP" text
+        const floatY = player.y - 50 - Math.sin(time * 3) * 10;
+        const textAlpha = (0.5 + Math.sin(time * 4) * 0.3) * opacity;
+
+        ctx.save();
+        ctx.globalAlpha = textAlpha;
+        ctx.fillStyle = '#22C55E';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = '#22C55E';
+        ctx.shadowBlur = 10;
+        ctx.fillText('+HP', player.x, floatY);
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 }
