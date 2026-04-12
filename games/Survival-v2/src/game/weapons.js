@@ -91,7 +91,9 @@ function fireMeleeAttack(weapon, weaponData, target) {
     const angle = Math.atan2(target.y - player.y, target.x - player.x);
     const arcAngle = weaponData.arcAngle || Math.PI / 3; // Default 60 degrees, Warrior sword has 90 degrees
 
-    // Damage all enemies in arc
+    // Find all enemies in arc and range
+    const enemiesInArc = [];
+    
     enemies.forEach(enemy => {
         const dx = enemy.x - player.x;
         const dy = enemy.y - player.y;
@@ -102,8 +104,22 @@ function fireMeleeAttack(weapon, weaponData, target) {
         if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
 
         if (distance <= weaponData.range && angleDiff < arcAngle / 2) {
-            damageEnemy(enemy, weapon.damage);
+            enemiesInArc.push(enemy);
         }
+    });
+
+    // Sort by distance (closest first) and hit up to 5 enemies
+    enemiesInArc.sort((a, b) => {
+        const distA = Math.sqrt((a.x - player.x) ** 2 + (a.y - player.y) ** 2);
+        const distB = Math.sqrt((b.x - player.x) ** 2 + (b.y - player.y) ** 2);
+        return distA - distB;
+    });
+
+    const maxHits = 5;
+    const hits = enemiesInArc.slice(0, maxHits);
+    
+    hits.forEach(enemy => {
+        damageEnemy(enemy, weapon.damage);
     });
 
     // Add slash effect

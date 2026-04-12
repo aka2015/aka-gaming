@@ -2,6 +2,41 @@
 // SURVIVAL GAME - Main Entry Point
 // ========================================
 
+// iOS Safari fullscreen fix
+function setupIOSFullscreen() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+        // Add iOS-specific body classes
+        document.body.classList.add('ios-device');
+        
+        // Hide address bar on iOS
+        setTimeout(() => {
+            window.scrollTo(0, 1);
+        }, 100);
+        
+        // Prevent pull-to-refresh on iOS
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.target.closest('#gameCanvas')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Prevent double-tap zoom on iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    }
+}
+
+// Call iOS setup immediately
+setupIOSFullscreen();
+
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');

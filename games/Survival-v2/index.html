@@ -2,7 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Survival Game - Survival.io Style</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -60,14 +63,48 @@
         <div id="mainMenu" class="screen">
             <h1>🎮 Survival Game</h1>
             <p class="subtitle">Survival.io Style</p>
+            
+            <!-- User Info -->
+            <div id="userInfo" class="user-info"></div>
+            
             <div class="menu-buttons">
                 <button id="playBtn" class="menu-btn">▶️ Main</button>
+                <button id="loginBtn" class="menu-btn"> Login</button>
+                <button id="logoutBtn" class="menu-btn hidden">🚪 Logout</button>
                 <button id="settingsBtn" class="menu-btn">⚙️ Pengaturan</button>
                 <button id="howToPlayBtn" class="menu-btn">📖 Cara Main</button>
                 <button id="highScoresBtn" class="menu-btn">🏆 Skor Tertinggi</button>
             </div>
         </div>
-        
+
+        <!-- Login/Register Modal -->
+        <div id="authModal" class="modal hidden">
+            <div class="modal-content auth-modal">
+                <button id="closeAuthModal" class="close-btn">✕</button>
+                
+                <!-- Login Form -->
+                <div id="loginForm" class="auth-form">
+                    <h2>Login</h2>
+                    <input type="email" id="loginEmail" placeholder="Email" class="auth-input">
+                    <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
+                    <div id="loginError" class="auth-error"></div>
+                    <button id="loginSubmitBtn" class="auth-submit-btn">Login</button>
+                    <p class="auth-switch">Belum punya akun? <a href="#" id="showRegisterBtn">Daftar</a></p>
+                </div>
+                
+                <!-- Register Form -->
+                <div id="registerForm" class="auth-form hidden">
+                    <h2>Daftar Akun Baru</h2>
+                    <input type="text" id="registerName" placeholder="Nama Lengkap" class="auth-input">
+                    <input type="email" id="registerEmail" placeholder="Email" class="auth-input">
+                    <input type="password" id="registerPassword" placeholder="Password (min. 6 karakter)" class="auth-input">
+                    <div id="registerError" class="auth-error"></div>
+                    <button id="registerSubmitBtn" class="auth-submit-btn">Daftar</button>
+                    <p class="auth-switch">Sudah punya akun? <a href="#" id="showLoginBtn">Login</a></p>
+                </div>
+            </div>
+        </div>
+
         <!-- Character Select Screen -->
         <div id="characterSelectScreen" class="screen hidden">
             <h1>Pilih Karakter Kamu</h1>
@@ -337,48 +374,49 @@
         <div id="warnings"></div>
 
         <!-- Mobile Joystick & Controls -->
-        <div id="joystickContainer">
+        <div id="joystickContainer" style="display: none;">
             <div id="joystickBase">
                 <div id="joystickStick"></div>
             </div>
         </div>
 
-        <button id="mobileAttackBtn" class="mobile-btn">⚔️</button>
         <button id="mobileShopBtn" class="mobile-btn">🛒</button>
     </div>
     
     <!-- Load game modules in correct order -->
     <!-- 1. Data definitions -->
-    <script src="src/data/game-data.js?v=3"></script>
+    <script type="module" src="src/data/game-data.js?v=3"></script>
 
     <!-- 2. System modules -->
-    <script src="src/system/sprite-loader.js?v=3"></script>
-    <script src="src/system/game-state.js?v=3"></script>
-    <script src="src/system/audio.js?v=3"></script>
-    <script src="src/system/joystick.js?v=3"></script>
+    <script type="module" src="src/system/sprite-loader.js?v=3"></script>
+    <script type="module" src="src/system/game-state.js?v=3"></script>
+    <script type="module" src="src/system/audio.js?v=3"></script>
+    <script type="module" src="src/system/joystick.js?v=3"></script>
+    <script type="module" src="src/system/auth.js?v=3"></script>
 
     <!-- 3. Rendering modules -->
-    <script src="src/render/character-render.js?v=3"></script>
-    <script src="src/render/rendering.js?v=3"></script>
+    <script type="module" src="src/render/character-render.js?v=3"></script>
+    <script type="module" src="src/render/rendering.js?v=3"></script>
 
     <!-- 4. UI modules -->
-    <script src="src/ui/ui-functions.js?v=3"></script>
+    <script type="module" src="src/ui/ui-functions.js?v=3"></script>
+    <script type="module" src="src/ui/leaderboard.js?v=3"></script>
 
     <!-- 5. Game logic modules -->
-    <script src="src/game/game-setup.js?v=3"></script>
-    <script src="src/game/game-start.js?v=3"></script>
-    <script src="src/game/player.js?v=3"></script>
-    <script src="src/game/weapons.js?v=3"></script>
-    <script src="src/game/enemies.js?v=3"></script>
-    <script src="src/game/projectiles.js?v=3"></script>
-    <script src="src/game/wave-system.js?v=3"></script>
-    <script src="src/game/collisions.js?v=3"></script>
-    <script src="src/game/collectibles.js?v=3"></script>
-    <script src="src/game/level-up.js?v=3"></script>
-    <script src="src/game/shop.js?v=3"></script>
-    <script src="src/game/wave-rest.js?v=3"></script>
+    <script type="module" src="src/game/game-setup.js?v=3"></script>
+    <script type="module" src="src/game/game-start.js?v=3"></script>
+    <script type="module" src="src/game/player.js?v=3"></script>
+    <script type="module" src="src/game/weapons.js?v=3"></script>
+    <script type="module" src="src/game/enemies.js?v=3"></script>
+    <script type="module" src="src/game/projectiles.js?v=3"></script>
+    <script type="module" src="src/game/wave-system.js?v=3"></script>
+    <script type="module" src="src/game/collisions.js?v=3"></script>
+    <script type="module" src="src/game/collectibles.js?v=3"></script>
+    <script type="module" src="src/game/level-up.js?v=3"></script>
+    <script type="module" src="src/game/shop.js?v=3"></script>
+    <script type="module" src="src/game/wave-rest.js?v=3"></script>
 
     <!-- 6. Main entry point -->
-    <script src="src/main.js?v=3"></script>
+    <script type="module" src="src/main.js?v=3"></script>
 </body>
 </html>

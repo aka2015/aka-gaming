@@ -46,7 +46,22 @@ function checkCollisions() {
 }
 
 function damageEnemy(enemy, damage) {
-    enemy.hp -= damage;
+    // Scale damage with wave level: each wave doubles the damage
+    // Wave 1 = 1x, Wave 2 = 2x, Wave 3 = 4x, Wave 4 = 8x, etc.
+    const waveMultiplier = Math.pow(2, currentWave - 1);
+    const scaledDamage = damage * waveMultiplier;
+
+    enemy.hp -= scaledDamage;
+
+    // Show damage number
+    damageNumbers.push({
+        x: enemy.x,
+        y: enemy.y - enemy.size / 2,
+        value: Math.round(scaledDamage),
+        color: '#FF4444',
+        timer: 0.8,
+        vy: -80
+    });
 
     if (enemy.hp <= 0 && !enemy.isDying) {
         killEnemy(enemy);

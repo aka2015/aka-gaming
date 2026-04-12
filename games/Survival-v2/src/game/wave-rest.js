@@ -2,6 +2,8 @@
 // WAVE REST & GAME STATE
 // ========================================
 
+import { saveGameScore, isLoggedIn } from '../system/auth.js';
+
 function updateWaveRest(deltaTime) {
     restTimer -= deltaTime;
 
@@ -69,6 +71,8 @@ function resumeGame() {
     }
 }
 
+import { saveGameScore, isLoggedIn } from '../system/auth.js';
+
 function gameOver() {
     gameState = 'game_over';
 
@@ -78,8 +82,20 @@ function gameOver() {
     // Calculate final score
     const finalScore = score + Math.floor(survivalTime);
 
-    // Save high score
+    // Save high score to local storage (legacy)
     saveHighScore(finalScore);
+    
+    // Save score to Firebase if user is logged in
+    if (isLoggedIn()) {
+        saveGameScore(finalScore, currentWave, player.level, survivalTime, selectedCharacter, enemiesKilled)
+            .then(result => {
+                if (result.success) {
+                    console.log('✅ Score saved to cloud!');
+                } else {
+                    console.error('Failed to save score:', result.error);
+                }
+            });
+    }
 
     // Show game over screen
     hideAllScreens();

@@ -2,7 +2,13 @@
 // GAME SETUP & INITIALIZATION
 // ========================================
 
+import { initAuth, registerUser, loginUser, logoutUser, getCurrentUser } from '../system/auth.js';
+import { displayLeaderboard } from '../ui/leaderboard.js';
+
 function setupGame() {
+    // Initialize Firebase Auth
+    initAuth();
+    
     // Event listeners
     window.addEventListener('keydown', (e) => {
         keys[e.key.toLowerCase()] = true;
@@ -178,6 +184,110 @@ function setupGame() {
             bgMusicVolumeValue.textContent = Math.round(volume * 100) + '%';
         });
     }
+
+    // ========================================
+    // AUTH EVENT HANDLERS
+    // ========================================
+
+    // Login button
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        document.getElementById('authModal').classList.remove('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+    });
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        const result = await logoutUser();
+        if (result.success) {
+            console.log('Logged out successfully');
+        }
+    });
+
+    // Close auth modal
+    document.getElementById('closeAuthModal').addEventListener('click', () => {
+        document.getElementById('authModal').classList.add('hidden');
+        clearAuthForms();
+    });
+
+    // Show register form
+    document.getElementById('showRegisterBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+        clearAuthForms();
+    });
+
+    // Show login form
+    document.getElementById('showLoginBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        clearAuthForms();
+    });
+
+    // Login submit
+    document.getElementById('loginSubmitBtn').addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+        
+        if (!email || !password) {
+            errorDiv.textContent = 'Email dan password harus diisi';
+            return;
+        }
+
+        const result = await loginUser(email, password);
+        if (result.success) {
+            document.getElementById('authModal').classList.add('hidden');
+            clearAuthForms();
+        } else {
+            errorDiv.textContent = result.error;
+        }
+    });
+
+    // Register submit
+    document.getElementById('registerSubmitBtn').addEventListener('click', async () => {
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const errorDiv = document.getElementById('registerError');
+        
+        if (!name || !email || !password) {
+            errorDiv.textContent = 'Semua field harus diisi';
+            return;
+        }
+
+        if (password.length < 6) {
+            errorDiv.textContent = 'Password minimal 6 karakter';
+            return;
+        }
+
+        const result = await registerUser(email, password, name);
+        if (result.success) {
+            document.getElementById('authModal').classList.add('hidden');
+            clearAuthForms();
+        } else {
+            errorDiv.textContent = result.error;
+        }
+    });
+
+    // High scores button - show leaderboard
+    document.getElementById('highScoresBtn').addEventListener('click', async () => {
+        hideAllScreens();
+        document.getElementById('highScoresScreen').classList.remove('hidden');
+        await displayLeaderboard();
+    });
+}
+
+function clearAuthForms() {
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('registerName').value = '';
+    document.getElementById('registerEmail').value = '';
+    document.getElementById('registerPassword').value = '';
+    document.getElementById('registerError').textContent = '';
 }
 
 function showMainMenu() {

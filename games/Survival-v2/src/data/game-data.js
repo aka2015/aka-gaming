@@ -440,7 +440,7 @@ const BOSSES = {
     5: {
         type: 'boss_giant_slime',
         name: 'Slime Raksasa',
-        baseHp: 300,
+        baseHp: 1000,
         speed: 60,
         damage: 30,
         xpValue: 100,
@@ -452,7 +452,7 @@ const BOSSES = {
     10: {
         type: 'boss_skeleton_king',
         name: 'Raja Tengkorak',
-        baseHp: 500,
+        baseHp: 1000,
         speed: 80,
         damage: 40,
         xpValue: 100,
@@ -464,7 +464,7 @@ const BOSSES = {
     15: {
         type: 'boss_dark_dragon',
         name: 'Naga Gelap',
-        baseHp: 800,
+        baseHp: 1000,
         speed: 100,
         damage: 50,
         xpValue: 100,
@@ -476,7 +476,7 @@ const BOSSES = {
     20: {
         type: 'boss_death_lord',
         name: 'Dewa Kematian',
-        baseHp: 1200,
+        baseHp: 1000,
         speed: 90,
         damage: 60,
         xpValue: 100,
