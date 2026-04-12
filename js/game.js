@@ -5,9 +5,10 @@ import { auth, db }   from "./firebase.js";
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  collection, addDoc, getDocs,
+  collection, addDoc, getDocs, doc, getDoc, setDoc, onSnapshot,
   query, orderBy, limit, startAfter, serverTimestamp, where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initPlayerTracking, subscribeToPlayerCount } from "./player-tracker.js";
 
 // ────────────────────────────────────────────────────────────
 //  PARAMS
@@ -28,6 +29,7 @@ const userAvatar        = document.getElementById("user-avatar");
 const userName          = document.getElementById("user-name");
 const gameTitleDisplay  = document.getElementById("game-title-display");
 const gameCatDisplay    = document.getElementById("game-cat-display");
+const playersOnlineCount= document.getElementById("players-online-count");
 const gameIframe        = document.getElementById("game-iframe");
 const gameLoading       = document.getElementById("game-loading");
 const gameError         = document.getElementById("game-error");
@@ -46,12 +48,21 @@ const commentsList      = document.getElementById("comments-list");
 const commentsEmpty     = document.getElementById("comments-empty");
 const loadMoreArea      = document.getElementById("load-more-area");
 const btnLoadMore       = document.getElementById("btn-load-more");
+const leaderboardLoading= document.getElementById("leaderboard-loading");
+const leaderboardEmpty  = document.getElementById("leaderboard-empty");
+const leaderboardList   = document.getElementById("leaderboard-list");
+const leaderboardStatus = document.getElementById("leaderboard-status");
+const personalBestScore = document.getElementById("personal-best-score");
+const personalBestCaption = document.getElementById("personal-best-caption");
+const leaderboardItemTemplate = document.getElementById("leaderboard-item-template");
 
 // ────────────────────────────────────────────────────────────
 //  AUTH
 // ────────────────────────────────────────────────────────────
 const provider = new GoogleAuthProvider();
 let currentUser = null;
+let unsubscribePlayerCount = null; // Firestore listener cleanup
+let unsubscribeLeaderboard = null;
 
 async function loginWithGoogle() {
   try { await signInWithPopup(auth, provider); }
@@ -67,13 +78,46 @@ if (btnLogout) btnLogout.addEventListener("click", () => signOut(auth));
 onAuthStateChanged(auth, user => {
   currentUser = user;
   updateAuthUI(user);
+  
   if (user) {
     // Show game
     if (gameLoginOverlay) gameLoginOverlay.classList.add("hidden");
+    
+    // Initialize player tracking for this game
+    initPlayerTracking(user.uid, gameId);
+    
+    // Subscribe to real-time player count updates
+    if (unsubscribePlayerCount) {
+      unsubscribePlayerCount();
+    }
+    
+    unsubscribePlayerCount = subscribeToPlayerCount(gameId, (count) => {
+      if (playersOnlineCount) {
+        const currentCount = parseInt(playersOnlineCount.textContent) || 0;
+        if (currentCount !== count) {
+          // Animate the number change
+          playersOnlineCount.style.transform = 'scale(1.3)';
+          playersOnlineCount.style.transition = 'transform 0.2s ease';
+          playersOnlineCount.textContent = count;
+          
+          setTimeout(() => {
+            playersOnlineCount.style.transform = 'scale(1)';
+          }, 200);
+        }
+      }
+    });
   } else {
     // Show login overlay over game
     if (gameLoginOverlay) gameLoginOverlay.classList.remove("hidden");
+    
+    // Cleanup player tracking when logged out
+    if (unsubscribePlayerCount) {
+      unsubscribePlayerCount();
+      unsubscribePlayerCount = null;
+    }
   }
+
+  loadPersonalBest();
 });
 
 function updateAuthUI(user) {
@@ -133,6 +177,139 @@ function showGameError() {
   if (gameLoading) gameLoading.classList.add("hidden");
   if (gameError)   gameError.classList.remove("hidden");
 }
+
+// ────────────────────────────────────────────────────────────
+//  LEADERBOARD
+// ────────────────────────────────────────────────────────────
+function leaderboardEntriesRef() {
+  return collection(db, "leaderboards", gameId, "entries");
+}
+
+async function saveGlobalScore(scorePayload) {
+  if (!currentUser || !scorePayload || scorePayload.gameId !== gameId) return;
+
+  const entryRef = doc(db, "leaderboards", gameId, "entries", currentUser.uid);
+  const now = new Date().toISOString();
+  const normalizedScore = Math.max(0, Math.floor(Number(scorePayload.score) || 0));
+  const meta = scorePayload.meta || {};
+
+  try {
+    const snap = await getDoc(entryRef);
+    const existing = snap.exists() ? snap.data() : null;
+    const previousBest = existing?.bestScore || 0;
+    const nextBest = Math.max(previousBest, normalizedScore);
+    const payload = {
+      gameId,
+      userId: currentUser.uid,
+      userName: currentUser.displayName || currentUser.email || "Anonim",
+      userAvatar: currentUser.photoURL || "",
+      bestScore: nextBest,
+      lastScore: normalizedScore,
+      attempts: (existing?.attempts || 0) + 1,
+      lastPlayedAt: now,
+      updatedAt: now,
+      meta,
+      bestMeta: nextBest > previousBest ? meta : (existing?.bestMeta || {})
+    };
+
+    if (!existing) payload.createdAt = now;
+
+    await setDoc(entryRef, payload, { merge: true });
+    personalBestScore.textContent = String(nextBest);
+    personalBestCaption.textContent = nextBest > previousBest
+      ? "Skor terbaik baru berhasil disimpan ke leaderboard global."
+      : "Skor terakhir tercatat. Coba pecahkan skor terbaikmu.";
+  } catch (error) {
+    console.error("Save leaderboard error:", error);
+  }
+}
+
+function subscribeToLeaderboard() {
+  if (unsubscribeLeaderboard) unsubscribeLeaderboard();
+
+  leaderboardLoading?.classList.remove("hidden");
+  leaderboardEmpty?.classList.add("hidden");
+  leaderboardList?.classList.add("hidden");
+  if (leaderboardStatus) leaderboardStatus.textContent = "Memuat...";
+
+  const q = query(leaderboardEntriesRef(), orderBy("bestScore", "desc"), limit(10));
+  unsubscribeLeaderboard = onSnapshot(q, (snapshot) => {
+    if (!leaderboardList) return;
+
+    leaderboardList.innerHTML = "";
+    leaderboardLoading?.classList.add("hidden");
+
+    if (snapshot.empty) {
+      leaderboardEmpty?.classList.remove("hidden");
+      leaderboardList.classList.add("hidden");
+      if (leaderboardStatus) leaderboardStatus.textContent = "Belum ada skor";
+      return;
+    }
+
+    leaderboardEmpty?.classList.add("hidden");
+    leaderboardList.classList.remove("hidden");
+    if (leaderboardStatus) leaderboardStatus.textContent = `${snapshot.size} skor teratas`;
+
+    snapshot.docs.forEach((entryDoc, index) => {
+      const data = entryDoc.data();
+      const item = leaderboardItemTemplate.content.cloneNode(true).querySelector(".leaderboard-item");
+      const avatar = item.querySelector(".leaderboard-avatar");
+      const isCurrent = currentUser?.uid && data.userId === currentUser.uid;
+
+      item.querySelector(".leaderboard-rank").textContent = `#${index + 1}`;
+      item.querySelector(".leaderboard-name").textContent = isCurrent
+        ? `${data.userName || "Anonim"} (Kamu)`
+        : (data.userName || "Anonim");
+      item.querySelector(".leaderboard-submeta").textContent = `${data.attempts || 1} permainan`;
+      item.querySelector(".leaderboard-score").textContent = data.bestScore || 0;
+      avatar.src = data.userAvatar || "";
+      avatar.alt = data.userName || "avatar";
+      avatar.onerror = () => {
+        avatar.src = "";
+        avatar.style.background = "rgba(0,255,255,0.15)";
+      };
+
+      leaderboardList.appendChild(item);
+    });
+  }, (error) => {
+    console.error("Leaderboard subscribe error:", error);
+    leaderboardLoading?.classList.add("hidden");
+    leaderboardEmpty?.classList.remove("hidden");
+    if (leaderboardStatus) leaderboardStatus.textContent = "Gagal memuat";
+  });
+}
+
+async function loadPersonalBest() {
+  if (!personalBestScore || !personalBestCaption) return;
+
+  if (!currentUser) {
+    personalBestScore.textContent = "0";
+    personalBestCaption.textContent = "Login dan mainkan game untuk menyimpan skor global.";
+    return;
+  }
+
+  try {
+    const snap = await getDoc(doc(db, "leaderboards", gameId, "entries", currentUser.uid));
+    if (!snap.exists()) {
+      personalBestScore.textContent = "0";
+      personalBestCaption.textContent = "Belum ada skor tersimpan untuk akunmu di game ini.";
+      return;
+    }
+
+    const data = snap.data();
+    personalBestScore.textContent = String(data.bestScore || 0);
+    personalBestCaption.textContent = `Total main: ${data.attempts || 1} kali. Skor terakhir: ${data.lastScore || 0}.`;
+  } catch (error) {
+    console.error("Load personal best error:", error);
+  }
+}
+
+window.addEventListener("message", (event) => {
+  if (event.source !== gameIframe?.contentWindow) return;
+  const data = event.data || {};
+  if (data.type !== "AKA_GAME_SCORE" || !data.payload) return;
+  saveGlobalScore(data.payload);
+});
 
 // ────────────────────────────────────────────────────────────
 //  FULLSCREEN
@@ -314,4 +491,5 @@ function catLabel(cat) {
 //  INIT
 // ────────────────────────────────────────────────────────────
 loadGame();
+subscribeToLeaderboard();
 loadComments();

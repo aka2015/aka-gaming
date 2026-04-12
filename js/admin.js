@@ -3,7 +3,7 @@
 // ============================================================
 import { auth, db, storage }  from "./firebase.js";
 import {
-  GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, getIdTokenResult
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   collection, addDoc, getDocs, deleteDoc,
@@ -13,14 +13,6 @@ import {
 import {
   ref, uploadBytesResumable, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-// ============================================================
-//  ⚙️  ADMIN EMAIL LIST — ubah sesuai email admin kamu
-// ============================================================
-const ADMIN_EMAILS = [
-  "admin@example.com",
-  // Tambah email admin lainnya di sini
-];
 
 // ────────────────────────────────────────────────────────────
 //  ELEMENTS
@@ -35,6 +27,7 @@ const adminAvatar      = document.getElementById("admin-avatar");
 const adminName        = document.getElementById("admin-name");
 const adminUserInfo    = document.getElementById("admin-user-info");
 const pageTitle        = document.getElementById("page-title");
+const notAuthorizedText= document.getElementById("admin-not-authorized-text");
 
 // Sidebar nav
 const sidebarLinks = document.querySelectorAll(".sidebar-link[data-page]");
@@ -52,22 +45,39 @@ const pages = {
 // ────────────────────────────────────────────────────────────
 const provider = new GoogleAuthProvider();
 let currentUser = null;
+let isAdminUser = false;
 
 if (btnLoginAdmin)   btnLoginAdmin.addEventListener("click",  () => signInWithPopup(auth, provider).catch(console.error));
 if (btnLogoutAdmin)  btnLogoutAdmin.addEventListener("click",  () => signOut(auth));
 if (btnLogoutNoauth) btnLogoutNoauth.addEventListener("click", () => signOut(auth));
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   currentUser = user;
+  isAdminUser = false;
+
   if (!user) {
     showView("login");
-  } else if (!ADMIN_EMAILS.includes(user.email)) {
-    showView("not-auth");
-  } else {
-    showView("admin");
-    updateAdminUI(user);
-    loadDashboard();
+    return;
   }
+
+  try {
+    const tokenResult = await getIdTokenResult(user, true);
+    isAdminUser = tokenResult.claims?.admin === true;
+  } catch (e) {
+    console.error("Admin claim check error:", e);
+  }
+
+  if (!isAdminUser) {
+    if (notAuthorizedText) {
+      notAuthorizedText.textContent = "Akun kamu belum memiliki custom claim admin. Hubungi administrator untuk mengaktifkan akses.";
+    }
+    showView("not-auth");
+    return;
+  }
+
+  showView("admin");
+  updateAdminUI(user);
+  loadDashboard();
 });
 
 function showView(view) {
@@ -82,6 +92,13 @@ function updateAdminUI(user) {
   if (adminUserInfo) adminUserInfo.classList.remove("hidden");
 }
 
+function requireAdminAccess() {
+  if (!currentUser || !isAdminUser) {
+    showView(currentUser ? "not-auth" : "login");
+    throw new Error("Admin access required");
+  }
+}
+
 // ────────────────────────────────────────────────────────────
 //  NAVIGATION
 // ────────────────────────────────────────────────────────────
@@ -94,6 +111,12 @@ sidebarLinks.forEach(link => {
 });
 
 function navigateTo(page) {
+  try {
+    requireAdminAccess();
+  } catch {
+    return;
+  }
+
   sidebarLinks.forEach(l => l.classList.toggle("active", l.dataset.page === page));
   Object.entries(pages).forEach(([key, el]) => {
     if (el) el.classList.toggle("hidden", key !== page);
@@ -110,6 +133,7 @@ function navigateTo(page) {
 // ────────────────────────────────────────────────────────────
 async function loadDashboard() {
   try {
+    requireAdminAccess();
     const [gamesSnap, commentsSnap, recentSnap] = await Promise.all([
       getCountFromServer(collection(db, "games")),
       getCountFromServer(collection(db, "comments")),
@@ -228,6 +252,7 @@ document.getElementById("upload-form")?.addEventListener("submit", async e => {
 });
 
 async function uploadGame({ name, desc, cat, badge }) {
+  requireAdminAccess();
   const submitBtn  = document.getElementById("btn-upload-submit");
   const btnText    = document.getElementById("upload-btn-text");
   const progressArea = document.getElementById("upload-progress-area");
@@ -329,6 +354,7 @@ function resetUploadForm() {
 let manageGames = [];
 
 async function loadManageGames() {
+  requireAdminAccess();
   const loading = document.getElementById("manage-loading");
   const table   = document.getElementById("manage-games-table");
   const empty   = document.getElementById("manage-empty");
@@ -422,6 +448,7 @@ btnModalCancel?.addEventListener("click", () => {
 
 btnModalConfirm?.addEventListener("click", async () => {
   if (!pendingDeleteId) return;
+  requireAdminAccess();
   btnModalConfirm.textContent = "Menghapus...";
   btnModalConfirm.disabled    = true;
 
@@ -467,6 +494,7 @@ modalDelete?.addEventListener("click", e => {
 //  MODERATION — Comments
 // ────────────────────────────────────────────────────────────
 async function loadModComments() {
+  requireAdminAccess();
   const loading = document.getElementById("mod-loading");
   const list    = document.getElementById("mod-comments-list");
   const empty   = document.getElementById("mod-empty");
@@ -519,6 +547,7 @@ function buildModCommentEl(commentId, data) {
   el.querySelector(".btn-delete-comment").addEventListener("click", async () => {
     if (!confirm("Hapus komentar ini?")) return;
     try {
+      requireAdminAccess();
       await deleteDoc(doc(db, "comments", commentId));
       el.remove();
     } catch(e) {

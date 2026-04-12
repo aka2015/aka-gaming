@@ -7,7 +7,14 @@
     "build:config": "node build-config.js",
     "setup:env": "cp .env.example .env && echo '✅ .env file created. Please update with your Firebase config.'"
   },
-  "keywords": ["gaming", "portal", "firebase"],
+  "keywords": [
+    "gaming",
+    "portal",
+    "firebase"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^13.8.0"
+  }
 }

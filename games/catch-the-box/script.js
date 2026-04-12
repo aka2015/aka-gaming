@@ -855,6 +855,10 @@ function endGame() {
 
   // Show final score
   finalScoreEl.textContent = score + ' points';
+  window.AkaScoreReporter?.report('catch-the-box', score, {
+    difficulty: speedSelect?.value || 'normal',
+    duration: gameDuration
+  });
 
   // Check if this score qualifies for top 5 highscores
   const highscores = getHighscores();

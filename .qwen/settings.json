@@ -9,7 +9,10 @@
       "Bash(sleep *)",
       "Bash(identify *)",
       "Bash(file *)",
-      "Bash(sed *)"
+      "Bash(sed *)",
+      "Bash(firebase *)",
+      "Bash(ls *)",
+      "Bash(git add *)"
     ]
   },
   "$version": 3

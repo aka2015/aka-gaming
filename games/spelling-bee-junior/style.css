@@ -68,7 +68,9 @@ h2 {
 .intro-grid,
 .hud,
 .result-grid,
-.review-list {
+.review-list,
+.status-strip,
+.badge-list {
   display: grid;
   gap: 14px;
 }
@@ -78,16 +80,27 @@ h2 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.status-strip,
+.badge-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.status-strip {
+  margin-bottom: 14px;
+}
+
 .result-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .intro-card,
 .hud-card,
+.status-card,
 .result-card,
 .review-item,
 .letter-btn,
-.slot {
+.slot,
+.badge-item {
   border-radius: 22px;
   background: #fff;
   border: 2px solid rgba(25, 51, 74, 0.08);
@@ -95,8 +108,41 @@ h2 {
 
 .intro-card,
 .hud-card,
+.status-card,
 .result-card {
   padding: 18px;
+}
+
+.badge-panel {
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 22px;
+  background: #fff8ea;
+  border: 2px solid rgba(25, 51, 74, 0.08);
+}
+
+.badge-panel h3 {
+  margin: 0 0 12px;
+}
+
+.review-reward-banner {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff3d7, #ffe2a6);
+  color: #895300;
+  font-weight: 800;
+  text-align: center;
+  border: 2px solid rgba(137, 83, 0, 0.12);
+}
+
+.badge-item {
+  padding: 14px 16px;
+}
+
+.badge-item strong {
+  display: block;
+  margin-bottom: 6px;
 }
 
 .intro-icon {
@@ -141,6 +187,16 @@ h2 {
 }
 
 .quiz-panel {
+  text-align: center;
+}
+
+.review-banner {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffe6a6, #ffc978);
+  color: #7a4b00;
+  font-weight: 800;
   text-align: center;
 }
 
@@ -306,7 +362,9 @@ h2 {
   .intro-grid,
   .hud,
   .result-grid,
-  .review-list {
+  .review-list,
+  .status-strip,
+  .badge-list {
     grid-template-columns: 1fr;
   }
 

@@ -993,6 +993,11 @@ function gameOver() {
     document.getElementById('finalLevel').textContent = gameState.level;
     document.getElementById('finalScore').textContent = gameState.score;
     document.getElementById('moneyCollected').textContent = gameState.collectedMoney;
+    window.AkaScoreReporter?.report('take-your-money', gameState.score, {
+        level: gameState.level,
+        collectedMoney: gameState.collectedMoney,
+        difficulty: gameState.settings.startingDifficulty
+    });
     
     updateHighScore();
     showScreen('gameOverScreen');

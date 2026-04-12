@@ -58,11 +58,23 @@
         </div>
       </header>
 
+      <div class="status-strip">
+        <div class="status-card">
+          <span class="hud-label">Streak</span>
+          <strong id="streak-count">0</strong>
+        </div>
+        <div class="status-card">
+          <span class="hud-label">Combo</span>
+          <strong id="combo-label">Belum ada</strong>
+        </div>
+      </div>
+
       <div class="progress-track" aria-hidden="true">
         <div id="progress-bar" class="progress-bar"></div>
       </div>
 
       <section class="panel quiz-panel">
+        <div id="review-banner" class="review-banner hidden">Review Round: ulangi kata yang tadi salah</div>
         <div class="topic-pill" id="topic-label">Animals</div>
         <p class="instruction">Pilih kata bahasa Inggris yang cocok dengan gambar ini.</p>
 
@@ -106,7 +118,20 @@
           <span class="result-label">Best Score</span>
           <strong id="best-score">0</strong>
         </div>
+        <div id="review-summary-card" class="result-card hidden">
+          <span class="result-label">Review Fixed</span>
+          <strong id="review-fixed-count">0 / 0</strong>
+        </div>
       </div>
+
+      <div id="review-reward-banner" class="review-reward-banner hidden">
+        Review Hero! Semua soal review berhasil diperbaiki. Bonus 1 bintang.
+      </div>
+
+      <section class="badge-panel">
+        <h3>Badge Topik</h3>
+        <div id="badge-list" class="badge-list"></div>
+      </section>
 
       <div id="review-list" class="review-list"></div>
 
@@ -116,6 +141,7 @@
     </section>
   </main>
 
+  <script src="../shared/score-reporter.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

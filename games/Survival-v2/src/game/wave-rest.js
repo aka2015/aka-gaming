@@ -83,6 +83,12 @@ function gameOver() {
 
     // Calculate final score
     const finalScore = score + Math.floor(survivalTime);
+    window.AkaScoreReporter?.report('Survival-v2', finalScore, {
+        wave: currentWave,
+        level: player.level,
+        survivalTime: Math.floor(survivalTime),
+        enemiesKilled
+    });
 
     // Save high score to local storage
     saveHighScore(finalScore);

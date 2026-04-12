@@ -4,7 +4,7 @@
 import { auth, db }              from "./firebase.js";
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { collection, query, where, getCountFromServer }
+import { collection, query, where, getCountFromServer, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ────────────────────────────────────────────────────────────
@@ -131,11 +131,73 @@ async function loadGames() {
 
     gamesReady = true;
     renderGames();
+    
+    // Initialize player tracking
+    initPlayerOnlineTracking();
   } catch (e) {
     console.error("Load games error:", e);
     gamesReady = true;
     showGamesState("empty");
+    
+    // Still try to init player tracking even if games failed to load
+    initPlayerOnlineTracking();
   }
+}
+
+// ────────────────────────────────────────────────────────────
+//  PLAYER ONLINE TRACKING
+// ────────────────────────────────────────────────────────────
+let unsubscribePlayerTracking = null;
+let gamePlayersMap = {}; // Store player counts per game
+
+async function initPlayerOnlineTracking() {
+  try {
+    // Subscribe to active sessions collection
+    const sessionsRef = collection(db, "active_sessions");
+    
+    unsubscribePlayerTracking = onSnapshot(sessionsRef, async (snapshot) => {
+      // Filter active sessions (last seen < 30 seconds)
+      const now = new Date();
+      const activeSessions = snapshot.docs.filter(doc => {
+        const data = doc.data();
+        const lastSeen = new Date(data.lastSeen);
+        const diffSeconds = (now - lastSeen) / 1000;
+        return diffSeconds < 30;
+      });
+      
+      // Group by game
+      gamePlayersMap = {};
+      activeSessions.forEach(session => {
+        const gameId = session.data().gameId;
+        if (!gamePlayersMap[gameId]) {
+          gamePlayersMap[gameId] = 0;
+        }
+        gamePlayersMap[gameId]++;
+      });
+      
+      // Update all game cards with player counts
+      updateGameCardPlayerCounts();
+    }, (error) => {
+      console.error("Error tracking players online:", error);
+    });
+  } catch (e) {
+    console.error("Init player tracking error:", e);
+  }
+}
+
+function updateGameCardPlayerCounts() {
+  // Update all visible game cards
+  document.querySelectorAll('.game-card').forEach(card => {
+    const gameId = card.dataset.id;
+    const playersEl = card.querySelector('.game-players-online');
+    const countEl = card.querySelector('.players-count');
+    
+    if (playersEl && countEl && gameId) {
+      const count = gamePlayersMap[gameId] || 0;
+      countEl.textContent = count;
+      playersEl.setAttribute('data-count', count);
+    }
+  });
 }
 
 function renderGames() {
@@ -154,6 +216,9 @@ function renderGames() {
   showGamesState("grid");
   gamesGrid.innerHTML = "";
   filtered.forEach(game => gamesGrid.appendChild(buildGameCard(game)));
+  
+  // Update player counts after rendering
+  updateGameCardPlayerCounts();
 }
 
 function buildGameCard(game) {
@@ -184,6 +249,29 @@ function buildGameCard(game) {
     badge.className   = `game-badge badge-${game.badge}`;
   } else {
     badge.remove();
+  }
+
+  // Add features if available
+  const featuresContainer = card.querySelector(".game-features");
+  if (game.features && Array.isArray(game.features)) {
+    // Show max 3 features
+    const featuresToShow = game.features.slice(0, 3);
+    featuresContainer.innerHTML = featuresToShow.map(f => 
+      `<span class="feature-tag">${f}</span>`
+    ).join("");
+  } else {
+    // Default features based on category
+    const defaultFeatures = {
+      'action': ['⚔️ Combat', '🎯 Skill-based', '🏆 Challenge'],
+      'puzzle': ['🧩 Logic', '🧠 Brain Teaser', '⭐ Fun'],
+      'educational': ['📚 Learn', '🎓 Educational', '✨ Interactive'],
+      'adventure': ['🗺️ Explore', '🎮 Adventure', '🌟 Story'],
+      'sport': ['⚽ Sports', '🏅 Competition', '🎯 Skill']
+    };
+    const defaults = defaultFeatures[game.category] || ['🎮 Fun', '⭐ Enjoy', '🏆 Play'];
+    featuresContainer.innerHTML = defaults.map(f => 
+      `<span class="feature-tag">${f}</span>`
+    ).join("");
   }
 
   // Click → go to game page (login required)

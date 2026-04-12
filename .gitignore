@@ -1,9 +1,47 @@
-# Firebase config (contains secrets)
-firebase-config.js
+# ──────────────────────────────────────────────
+# Environment & Secret Config
+# ──────────────────────────────────────────────
 .env
 .env.local
 .env.*.local
 
-# Other
-.claude
-.qwen
+# Firebase configs that may contain secrets
+firebase-config.js
+service-account.json
+service-account-*.json
+*.key
+*.pem
+firebase-adminsdk.json
+
+# ──────────────────────────────────────────────
+# Dependencies & Build
+# ──────────────────────────────────────────────
+node_modules/
+dist/
+build/
+
+# ──────────────────────────────────────────────
+# OS & Editor
+# ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ──────────────────────────────────────────────
+# AI / Assistant Tools
+# ──────────────────────────────────────────────
+.claude/
+.qwen/
+.codex
+
+# ──────────────────────────────────────────────
+# Misc / Generated
+# ──────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

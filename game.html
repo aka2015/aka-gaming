@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Mainkan Game - AKA GAMING</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
@@ -11,13 +13,16 @@
 <body class="game-page">
 
   <!-- ===== NAVBAR ===== -->
-  <header class="navbar">
+  <header class="navbar game-navbar">
     <div class="navbar-inner">
       <a href="index.html" class="logo">
         <span class="logo-icon">🎮</span>
         <span class="logo-text">AKA GAMING</span>
       </a>
-      <a href="index.html" class="btn-back">← Kembali</a>
+      <a href="index.html" class="btn-back">
+        <span class="btn-back-icon">←</span>
+        <span class="btn-back-text">Kembali</span>
+      </a>
       <div class="auth-area">
         <div id="user-menu" class="user-menu hidden">
           <img id="user-avatar" class="user-avatar" src="" alt="avatar" />
@@ -30,47 +35,75 @@
 
   <!-- ===== GAME PLAYER ===== -->
   <main class="game-main">
-    <div class="container">
+    <div class="container game-container">
 
       <!-- Game Info Bar -->
       <div class="game-infobar">
-        <div>
+        <div class="game-title-section">
           <h1 id="game-title-display" class="game-page-title">Memuat Game...</h1>
-          <span id="game-cat-display" class="game-cat-tag"></span>
+          <div class="game-title-meta">
+            <span id="game-cat-display" class="game-cat-tag"></span>
+            <span class="game-divider">•</span>
+            <span class="game-status">
+              <span class="status-dot"></span>
+              <span id="players-online-count">0</span> sedang bermain
+            </span>
+          </div>
         </div>
         <div class="game-actions">
-          <button id="btn-fullscreen" class="btn-icon" title="Layar Penuh">⛶</button>
+          <button id="btn-fullscreen" class="btn-icon btn-fullscreen" title="Layar Penuh">
+            <span class="btn-icon-label">⛶</span>
+            <span class="btn-tooltip">Fullscreen</span>
+          </button>
+          <button id="btn-share" class="btn-icon btn-share" title="Bagikan">
+            <span class="btn-icon-label">🔗</span>
+            <span class="btn-tooltip">Share</span>
+          </button>
         </div>
       </div>
 
       <!-- Game Frame -->
-      <div class="game-frame-wrapper" id="game-frame-wrapper">
-        <div id="game-loading" class="game-loading">
-          <div class="spinner big"></div>
-          <p>Memuat game, tunggu sebentar...</p>
-        </div>
-        <iframe
-          id="game-iframe"
-          class="game-iframe hidden"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
-          allowfullscreen
-          title="Game Frame"
-        ></iframe>
-        <div id="game-error" class="game-error hidden">
-          <div class="error-icon">😢</div>
-          <h3>Oops! Game tidak bisa dimuat</h3>
-          <p>Coba muat ulang halaman ini.</p>
-          <button onclick="location.reload()" class="btn-primary">Coba Lagi</button>
+      <div class="game-frame-container" id="game-frame-container">
+        <div class="game-frame-glow"></div>
+        <div class="game-frame-wrapper" id="game-frame-wrapper">
+          <div id="game-loading" class="game-loading">
+            <div class="game-loading-spinner">
+              <div class="spinner-ring"></div>
+              <div class="spinner-ring"></div>
+              <div class="spinner-ring"></div>
+              <div class="spinner-icon">🎮</div>
+            </div>
+            <p class="game-loading-text">Memuat game, tunggu sebentar...</p>
+            <div class="game-loading-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <iframe
+            id="game-iframe"
+            class="game-iframe hidden"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
+            allowfullscreen
+            title="Game Frame"
+          ></iframe>
+          <div id="game-error" class="game-error hidden">
+            <div class="error-content">
+              <div class="error-icon">😢</div>
+              <h3>Oops! Game tidak bisa dimuat</h3>
+              <p>Coba muat ulang halaman ini.</p>
+              <button onclick="location.reload()" class="btn-primary btn-retry">🔄 Coba Lagi</button>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Not Logged In Overlay -->
       <div id="game-login-overlay" class="game-login-overlay hidden">
         <div class="overlay-card">
+          <div class="overlay-card-glow"></div>
           <div class="overlay-icon">🔐</div>
           <h2>Login untuk Bermain!</h2>
           <p>Kamu perlu login dulu untuk memainkan game ini.</p>
-          <button id="btn-login-overlay" class="btn-primary btn-big">
+          <button id="btn-login-overlay" class="btn-primary btn-big btn-login-gradient">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" />
             Masuk dengan Google
           </button>
@@ -81,10 +114,41 @@
     </div>
   </main>
 
+  <section class="leaderboard-section">
+    <div class="container leaderboard-container">
+      <div class="leaderboard-header">
+        <h2 class="section-title">🏆 Leaderboard Global</h2>
+        <span id="leaderboard-status" class="leaderboard-status">Memuat...</span>
+      </div>
+      <div class="leaderboard-grid">
+        <div class="leaderboard-card">
+          <div class="leaderboard-card-title">Top Player</div>
+          <div id="leaderboard-loading" class="loading-area">
+            <div class="spinner"></div>
+            <p>Memuat leaderboard...</p>
+          </div>
+          <div id="leaderboard-empty" class="empty-state hidden">
+            <div class="empty-icon">🎯</div>
+            <p>Belum ada skor global untuk game ini.</p>
+          </div>
+          <div id="leaderboard-list" class="leaderboard-list hidden"></div>
+        </div>
+        <div class="leaderboard-card personal-best-card">
+          <div class="leaderboard-card-title">Skor Kamu</div>
+          <div id="personal-best-score" class="personal-best-score">0</div>
+          <p id="personal-best-caption" class="personal-best-caption">Mainkan game untuk mencatat skor global.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== COMMENTS SECTION ===== -->
   <section class="comments-section" id="comments-section">
     <div class="container comments-container">
-      <h2 class="section-title">💬 Komentar</h2>
+      <div class="comments-header">
+        <h2 class="section-title">💬 Komentar</h2>
+        <span class="comments-count-badge" id="comments-count">0</span>
+      </div>
 
       <!-- Comment Form -->
       <div id="comment-form-area" class="comment-form-area hidden">
@@ -102,7 +166,9 @@
 
       <!-- Login to comment -->
       <div id="comment-login-prompt" class="comment-login-prompt hidden">
-        <p>Login untuk meninggalkan komentar! <button id="btn-login-comment" class="btn-link">Masuk sekarang</button></p>
+        <div class="comment-prompt-card">
+          <p>Login untuk meninggalkan komentar! <button id="btn-login-comment" class="btn-link">Masuk sekarang</button></p>
+        </div>
       </div>
 
       <!-- Comments List -->
@@ -134,6 +200,18 @@
         </div>
         <p class="comment-text"></p>
       </div>
+    </div>
+  </template>
+
+  <template id="leaderboard-item-template">
+    <div class="leaderboard-item">
+      <div class="leaderboard-rank"></div>
+      <img class="leaderboard-avatar" src="" alt="avatar" />
+      <div class="leaderboard-meta">
+        <div class="leaderboard-name"></div>
+        <div class="leaderboard-submeta"></div>
+      </div>
+      <div class="leaderboard-score"></div>
     </div>
   </template>
 

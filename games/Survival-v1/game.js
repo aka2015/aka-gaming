@@ -917,6 +917,10 @@ waitForDOM(function() {
         showScreen('gameOverScreen');
         document.getElementById('finalScore').textContent = 'Score: ' + Math.floor(score);
         document.getElementById('finalTime').textContent = 'Time: ' + Math.floor(gameTime) + 's | Chapter: ' + currentChapter;
+        window.AkaScoreReporter?.report('Survival-v1', Math.floor(score), {
+            chapter: currentChapter,
+            survivalTime: Math.floor(gameTime)
+        });
     }
     
     function completeChapter() {
