@@ -8,16 +8,30 @@ let joystickBasePos = { x: 0, y: 0 };
 let joystickStickPos = { x: 0, y: 0 };
 let joystickTouchId = null;
 const JOYSTICK_RADIUS = 60;
+const JOYSTICK_OFFSET_BOTTOM = 100; // Distance from bottom of screen
 
 // Check if device is mobile
 function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
         || window.innerWidth <= 1024;
+}
+
+// Get joystick center position (centered horizontally, offset from bottom)
+function getJoystickCenter() {
+    return {
+        x: window.innerWidth / 2,
+        y: window.innerHeight - JOYSTICK_OFFSET_BOTTOM
+    };
 }
 
 // Initialize joystick
 function initJoystick() {
     if (!isMobileDevice()) return;
+
+    // Set initial joystick position
+    const center = getJoystickCenter();
+    joystickBasePos.x = center.x;
+    joystickBasePos.y = center.y;
 
     // Show joystick UI (fixed position via CSS)
     const joystickContainer = document.getElementById('joystickContainer');
@@ -41,24 +55,24 @@ function initJoystick() {
 // Handle touch start for joystick
 function handleTouchStart(e) {
     e.preventDefault();
-    
+
+    const joyCenter = getJoystickCenter();
+
     for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
         const x = touch.clientX;
         const y = touch.clientY;
 
-        // Calculate distance from joystick center (fixed at 120, window.innerHeight - 120)
-        const joyCenterX = 120;
-        const joyCenterY = window.innerHeight - 120;
-        const dx = x - joyCenterX;
-        const dy = y - joyCenterY;
+        // Calculate distance from joystick center (centered at bottom)
+        const dx = x - joyCenter.x;
+        const dy = y - joyCenter.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // Activate if touch is within 120px of joystick center
         if (distance < 120 && joystickTouchId === null) {
             joystickActive = true;
             joystickTouchId = touch.identifier;
-            
+
             // Update stick position to touch (relative to base)
             joystickStickPos.x = x;
             joystickStickPos.y = y;
@@ -72,10 +86,10 @@ function handleTouchStart(e) {
 // Handle touch move for joystick
 function handleTouchMove(e) {
     e.preventDefault();
-    
+
     for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
-        
+
         if (touch.identifier === joystickTouchId && joystickActive) {
             const x = touch.clientX;
             const y = touch.clientY;
@@ -106,10 +120,10 @@ function handleTouchMove(e) {
 // Handle touch end for joystick
 function handleTouchEnd(e) {
     e.preventDefault();
-    
+
     for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
-        
+
         if (touch.identifier === joystickTouchId) {
             joystickActive = false;
             joystickTouchId = null;
@@ -208,14 +222,10 @@ function updateJoystickVisual() {
     const container = document.getElementById('joystickContainer');
     if (container) container.style.display = 'block';
 
-    // Position joystick base (centered at base position)
-    joystickBaseEl.style.left = (joystickBasePos.x - JOYSTICK_RADIUS) + 'px';
-    joystickBaseEl.style.top = (joystickBasePos.y - JOYSTICK_RADIUS) + 'px';
-
-    // Position joystick stick (relative to base)
+    // Position joystick stick (relative to base center)
     const stickOffsetX = joystickStickPos.x - joystickBasePos.x;
     const stickOffsetY = joystickStickPos.y - joystickBasePos.y;
-    joystickStickEl.style.transform = `translate(${stickOffsetX}px, ${stickOffsetY}px)`;
+    joystickStickEl.style.transform = `translateX(-50%) translate(${stickOffsetX}px, ${stickOffsetY}px)`;
 }
 
 // Reset joystick visual
@@ -223,10 +233,10 @@ function resetJoystickVisual() {
     // Reset stick to center
     joystickStickPos.x = joystickBasePos.x;
     joystickStickPos.y = joystickBasePos.y;
-    
+
     const joystickStickEl = document.getElementById('joystickStick');
     if (joystickStickEl) {
-        joystickStickEl.style.transform = `translate(0px, 0px)`;
+        joystickStickEl.style.transform = `translateX(-50%) translate(0px, 0px)`;
     }
 }
 

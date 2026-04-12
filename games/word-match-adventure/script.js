@@ -1,6 +1,69 @@
 const QUESTION_COUNT = 10;
 const STORAGE_KEY = "aka_word_match_best_score";
 
+// Audio feedback system
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playCorrectSound() {
+  initAudio();
+  if (!audioCtx) return;
+
+  // Play a pleasant ascending tone (success sound)
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  oscillator.type = 'sine';
+  
+  // Ascending melody: C5 → E5 → G5
+  const now = audioCtx.currentTime;
+  oscillator.frequency.setValueAtTime(523.25, now); // C5
+  oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
+  oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
+  
+  gainNode.gain.setValueAtTime(0.3, now);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+  
+  oscillator.start(now);
+  oscillator.stop(now + 0.4);
+}
+
+function playWrongSound() {
+  initAudio();
+  if (!audioCtx) return;
+
+  // Play a descending tone (error sound)
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  oscillator.type = 'sawtooth';
+  
+  // Descending tone: G3 → E3
+  const now = audioCtx.currentTime;
+  oscillator.frequency.setValueAtTime(196.00, now); // G3
+  oscillator.frequency.setValueAtTime(164.81, now + 0.15); // E3
+  
+  gainNode.gain.setValueAtTime(0.2, now);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+  
+  oscillator.start(now);
+  oscillator.stop(now + 0.3);
+}
+
 const WORD_BANK = [
   { word: "cat", emoji: "🐱", topic: "Animals" },
   { word: "dog", emoji: "🐶", topic: "Animals" },
@@ -214,6 +277,9 @@ function selectAnswer(choice, button) {
   });
 
   if (isCorrect) {
+    // Play correct sound
+    playCorrectSound();
+    
     streak += 1;
     score += 10;
     stars += 1;
@@ -235,6 +301,9 @@ function selectAnswer(choice, button) {
     feedbackBoxEl.textContent = `Benar! Ini adalah "${question.word}".${bonusText}${badgeText}`;
     feedbackBoxEl.className = "feedback-box success";
   } else {
+    // Play wrong sound
+    playWrongSound();
+    
     streak = 0;
     button.classList.add("wrong");
     feedbackBoxEl.textContent = `Belum tepat. Jawaban yang benar adalah "${question.word}".`;
