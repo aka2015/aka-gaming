@@ -71,8 +71,6 @@ function resumeGame() {
     }
 }
 
-import { saveGameScore, isLoggedIn } from '../system/auth.js';
-
 function gameOver() {
     gameState = 'game_over';
 
