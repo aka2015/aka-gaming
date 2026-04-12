@@ -1,0 +1,27 @@
+<svg width="640" height="360" viewBox="0 0 640 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" rx="32" fill="url(#bg)"/>
+  <circle cx="91" cy="88" r="54" fill="#FFF4B8"/>
+  <circle cx="554" cy="284" r="68" fill="#C7EEFF"/>
+  <rect x="55" y="57" width="530" height="246" rx="28" fill="#FFFFFF" fill-opacity="0.9"/>
+  <rect x="84" y="86" width="138" height="138" rx="28" fill="#FFF7D8"/>
+  <text x="153" y="177" text-anchor="middle" font-size="74" font-family="Arial, sans-serif">🐱</text>
+  <text x="258" y="128" fill="#173149" font-size="24" font-family="Arial, sans-serif" font-weight="700">WORD MATCH</text>
+  <text x="258" y="166" fill="#173149" font-size="42" font-family="Arial, sans-serif" font-weight="800">Adventure</text>
+  <rect x="258" y="194" width="142" height="40" rx="18" fill="#173149"/>
+  <text x="329" y="220" text-anchor="middle" fill="#FFFFFF" font-size="18" font-family="Arial, sans-serif" font-weight="700">EDUCATIONAL</text>
+  <rect x="84" y="250" width="128" height="28" rx="14" fill="#FFCA55"/>
+  <text x="148" y="269" text-anchor="middle" fill="#173149" font-size="16" font-family="Arial, sans-serif" font-weight="700">cat</text>
+  <rect x="420" y="98" width="118" height="46" rx="18" fill="#E3F5FF"/>
+  <text x="479" y="128" text-anchor="middle" fill="#1D5276" font-size="22" font-family="Arial, sans-serif" font-weight="700">apple</text>
+  <rect x="420" y="156" width="118" height="46" rx="18" fill="#E9FCE9"/>
+  <text x="479" y="186" text-anchor="middle" fill="#20724A" font-size="22" font-family="Arial, sans-serif" font-weight="700">book</text>
+  <rect x="420" y="214" width="118" height="46" rx="18" fill="#FFE6E0"/>
+  <text x="479" y="244" text-anchor="middle" fill="#B74433" font-size="22" font-family="Arial, sans-serif" font-weight="700">blue</text>
+  <defs>
+    <linearGradient id="bg" x1="48" y1="33" x2="585" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7D0"/>
+      <stop offset="0.5" stop-color="#E0F5FF"/>
+      <stop offset="1" stop-color="#FFF0FA"/>
+    </linearGradient>
+  </defs>
+</svg>

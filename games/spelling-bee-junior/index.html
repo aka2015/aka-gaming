@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spelling Bee Junior</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="start-screen" class="panel screen active">
+      <div class="tag">Spelling Game</div>
+      <h1>Spelling Bee Junior</h1>
+      <p class="lead">Susun huruf acak menjadi kata bahasa Inggris yang benar.</p>
+
+      <div class="intro-grid">
+        <article class="intro-card">
+          <div class="intro-icon">A</div>
+          <strong>Lihat gambar</strong>
+          <p>Anak melihat petunjuk emoji dan kategori kata.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">B</div>
+          <strong>Susun huruf</strong>
+          <p>Klik huruf satu per satu sampai menjadi kata yang benar.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">C</div>
+          <strong>Dapatkan bintang</strong>
+          <p>Jawaban benar memberi skor dan progres belajar.</p>
+        </article>
+      </div>
+
+      <button id="start-btn" class="primary-btn">Mulai Eja Kata</button>
+    </section>
+
+    <section id="game-screen" class="screen hidden">
+      <header class="hud">
+        <div class="hud-card">
+          <span>Soal</span>
+          <strong id="question-count">1 / 8</strong>
+        </div>
+        <div class="hud-card">
+          <span>Skor</span>
+          <strong id="score-count">0</strong>
+        </div>
+        <div class="hud-card">
+          <span>Bintang</span>
+          <strong id="star-count">0</strong>
+        </div>
+      </header>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+      <section class="panel quiz-panel">
+        <div class="tag" id="topic-label">Animals</div>
+        <div class="prompt-card">
+          <div id="emoji-card" class="emoji-card">🐱</div>
+          <div class="prompt-copy">
+            <h2>Spell this word</h2>
+            <p class="lead small">Klik huruf untuk menyusun kata bahasa Inggris yang benar.</p>
+          </div>
+        </div>
+
+        <div class="answer-wrap">
+          <div id="answer-slots" class="answer-slots"></div>
+          <div class="helper-row">
+            <button id="clear-btn" class="ghost-btn" type="button">Ulangi</button>
+            <button id="hint-btn" class="ghost-btn" type="button">Petunjuk</button>
+          </div>
+        </div>
+
+        <div id="letters-bank" class="letters-bank"></div>
+        <div id="feedback-box" class="feedback-box" aria-live="polite"></div>
+
+        <div class="action-row">
+          <button id="next-btn" class="primary-btn hidden" type="button">Soal Berikutnya</button>
+        </div>
+      </section>
+    </section>
+
+    <section id="result-screen" class="panel screen hidden">
+      <div class="tag">Spelling Result</div>
+      <h2 id="result-title">Great Spelling</h2>
+      <p id="result-summary" class="lead"></p>
+
+      <div class="result-grid">
+        <div class="result-card">
+          <span>Skor</span>
+          <strong id="final-score">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Bintang</span>
+          <strong id="final-stars">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Benar</span>
+          <strong id="correct-count">0 / 8</strong>
+        </div>
+        <div class="result-card">
+          <span>Best Score</span>
+          <strong id="best-score">0</strong>
+        </div>
+      </div>
+
+      <div id="review-list" class="review-list"></div>
+
+      <div class="action-row">
+        <button id="play-again-btn" class="primary-btn" type="button">Main Lagi</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

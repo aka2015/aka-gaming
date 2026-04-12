@@ -1,0 +1,25 @@
+<svg width="640" height="360" viewBox="0 0 640 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" rx="32" fill="url(#paint0_linear)"/>
+  <rect x="53" y="50" width="534" height="260" rx="30" fill="#FFFFFF" fill-opacity="0.92"/>
+  <circle cx="154" cy="163" r="76" fill="#DFF7FF"/>
+  <circle cx="503" cy="235" r="58" fill="#FFF0BF"/>
+  <circle cx="154" cy="163" r="52" fill="#7BDFF2"/>
+  <text x="154" y="184" text-anchor="middle" font-size="64" font-family="Arial, sans-serif">🔊</text>
+  <text x="263" y="126" fill="#17324A" font-size="25" font-family="Arial, sans-serif" font-weight="700">LISTEN AND</text>
+  <text x="263" y="172" fill="#17324A" font-size="44" font-family="Arial, sans-serif" font-weight="800">Choose</text>
+  <rect x="263" y="194" width="160" height="42" rx="18" fill="#17324A"/>
+  <text x="343" y="221" text-anchor="middle" fill="#FFFFFF" font-size="18" font-family="Arial, sans-serif" font-weight="700">LISTENING GAME</text>
+  <rect x="453" y="104" width="96" height="48" rx="18" fill="#E6F8EA"/>
+  <text x="501" y="135" text-anchor="middle" fill="#0E7A48" font-size="24" font-family="Arial, sans-serif" font-weight="700">🐶</text>
+  <rect x="453" y="163" width="96" height="48" rx="18" fill="#EAF3FF"/>
+  <text x="501" y="194" text-anchor="middle" fill="#2F5A78" font-size="24" font-family="Arial, sans-serif" font-weight="700">🍎</text>
+  <rect x="453" y="222" width="96" height="48" rx="18" fill="#FFF0E5"/>
+  <text x="501" y="253" text-anchor="middle" fill="#B34F26" font-size="24" font-family="Arial, sans-serif" font-weight="700">📘</text>
+  <defs>
+    <linearGradient id="paint0_linear" x1="49" y1="31" x2="598" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3FBFF"/>
+      <stop offset="0.5" stop-color="#ECFFF3"/>
+      <stop offset="1" stop-color="#FFF5E6"/>
+    </linearGradient>
+  </defs>
+</svg>

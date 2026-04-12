@@ -1,0 +1,10 @@
+{
+  "id": "spelling-bee-junior",
+  "name": "Spelling Bee Junior",
+  "description": "Game spelling bahasa Inggris untuk anak kelas 1-3: susun huruf acak menjadi kata yang benar.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-04-12"
+}

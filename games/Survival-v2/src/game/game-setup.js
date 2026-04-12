@@ -2,12 +2,7 @@
 // GAME SETUP & INITIALIZATION
 // ========================================
 
-import { initAuth, registerUser, loginUser, logoutUser, getCurrentUser } from '../system/auth.js';
-import { displayLeaderboard } from '../ui/leaderboard.js';
-
 function setupGame() {
-    // Initialize Firebase Auth
-    initAuth();
     
     // Event listeners
     window.addEventListener('keydown', (e) => {
@@ -198,7 +193,9 @@ function setupGame() {
 
     // Logout button
     document.getElementById('logoutBtn').addEventListener('click', async () => {
-        const result = await logoutUser();
+        const result = typeof logoutUser === 'function'
+            ? await logoutUser()
+            : { success: false, error: 'Auth not available' };
         if (result.success) {
             console.log('Logged out successfully');
         }
@@ -237,7 +234,9 @@ function setupGame() {
             return;
         }
 
-        const result = await loginUser(email, password);
+        const result = typeof loginUser === 'function'
+            ? await loginUser(email, password)
+            : { success: false, error: 'Auth not available' };
         if (result.success) {
             document.getElementById('authModal').classList.add('hidden');
             clearAuthForms();
@@ -263,7 +262,9 @@ function setupGame() {
             return;
         }
 
-        const result = await registerUser(email, password, name);
+        const result = typeof registerUser === 'function'
+            ? await registerUser(email, password, name)
+            : { success: false, error: 'Auth not available' };
         if (result.success) {
             document.getElementById('authModal').classList.add('hidden');
             clearAuthForms();
@@ -276,7 +277,11 @@ function setupGame() {
     document.getElementById('highScoresBtn').addEventListener('click', async () => {
         hideAllScreens();
         document.getElementById('highScoresScreen').classList.remove('hidden');
-        await displayLeaderboard();
+        if (typeof displayLeaderboard === 'function') {
+            await displayLeaderboard();
+        } else {
+            displayHighScores(); // Fallback to local high scores
+        }
     });
 }
 

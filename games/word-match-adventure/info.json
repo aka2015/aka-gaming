@@ -1,0 +1,10 @@
+{
+  "id": "word-match-adventure",
+  "name": "Word Match Adventure",
+  "description": "Game edukasi bahasa Inggris untuk anak kelas 1-3 dengan gambar emoji dan pilihan kata sederhana.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-04-12"
+}

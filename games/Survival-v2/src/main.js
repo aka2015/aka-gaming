@@ -164,11 +164,6 @@ async function loadAllAssets() {
         initAudio();
         updateLoadingUI(90, 'Audio loaded');
         
-        // Step 4: Setup game systems
-        updateLoadingUI(92, 'Preparing game...');
-        setupGame();
-        updateLoadingUI(95, 'Almost ready...');
-        
         // Small delay to show completion
         await new Promise(resolve => setTimeout(resolve, 300));
         
@@ -256,7 +251,7 @@ async function initGame() {
         loadingScreen.classList.remove('hidden');
     }
     
-    // Load all assets (this also calls setupGame internally)
+    // Load all assets
     const success = await loadAllAssets();
     
     if (!success) {
@@ -267,6 +262,9 @@ async function initGame() {
     if (loadingScreen) {
         loadingScreen.classList.add('hidden');
     }
+    
+    // Setup game systems and event listeners
+    setupGame();
     
     // Show main menu
     showMainMenu();

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listen and Choose</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="start-screen" class="panel screen active">
+      <div class="pill">Listening Game</div>
+      <h1>Listen and Choose</h1>
+      <p class="lead">Dengar kata bahasa Inggris, lalu pilih gambar yang benar.</p>
+
+      <div class="intro-grid">
+        <article class="intro-card">
+          <div class="intro-icon">1</div>
+          <strong>Tekan speaker</strong>
+          <p>Anak mendengar kata dalam bahasa Inggris.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">2</div>
+          <strong>Pilih gambar</strong>
+          <p>Ada 4 pilihan emoji yang mudah dikenali.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">3</div>
+          <strong>Kumpulkan bintang</strong>
+          <p>Jawaban benar memberi skor dan bintang.</p>
+        </article>
+      </div>
+
+      <button id="start-btn" class="primary-btn">Mulai Main</button>
+    </section>
+
+    <section id="game-screen" class="screen hidden">
+      <header class="hud">
+        <div class="hud-card">
+          <span>Soal</span>
+          <strong id="question-count">1 / 8</strong>
+        </div>
+        <div class="hud-card">
+          <span>Skor</span>
+          <strong id="score-count">0</strong>
+        </div>
+        <div class="hud-card">
+          <span>Bintang</span>
+          <strong id="star-count">0</strong>
+        </div>
+      </header>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+      <section class="panel quiz-panel">
+        <div class="pill" id="topic-label">Animals</div>
+        <h2>Listen carefully</h2>
+        <p class="lead small">Tekan tombol ini, lalu pilih gambar yang cocok.</p>
+
+        <div class="speaker-wrap">
+          <button id="listen-btn" class="listen-btn" type="button" aria-label="Dengarkan kata">🔊</button>
+          <div id="heard-word" class="heard-word">Klik speaker untuk mendengar kata</div>
+        </div>
+
+        <div id="choices" class="choices"></div>
+        <div id="feedback-box" class="feedback-box" aria-live="polite"></div>
+
+        <div class="action-row">
+          <button id="next-btn" class="primary-btn hidden" type="button">Soal Berikutnya</button>
+        </div>
+      </section>
+    </section>
+
+    <section id="result-screen" class="panel screen hidden">
+      <div class="pill">Listening Result</div>
+      <h2 id="result-title">Great Listening</h2>
+      <p id="result-summary" class="lead"></p>
+
+      <div class="result-grid">
+        <div class="result-card">
+          <span>Skor</span>
+          <strong id="final-score">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Bintang</span>
+          <strong id="final-stars">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Benar</span>
+          <strong id="correct-count">0 / 8</strong>
+        </div>
+        <div class="result-card">
+          <span>Best Score</span>
+          <strong id="best-score">0</strong>
+        </div>
+      </div>
+
+      <div id="review-list" class="review-list"></div>
+
+      <div class="action-row">
+        <button id="play-again-btn" class="primary-btn" type="button">Main Lagi</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

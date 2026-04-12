@@ -1,10 +1,44 @@
 {
   "id": "Survival-v2",
   "name": "Survival Roguelike 2D",
-  "description": "Selamat dari gelombang musuh → Dapat XP → Naik Level → Pilih Upgrade → Makin Kuat → Selamat Lebih Lama",
+  "description": "Selamat dari gelombang musuh → Dapat XP → Naik Level → Pilih Upgrade → Makin Kuat → Selamat Lebih Lama. Game roguelike 2D dengan 4 karakter unik (Warrior, Mage, Ranger, Orc), sistem wave, boss fights, shop system, dan background music.",
   "category": "action",
-  "badge": "new",
+  "badge": "updated",
   "gameFile": "index.html",
   "thumbnail": "thumbnail.png",
-  "createdAt": "2026-04-11"
+  "createdAt": "2026-04-11",
+  "updatedAt": "2026-04-12",
+  "version": "2.1.0",
+  "features": [
+    "4 Playable Characters (Warrior, Mage, Ranger, Orc)",
+    "Wave System dengan Boss Fights setiap 5 wave",
+    "Level Up & Upgrade System",
+    "Shop System (Senjata, Armor, Special Items)",
+    "Background Music (MP3)",
+    "HP Regeneration Visual Effect",
+    "Loading Screen dengan Asset Preloader",
+    "Mobile Responsive dengan Touch Controls",
+    "iOS Safari Fullscreen Support"
+  ],
+  "controls": {
+    "desktop": "WASD / Arrow Keys untuk bergerak, SPACE untuk pause, B untuk shop",
+    "mobile": "Virtual Joystick & Touch Buttons"
+  },
+  "assets": {
+    "characters": "TinySword Asset Pack (Blue Warrior, Red Pawn, Blue Archer, Blue Monk)",
+    "projectiles": "TinySword Arrow Effects",
+    "effects": "TinySword Heal Effect (Blue Monk)",
+    "sounds": "Custom Background Music (MP3)",
+    "license": "TinySword assets used under appropriate license"
+  },
+  "technologies": [
+    "HTML5 Canvas",
+    "JavaScript (ES6+)",
+    "CSS3 with Media Queries",
+    "Web Audio API",
+    "HTML5 Audio",
+    "Sprite Sheet Animation"
+  ],
+  "author": "AKA Gaming",
+  "platform": "Web Browser (Desktop & Mobile)"
 }

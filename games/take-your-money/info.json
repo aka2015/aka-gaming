@@ -2,8 +2,8 @@
   "id": "take-your-money",
   "name": "Take Your Money",
   "description": "ambil uangmu!",
-  "category": "clicker",
-  "badge": "new",
+  "category": "puzzle",
+  "badge": "old",
   "gameFile": "index.html",
   "thumbnail": "thumbnail.png",
   "createdAt": "2026-04-11"

@@ -2,7 +2,11 @@
 // WAVE REST & GAME STATE
 // ========================================
 
-import { saveGameScore, isLoggedIn } from '../system/auth.js';
+// Firebase auth functions - loaded dynamically if available
+const waveRestAuth = {
+    saveGameScore: typeof saveGameScore !== 'undefined' ? saveGameScore : null,
+    isLoggedIn: typeof isLoggedIn !== 'undefined' ? isLoggedIn : () => false
+};
 
 function updateWaveRest(deltaTime) {
     restTimer -= deltaTime;
@@ -80,19 +84,20 @@ function gameOver() {
     // Calculate final score
     const finalScore = score + Math.floor(survivalTime);
 
-    // Save high score to local storage (legacy)
+    // Save high score to local storage
     saveHighScore(finalScore);
-    
+
     // Save score to Firebase if user is logged in
-    if (isLoggedIn()) {
-        saveGameScore(finalScore, currentWave, player.level, survivalTime, selectedCharacter, enemiesKilled)
+    if (waveRestAuth.isLoggedIn && waveRestAuth.isLoggedIn() && waveRestAuth.saveGameScore) {
+        waveRestAuth.saveGameScore(finalScore, currentWave, player.level, survivalTime, selectedCharacter, enemiesKilled)
             .then(result => {
                 if (result.success) {
                     console.log('✅ Score saved to cloud!');
                 } else {
                     console.error('Failed to save score:', result.error);
                 }
-            });
+            })
+            .catch(err => console.log('Failed to save score to Firebase:', err));
     }
 
     // Show game over screen

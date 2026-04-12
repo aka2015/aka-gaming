@@ -1,0 +1,10 @@
+{
+  "id": "listen-and-choose",
+  "name": "Listen and Choose",
+  "description": "Game listening bahasa Inggris untuk anak kelas 1-3: dengar kata lalu pilih gambar yang benar.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-04-12"
+}
