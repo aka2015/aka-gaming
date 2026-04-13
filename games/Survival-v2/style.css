@@ -1427,8 +1427,8 @@ body {
     left: 50%;
     transform: translateX(-50%);
     bottom: 20px;
-    width: 240px;
-    height: 240px;
+    width: 200px;
+    height: 200px;
     pointer-events: none;
     z-index: 1000;
     opacity: 0.8;
@@ -1438,9 +1438,9 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 60px;
-    width: 120px;
-    height: 120px;
+    bottom: 50px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: rgba(0, 255, 255, 0.15);
     border: 3px solid rgba(0, 255, 255, 0.5);
@@ -1452,9 +1452,9 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 35px;
-    width: 50px;
-    height: 50px;
+    bottom: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(0, 255, 255, 0.8) 0%, rgba(0, 128, 255, 0.6) 100%);
     border: 2px solid rgba(255, 255, 255, 0.8);
@@ -1462,6 +1462,52 @@ body {
     transform: translateX(-50%) translateY(0px);
     pointer-events: none;
     transition: transform 0.05s ease-out;
+}
+
+/* Scale down joystick on small screens */
+@media (max-width: 480px) {
+    #joystickContainer {
+        width: 150px;
+        height: 150px;
+        bottom: 15px;
+    }
+    
+    #joystickBase {
+        width: 80px;
+        height: 80px;
+        bottom: 40px;
+        border-width: 2px;
+    }
+    
+    #joystickStick {
+        width: 32px;
+        height: 32px;
+        bottom: 24px;
+        border-width: 2px;
+    }
+}
+
+/* Extra small screens (iPhone SE, etc) */
+@media (max-width: 375px) {
+    #joystickContainer {
+        width: 120px;
+        height: 120px;
+        bottom: 10px;
+    }
+    
+    #joystickBase {
+        width: 70px;
+        height: 70px;
+        bottom: 35px;
+        border-width: 2px;
+    }
+    
+    #joystickStick {
+        width: 28px;
+        height: 28px;
+        bottom: 21px;
+        border-width: 1.5px;
+    }
 }
 
 .mobile-btn {

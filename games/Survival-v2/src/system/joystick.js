@@ -7,8 +7,16 @@ let joystickActive = false;
 let joystickBasePos = { x: 0, y: 0 };
 let joystickStickPos = { x: 0, y: 0 };
 let joystickTouchId = null;
-const JOYSTICK_RADIUS = 60;
-const JOYSTICK_OFFSET_BOTTOM = 100; // Distance from bottom of screen
+
+// Responsive joystick radius based on screen size
+function getJoystickRadius() {
+    const width = window.innerWidth;
+    if (width <= 375) return 35;   // Extra small (iPhone SE)
+    if (width <= 480) return 40;   // Small phones
+    return 50;                      // Default
+}
+
+const JOYSTICK_OFFSET_BOTTOM = 90; // Distance from bottom of screen
 
 // Check if device is mobile
 function isMobileDevice() {
@@ -67,9 +75,10 @@ function handleTouchStart(e) {
         const dx = x - joyCenter.x;
         const dy = y - joyCenter.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
+        const touchRadius = getJoystickRadius() * 2.4; // Touch area is larger than visual
 
-        // Activate if touch is within 120px of joystick center
-        if (distance < 120 && joystickTouchId === null) {
+        // Activate if touch is within radius of joystick center
+        if (distance < touchRadius && joystickTouchId === null) {
             joystickActive = true;
             joystickTouchId = touch.identifier;
 
@@ -100,9 +109,10 @@ function handleTouchMove(e) {
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             // Clamp to joystick radius
-            if (distance > JOYSTICK_RADIUS) {
-                dx = (dx / distance) * JOYSTICK_RADIUS;
-                dy = (dy / distance) * JOYSTICK_RADIUS;
+            const radius = getJoystickRadius();
+            if (distance > radius) {
+                dx = (dx / distance) * radius;
+                dy = (dy / distance) * radius;
             }
 
             joystickStickPos.x = joystickBasePos.x + dx;
