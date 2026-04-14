@@ -1,5 +1,61 @@
-const QUESTION_COUNT = 8;
 const STORAGE_KEY = "aka_listen_choose_best_score";
+const LEVEL_STORAGE_KEY = "aka_listen_choose_levels";
+
+// Level configurations
+const LEVELS = {
+  1: {
+    name: "Beginner",
+    emoji: "🌱",
+    questionCount: 5,
+    choicesCount: 3,
+    speechRate: 0.7,
+    categories: ["Animals", "Fruits"],
+    pointsPerCorrect: 10,
+    listenRequired: 1
+  },
+  2: {
+    name: "Elementary",
+    emoji: "🌿",
+    questionCount: 8,
+    choicesCount: 4,
+    speechRate: 0.82,
+    categories: ["Animals", "Fruits", "Colors"],
+    pointsPerCorrect: 15,
+    listenRequired: 1
+  },
+  3: {
+    name: "Intermediate",
+    emoji: "🌳",
+    questionCount: 10,
+    choicesCount: 4,
+    speechRate: 0.9,
+    categories: ["Animals", "Fruits", "School Objects", "Colors"],
+    pointsPerCorrect: 20,
+    listenRequired: 1
+  },
+  4: {
+    name: "Advanced",
+    emoji: "⭐",
+    questionCount: 12,
+    choicesCount: 5,
+    speechRate: 1.0,
+    categories: ["Animals", "Fruits", "School Objects", "Colors", "Body Parts"],
+    pointsPerCorrect: 25,
+    listenRequired: 1,
+    timeLimit: 15
+  },
+  5: {
+    name: "Expert",
+    emoji: "🏆",
+    questionCount: 15,
+    choicesCount: 5,
+    speechRate: 1.1,
+    categories: ["Animals", "Fruits", "School Objects", "Colors", "Body Parts", "Clothes"],
+    pointsPerCorrect: 30,
+    listenRequired: 2,
+    timeLimit: 12
+  }
+};
 
 // Audio feedback system
 let audioCtx = null;
@@ -65,20 +121,55 @@ function playWrongSound() {
 }
 
 const WORD_BANK = [
+  // Animals
   { word: "cat", emoji: "🐱", topic: "Animals" },
   { word: "dog", emoji: "🐶", topic: "Animals" },
   { word: "bird", emoji: "🐦", topic: "Animals" },
   { word: "fish", emoji: "🐟", topic: "Animals" },
+  { word: "rabbit", emoji: "🐰", topic: "Animals" },
+  { word: "turtle", emoji: "🐢", topic: "Animals" },
+  { word: "lion", emoji: "🦁", topic: "Animals" },
+  { word: "monkey", emoji: "🐵", topic: "Animals" },
+  
+  // Fruits
   { word: "apple", emoji: "🍎", topic: "Fruits" },
   { word: "banana", emoji: "🍌", topic: "Fruits" },
   { word: "orange", emoji: "🍊", topic: "Fruits" },
+  { word: "grape", emoji: "🍇", topic: "Fruits" },
+  { word: "strawberry", emoji: "🍓", topic: "Fruits" },
+  { word: "watermelon", emoji: "🍉", topic: "Fruits" },
+  
+  // School Objects
   { word: "book", emoji: "📘", topic: "School Objects" },
   { word: "pencil", emoji: "✏️", topic: "School Objects" },
   { word: "bag", emoji: "🎒", topic: "School Objects" },
   { word: "chair", emoji: "🪑", topic: "School Objects" },
+  { word: "ruler", emoji: "📏", topic: "School Objects" },
+  { word: "eraser", emoji: "🧼", topic: "School Objects" },
+  
+  // Colors
   { word: "red", emoji: "🟥", topic: "Colors" },
   { word: "blue", emoji: "🟦", topic: "Colors" },
-  { word: "green", emoji: "🟩", topic: "Colors" }
+  { word: "green", emoji: "🟩", topic: "Colors" },
+  { word: "yellow", emoji: "🟨", topic: "Colors" },
+  { word: "purple", emoji: "🟪", topic: "Colors" },
+  { word: "orange", emoji: "🟧", topic: "Colors" },
+  
+  // Body Parts
+  { word: "head", emoji: "🗣️", topic: "Body Parts" },
+  { word: "hand", emoji: "✋", topic: "Body Parts" },
+  { word: "eye", emoji: "👁️", topic: "Body Parts" },
+  { word: "ear", emoji: "👂", topic: "Body Parts" },
+  { word: "mouth", emoji: "👄", topic: "Body Parts" },
+  { word: "nose", emoji: "👃", topic: "Body Parts" },
+  
+  // Clothes
+  { word: "shirt", emoji: "👕", topic: "Clothes" },
+  { word: "shoes", emoji: "👟", topic: "Clothes" },
+  { word: "hat", emoji: "🎩", topic: "Clothes" },
+  { word: "dress", emoji: "👗", topic: "Clothes" },
+  { word: "pants", emoji: "👖", topic: "Clothes" },
+  { word: "socks", emoji: "🧦", topic: "Clothes" }
 ];
 
 const startScreen = document.getElementById("start-screen");
@@ -110,6 +201,11 @@ const reviewFixedCountEl = document.getElementById("review-fixed-count");
 const reviewRewardBannerEl = document.getElementById("review-reward-banner");
 const badgeListEl = document.getElementById("badge-list");
 const reviewListEl = document.getElementById("review-list");
+const levelSelectBtn = document.getElementById("level-select-btn");
+const levelSelectionEl = document.getElementById("level-selection");
+const levelButtons = document.querySelectorAll(".level-btn");
+const currentLevelEl = document.getElementById("current-level");
+const timerEl = document.getElementById("timer");
 
 let questions = [];
 let activeQuestions = [];
@@ -121,19 +217,26 @@ let streak = 0;
 let correctAnswers = 0;
 let answerLocked = false;
 let listenedOnce = false;
+let listenedCount = 0;
 let isReviewMode = false;
 let reviewRoundTotal = 0;
 let reviewRoundFixed = 0;
 let earnedReviewReward = false;
 let reviewItems = [];
-const topicProgress = new Map();
-const earnedBadges = new Map();
+let currentLevel = 2; // Default level
+let unlockedLevels = [1, 2]; // Start with levels 1 and 2 unlocked
+let topicProgress = new Map();
+let earnedBadges = new Map();
+let timerInterval = null;
+let timeRemaining = 0;
 
 const BADGE_RULES = {
   Animals: { label: "Animal Listener", target: 2 },
   Fruits: { label: "Fruit Listener", target: 2 },
   "School Objects": { label: "Classroom Listener", target: 2 },
-  Colors: { label: "Color Listener", target: 2 }
+  Colors: { label: "Color Listener", target: 2 },
+  "Body Parts": { label: "Body Expert", target: 2 },
+  Clothes: { label: "Fashion Master", target: 2 }
 };
 
 function shuffle(items) {
@@ -145,16 +248,23 @@ function shuffle(items) {
   return clone;
 }
 
-function buildQuestion(entry) {
-  const distractors = shuffle(WORD_BANK.filter((item) => item.word !== entry.word)).slice(0, 3);
+function buildQuestion(entry, levelConfig) {
+  const choicesCount = levelConfig.choicesCount || 4;
+  const distractors = shuffle(WORD_BANK.filter((item) => item.word !== entry.word)).slice(0, choicesCount - 1);
   return {
     ...entry,
     choices: shuffle([entry, ...distractors])
   };
 }
 
-function pickQuestions() {
-  return shuffle(WORD_BANK).slice(0, QUESTION_COUNT).map(buildQuestion);
+function getFilteredWordBank(levelConfig) {
+  return WORD_BANK.filter(item => levelConfig.categories.includes(item.topic));
+}
+
+function pickQuestions(levelConfig) {
+  const filteredBank = getFilteredWordBank(levelConfig);
+  const questionCount = Math.min(levelConfig.questionCount, filteredBank.length);
+  return shuffle(filteredBank).slice(0, questionCount).map(entry => buildQuestion(entry, levelConfig));
 }
 
 function switchScreen(target) {
@@ -167,6 +277,34 @@ function switchScreen(target) {
   target.classList.add("active");
 }
 
+function loadUnlockedLevels() {
+  try {
+    const saved = localStorage.getItem(LEVEL_STORAGE_KEY);
+    if (saved) {
+      unlockedLevels = JSON.parse(saved);
+    }
+  } catch (e) {
+    // Ignore errors, use default
+  }
+}
+
+function saveUnlockedLevels() {
+  try {
+    localStorage.setItem(LEVEL_STORAGE_KEY, JSON.stringify(unlockedLevels));
+  } catch (e) {
+    // Ignore errors
+  }
+}
+
+function unlockLevel(level) {
+  if (!unlockedLevels.includes(level)) {
+    unlockedLevels.push(level);
+    saveUnlockedLevels();
+    return true;
+  }
+  return false;
+}
+
 function loadBestScore() {
   return Number(localStorage.getItem(STORAGE_KEY) || 0);
 }
@@ -176,12 +314,34 @@ function saveBestScore(value) {
 }
 
 function updateHud() {
-  questionCountEl.textContent = `${currentIndex + 1} / ${activeQuestions.length || QUESTION_COUNT}`;
+  const levelConfig = LEVELS[currentLevel];
+  const totalQuestions = activeQuestions.length || levelConfig.questionCount;
+  questionCountEl.textContent = `${currentIndex + 1} / ${totalQuestions}`;
   scoreCountEl.textContent = String(score);
   starCountEl.textContent = String(stars);
   streakCountEl.textContent = String(streak);
   comboLabelEl.textContent = streak >= 5 ? "Super Combo" : streak >= 3 ? "Combo Aktif" : "Belum ada";
-  progressBarEl.style.width = `${((currentIndex + 1) / (activeQuestions.length || QUESTION_COUNT)) * 100}%`;
+  progressBarEl.style.width = `${((currentIndex + 1) / totalQuestions) * 100}%`;
+  if (currentLevelEl) {
+    currentLevelEl.textContent = `${levelConfig.emoji} Level ${currentLevel}: ${levelConfig.name}`;
+  }
+  
+  // Update timer if applicable
+  if (levelConfig.timeLimit) {
+    if (timerEl) {
+      timerEl.parentElement.classList.remove("hidden");
+      timerEl.textContent = `${timeRemaining}s`;
+      if (timeRemaining <= 5) {
+        timerEl.style.color = "#e74c3c";
+      } else {
+        timerEl.style.color = "#17324a";
+      }
+    }
+  } else {
+    if (timerEl) {
+      timerEl.parentElement.classList.add("hidden");
+    }
+  }
 }
 
 function updateTopicProgress(topic, isCorrect) {
@@ -219,14 +379,22 @@ function speakCurrentWord() {
     return;
   }
 
-  heardWordEl.textContent = `Kata diputar. Dengarkan baik-baik.`;
+  const levelConfig = LEVELS[currentLevel];
+  listenedCount += 1;
+  
+  if (listenedCount >= levelConfig.listenRequired) {
+    heardWordEl.textContent = `Kata: "${question.word}"`;
+  } else {
+    heardWordEl.textContent = `Kata diputar (${listenedCount}/${levelConfig.listenRequired}). Dengarkan baik-baik.`;
+  }
   listenedOnce = true;
 
   if ("speechSynthesis" in window) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(question.word);
     utterance.lang = "en-US";
-    utterance.rate = 0.82;
+    utterance.rate = levelConfig.speechRate;
+    utterance.pitch = 1;
     window.speechSynthesis.speak(utterance);
     return;
   }
@@ -238,6 +406,7 @@ function renderQuestion() {
   const question = activeQuestions[currentIndex];
   answerLocked = false;
   listenedOnce = false;
+  listenedCount = 0;
   updateHud();
   topicLabelEl.textContent = isReviewMode ? `${question.topic} • Review` : question.topic;
   reviewBannerEl.classList.toggle("hidden", !isReviewMode);
@@ -246,6 +415,13 @@ function renderQuestion() {
   feedbackBoxEl.className = "feedback-box";
   nextBtn.classList.add("hidden");
   choicesEl.innerHTML = "";
+
+  // Start timer if applicable
+  stopTimer();
+  const levelConfig = LEVELS[currentLevel];
+  if (levelConfig.timeLimit && !isReviewMode) {
+    startTimer(levelConfig.timeLimit);
+  }
 
   question.choices.forEach((choice) => {
     const button = document.createElement("button");
@@ -260,6 +436,74 @@ function renderQuestion() {
   });
 }
 
+function startTimer(seconds) {
+  timeRemaining = seconds;
+  if (timerEl) {
+    timerEl.textContent = `${timeRemaining}s`;
+  }
+  
+  timerInterval = setInterval(() => {
+    timeRemaining -= 1;
+    if (timerEl) {
+      timerEl.textContent = `${timeRemaining}s`;
+      if (timeRemaining <= 5) {
+        timerEl.style.color = "#e74c3c";
+      } else {
+        timerEl.style.color = "#17324a";
+      }
+    }
+    
+    if (timeRemaining <= 0) {
+      stopTimer();
+      // Auto-select wrong if time runs out
+      if (!answerLocked) {
+        handleTimeUp();
+      }
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function handleTimeUp() {
+  const question = activeQuestions[currentIndex];
+  answerLocked = true;
+  playWrongSound();
+  streak = 0;
+  
+  const buttons = [...document.querySelectorAll(".choice-btn")];
+  buttons.forEach((itemButton) => {
+    itemButton.disabled = true;
+    const text = itemButton.querySelector(".choice-word")?.textContent;
+    if (text === question.word) {
+      itemButton.classList.add("correct");
+    }
+  });
+  
+  feedbackBoxEl.textContent = `Waktu habis! Jawaban yang benar adalah "${question.word}".`;
+  feedbackBoxEl.className = "feedback-box error";
+  
+  if (!isReviewMode) {
+    failedQuestions.push(question);
+  }
+  
+  reviewItems.push({
+    emoji: question.emoji,
+    word: question.word,
+    topic: question.topic,
+    success: false
+  });
+  
+  streakCountEl.textContent = String(streak);
+  nextBtn.textContent = currentIndex === activeQuestions.length - 1 ? "Lihat Hasil" : "Soal Berikutnya";
+  nextBtn.classList.remove("hidden");
+}
+
 function selectAnswer(choice, button) {
   if (answerLocked) {
     return;
@@ -267,8 +511,11 @@ function selectAnswer(choice, button) {
 
   const question = activeQuestions[currentIndex];
   answerLocked = true;
+  stopTimer(); // Stop timer if running
+  
   const buttons = [...document.querySelectorAll(".choice-btn")];
   const isCorrect = choice.word === question.word;
+  const levelConfig = LEVELS[currentLevel];
 
   buttons.forEach((itemButton) => {
     itemButton.disabled = true;
@@ -281,9 +528,12 @@ function selectAnswer(choice, button) {
   if (isCorrect) {
     // Play correct sound
     playCorrectSound();
-    
+
     streak += 1;
-    score += listenedOnce ? 15 : 10;
+    // Base points from level + bonus for listening
+    const basePoints = levelConfig.pointsPerCorrect || 15;
+    const listenBonus = listenedCount === 0 ? 5 : 0; // Bonus for not listening
+    score += basePoints + listenBonus;
     stars += 1;
     correctAnswers += 1;
     button.classList.add("correct");
@@ -305,7 +555,7 @@ function selectAnswer(choice, button) {
   } else {
     // Play wrong sound
     playWrongSound();
-    
+
     streak = 0;
     button.classList.add("wrong");
     feedbackBoxEl.textContent = `Belum tepat. Jawaban yang benar adalah "${question.word}".`;
@@ -326,42 +576,53 @@ function selectAnswer(choice, button) {
   starCountEl.textContent = String(stars);
   streakCountEl.textContent = String(streak);
   comboLabelEl.textContent = streak >= 5 ? "Super Combo" : streak >= 3 ? "Combo Aktif" : "Belum ada";
-  nextBtn.textContent = currentIndex === QUESTION_COUNT - 1 ? "Lihat Hasil" : "Soal Berikutnya";
+  nextBtn.textContent = currentIndex === activeQuestions.length - 1 ? "Lihat Hasil" : "Soal Berikutnya";
   nextBtn.classList.remove("hidden");
 }
 
 function resultMessage() {
-  if (correctAnswers === QUESTION_COUNT) {
+  const levelConfig = LEVELS[currentLevel];
+  const totalQuestions = activeQuestions.length;
+  const percentage = correctAnswers / totalQuestions;
+
+  if (correctAnswers === totalQuestions) {
     return {
-      title: "Amazing Listening",
-      summary: "Semua jawaban benar. Kemampuan listening sudah sangat kuat."
+      title: "Perfect! 🎉",
+      summary: `Level ${currentLevel} (${levelConfig.name}) selesai dengan sempurna! Kemampuan listening luar biasa.`,
+      unlockNext: true
     };
   }
 
-  if (correctAnswers >= 6) {
+  if (percentage >= 0.8) {
     return {
-      title: "Great Listening",
-      summary: "Hasilnya bagus. Tinggal sedikit latihan agar makin cepat mengenali kata."
+      title: "Excellent! ⭐",
+      summary: `Hasil sangat bagus di level ${levelConfig.name}. Tinggal sedikit lagi untuk sempurna!`,
+      unlockNext: percentage >= 0.9
     };
   }
 
-  if (correctAnswers >= 4) {
+  if (percentage >= 0.6) {
     return {
-      title: "Nice Practice",
-      summary: "Pemahaman dasar sudah ada. Ulangi lagi sambil dengarkan speaker beberapa kali."
+      title: "Good Job! 👍",
+      summary: `Pemahaman dasar di level ${levelConfig.name} sudah kuat. Latihan lagi untuk hasil lebih baik.`,
+      unlockNext: false
     };
   }
 
   return {
-    title: "Keep Trying",
-    summary: "Coba lagi pelan-pelan. Fokus ke bunyi kata dan gambar yang muncul."
+    title: "Keep Practicing 💪",
+    summary: `Level ${levelConfig.name} masih perlu latihan. Coba lagi dan dengarkan baik-baik!`,
+    unlockNext: false
   };
 }
 
 function renderResults() {
+  stopTimer();
+  
   window.AkaScoreReporter?.report("listen-and-choose", score, {
     stars,
     correctAnswers,
+    level: currentLevel,
     reviewFixed: reviewRoundFixed,
     reviewTotal: reviewRoundTotal
   });
@@ -374,8 +635,9 @@ function renderResults() {
   resultSummaryEl.textContent = message.summary;
   finalScoreEl.textContent = String(score);
   finalStarsEl.textContent = String(stars);
-  correctCountEl.textContent = `${correctAnswers} / ${QUESTION_COUNT}`;
+  correctCountEl.textContent = `${correctAnswers} / ${activeQuestions.length}`;
   bestScoreEl.textContent = String(bestScore);
+  
   if (reviewRoundTotal > 0) {
     reviewSummaryCardEl.classList.remove("hidden");
     reviewFixedCountEl.textContent = `${reviewRoundFixed} / ${reviewRoundTotal}`;
@@ -384,6 +646,16 @@ function renderResults() {
   }
   reviewRewardBannerEl.classList.toggle("hidden", !earnedReviewReward);
   renderBadges();
+
+  // Show level completion and unlock next level
+  if (message.unlockNext && currentLevel < 5) {
+    const nextLevel = currentLevel + 1;
+    const unlocked = unlockLevel(nextLevel);
+    if (unlocked) {
+      const nextLevelConfig = LEVELS[nextLevel];
+      resultSummaryEl.textContent += ` Level ${nextLevel} (${nextLevelConfig.name}) terbuka!`;
+    }
+  }
 
   reviewListEl.innerHTML = "";
   reviewItems.slice(-6).forEach((item) => {
@@ -430,8 +702,11 @@ function nextQuestion() {
   renderQuestion();
 }
 
-function startGame() {
-  questions = pickQuestions();
+function startGame(level) {
+  currentLevel = level || currentLevel;
+  const levelConfig = LEVELS[currentLevel];
+  
+  questions = pickQuestions(levelConfig);
   activeQuestions = questions;
   failedQuestions = [];
   currentIndex = 0;
@@ -451,14 +726,48 @@ function startGame() {
   earnedBadges.clear();
   renderBadges();
   bestScoreEl.textContent = String(loadBestScore());
+  stopTimer();
   switchScreen(gameScreen);
   renderQuestion();
 }
 
-startBtn.addEventListener("click", startGame);
+startBtn.addEventListener("click", () => {
+  initAudio();
+  startGame(currentLevel);
+});
+
 listenBtn.addEventListener("click", speakCurrentWord);
 nextBtn.addEventListener("click", nextQuestion);
-playAgainBtn.addEventListener("click", startGame);
+playAgainBtn.addEventListener("click", () => {
+  switchScreen(startScreen);
+});
+
+// Level selection
+if (levelSelectBtn) {
+  levelSelectBtn.addEventListener("click", () => {
+    levelSelectionEl.classList.toggle("hidden");
+  });
+}
+
+levelButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const level = parseInt(btn.dataset.level);
+    if (unlockedLevels.includes(level)) {
+      currentLevel = level;
+      levelSelectionEl.classList.add("hidden");
+      // Update UI to show selected level
+      levelButtons.forEach((b) => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      if (currentLevelEl) {
+        const levelConfig = LEVELS[level];
+        currentLevelEl.textContent = `${levelConfig.emoji} Level ${level}: ${levelConfig.name}`;
+      }
+    }
+  });
+});
+
+// Load unlocked levels on startup
+loadUnlockedLevels();
 
 bestScoreEl.textContent = String(loadBestScore());
 renderBadges();

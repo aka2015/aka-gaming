@@ -13,6 +13,39 @@
       <h1>Listen and Choose</h1>
       <p class="lead">Dengar kata bahasa Inggris, lalu pilih gambar yang benar.</p>
 
+      <div class="level-selector">
+        <h3>Pilih Level</h3>
+        <div id="current-level" class="current-level-display">🌿 Level 2: Elementary</div>
+        <button id="level-select-btn" class="level-select-btn">Ganti Level</button>
+        <div id="level-selection" class="level-selection hidden">
+          <button class="level-btn" data-level="1">
+            <span class="level-emoji">🌱</span>
+            <span class="level-name">Beginner</span>
+            <span class="level-desc">5 soal, 3 pilihan</span>
+          </button>
+          <button class="level-btn selected" data-level="2">
+            <span class="level-emoji">🌿</span>
+            <span class="level-name">Elementary</span>
+            <span class="level-desc">8 soal, 4 pilihan</span>
+          </button>
+          <button class="level-btn" data-level="3">
+            <span class="level-emoji">🌳</span>
+            <span class="level-name">Intermediate</span>
+            <span class="level-desc">10 soal, 4 pilihan</span>
+          </button>
+          <button class="level-btn locked" data-level="4" disabled>
+            <span class="level-emoji">⭐</span>
+            <span class="level-name">Advanced</span>
+            <span class="level-desc">12 soal, timer 15s</span>
+          </button>
+          <button class="level-btn locked" data-level="5" disabled>
+            <span class="level-emoji">🏆</span>
+            <span class="level-name">Expert</span>
+            <span class="level-desc">15 soal, timer 12s</span>
+          </button>
+        </div>
+      </div>
+
       <div class="intro-grid">
         <article class="intro-card">
           <div class="intro-icon">1</div>
@@ -22,7 +55,7 @@
         <article class="intro-card">
           <div class="intro-icon">2</div>
           <strong>Pilih gambar</strong>
-          <p>Ada 4 pilihan emoji yang mudah dikenali.</p>
+          <p>Ada 3-5 pilihan emoji yang mudah dikenali.</p>
         </article>
         <article class="intro-card">
           <div class="intro-icon">3</div>
@@ -47,6 +80,10 @@
         <div class="hud-card">
           <span>Bintang</span>
           <strong id="star-count">0</strong>
+        </div>
+        <div class="hud-card hidden" id="timer-card">
+          <span>Waktu</span>
+          <strong id="timer">15s</strong>
         </div>
       </header>
 

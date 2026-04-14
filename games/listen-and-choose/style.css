@@ -78,7 +78,7 @@ h2 {
 
 .intro-grid,
 .hud {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .status-strip,
@@ -164,6 +164,117 @@ h2 {
 .review-item span {
   margin: 0;
   color: #5a7387;
+}
+
+/* Level Selector Styles */
+.level-selector {
+  margin-bottom: 22px;
+  padding: 18px;
+  border-radius: 22px;
+  background: #f0f7ff;
+  border: 2px solid rgba(23, 50, 74, 0.08);
+}
+
+.level-selector h3 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: #17324a;
+}
+
+.current-level-display {
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-align: center;
+  color: #17324a;
+}
+
+.level-select-btn {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7bdff2, #b2f7ef);
+  color: #17324a;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.level-select-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(51, 130, 170, 0.2);
+}
+
+.level-selection {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.level-btn {
+  padding: 16px 12px;
+  border-radius: 16px;
+  border: 2px solid rgba(23, 50, 74, 0.12);
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.level-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(20, 59, 91, 0.12);
+  border-color: #34c38f;
+}
+
+.level-btn.selected {
+  background: linear-gradient(135deg, #34c38f, #9be15d);
+  border-color: #34c38f;
+  color: #fff;
+}
+
+.level-btn.selected .level-name,
+.level-btn.selected .level-desc {
+  color: #fff;
+}
+
+.level-btn.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.level-btn.locked::after {
+  content: "🔒";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 1.2rem;
+}
+
+.level-emoji {
+  font-size: 2.2rem;
+}
+
+.level-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #17324a;
+}
+
+.level-desc {
+  font-size: 0.85rem;
+  color: #5a7387;
+  text-align: center;
 }
 
 .primary-btn,
@@ -337,7 +448,12 @@ h2 {
   .review-list,
   .hud,
   .status-strip,
-  .badge-list {
+  .badge-list,
+  .level-selection {
     grid-template-columns: 1fr;
+  }
+  
+  .hud {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
