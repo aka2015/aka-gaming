@@ -1,0 +1,10 @@
+{
+  "id": "treasure-quest",
+  "name": "Treasure Quest",
+  "description": "Petualangan platformer yang seru! Jelajahi 5 dunia, kumpulkan harta karun, dan hindari monster.",
+  "category": "adventure",
+  "badge": "new",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png",
+  "created": "2026-04-13"
+}
