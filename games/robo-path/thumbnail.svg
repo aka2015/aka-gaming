@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1f3c"/>
+      <stop offset="1" stop-color="#1a3a6c"/>
+    </linearGradient>
+    <linearGradient id="cell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e3a8a"/>
+      <stop offset="1" stop-color="#1e2a5a"/>
+    </linearGradient>
+    <radialGradient id="starGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe066" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffe066" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="400" height="300" fill="url(#bg)"/>
+
+  <!-- Grid background -->
+  <g stroke="#3a5a9a" stroke-width="0.5" opacity="0.4">
+    <path d="M 0 60 L 400 60 M 0 120 L 400 120 M 0 180 L 400 180 M 0 240 L 400 240"/>
+    <path d="M 60 0 L 60 300 M 120 0 L 120 300 M 180 0 L 180 300 M 240 0 L 240 300 M 300 0 L 300 300 M 360 0 L 360 300"/>
+  </g>
+
+  <!-- Path trail (robot's intended path) -->
+  <path d="M 80 220 L 80 130 L 200 130 L 200 70 L 320 70"
+        fill="none" stroke="#60a5fa" stroke-width="3" stroke-dasharray="6 6" opacity="0.7"/>
+
+  <!-- Goal star with glow -->
+  <circle cx="320" cy="70" r="35" fill="url(#starGlow)"/>
+  <g transform="translate(320, 70) scale(1.2)">
+    <polygon points="0,-15 4,-5 15,-5 6,2 9,13 0,7 -9,13 -6,2 -15,-5 -4,-5"
+             fill="#ffe066" stroke="#ffa726" stroke-width="1.5"/>
+  </g>
+
+  <!-- Bonus stars on path -->
+  <g transform="translate(80, 130)">
+    <polygon points="0,-9 3,-3 9,-3 4,1 6,8 0,4 -6,8 -4,1 -9,-3 -3,-3"
+             fill="#ffe066" opacity="0.85"/>
+  </g>
+  <g transform="translate(200, 130)">
+    <polygon points="0,-9 3,-3 9,-3 4,1 6,8 0,4 -6,8 -4,1 -9,-3 -3,-3"
+             fill="#ffe066" opacity="0.85"/>
+  </g>
+
+  <!-- Wall obstacle -->
+  <rect x="135" y="155" width="50" height="40" fill="#7a3a3a" stroke="#a04a4a" stroke-width="2" rx="3"/>
+  <line x1="160" y1="155" x2="160" y2="195" stroke="#5a2a2a" stroke-width="1.5"/>
+  <line x1="135" y1="175" x2="185" y2="175" stroke="#5a2a2a" stroke-width="1.5"/>
+
+  <!-- Robot -->
+  <g transform="translate(80, 220)">
+    <!-- Robot body -->
+    <rect x="-18" y="-22" width="36" height="32" rx="6" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+    <!-- Eyes -->
+    <circle cx="-7" cy="-10" r="4" fill="#0d1f3c"/>
+    <circle cx="7" cy="-10" r="4" fill="#0d1f3c"/>
+    <circle cx="-6" cy="-11" r="1.5" fill="#fff"/>
+    <circle cx="8" cy="-11" r="1.5" fill="#fff"/>
+    <!-- Antenna -->
+    <line x1="0" y1="-22" x2="0" y2="-30" stroke="#475569" stroke-width="2"/>
+    <circle cx="0" cy="-32" r="3" fill="#ef4444"/>
+    <!-- Wheels/tracks -->
+    <rect x="-22" y="8" width="6" height="12" rx="2" fill="#475569"/>
+    <rect x="16" y="8" width="6" height="12" rx="2" fill="#475569"/>
+    <!-- Direction arrow -->
+    <polygon points="0,-2 4,4 -4,4" fill="#ffe066"/>
+  </g>
+
+  <!-- Title -->
+  <text x="200" y="285" font-size="20" font-weight="bold" fill="#ffe066" text-anchor="middle" font-family="sans-serif" letter-spacing="2">ROBO PATH</text>
+</svg>

@@ -191,7 +191,8 @@ function generateEnemies(worldIdx, levelIdx) {
       type: getEnemyType(worldIdx),
       speed: 1 + worldIdx * 0.5,
       range: 100,
-      startX: 300 + i * 150
+      startX: 300 + i * 150,
+      dir: 1
     });
   }
 
@@ -256,7 +257,7 @@ let gameState = {
     facing: 1
   },
   enemies: [],
-  coins: [],
+  coinItems: [],
   powerups: [],
   platforms: [],
   goal: null,
@@ -303,7 +304,10 @@ let lastTime = 0;
 
 // Screen Management
 function showScreen(screen) {
+  const isOverlay = screen.classList.contains('overlay');
   [startScreen, gameScreen, pauseScreen, gameoverScreen, levelcompleteScreen, winScreen].forEach(s => {
+    // Keep game screen visible behind overlay screens
+    if (isOverlay && s === gameScreen) return;
     s.classList.add("hidden");
     s.classList.remove("active");
   });
@@ -324,7 +328,7 @@ function loadLevel(worldIdx, levelIdx) {
   gameState.currentLevel = levelIdx;
   gameState.platforms = level.platforms.map(p => ({ ...p }));
   gameState.enemies = level.enemies.map(e => ({ ...e, startX: e.x }));
-  gameState.coins = level.coins.map(c => ({ ...c }));
+  gameState.coinItems = level.coins.map(c => ({ ...c }));
   gameState.powerups = level.powerups.map(p => ({ ...p }));
   gameState.goal = { ...level.goal };
   gameState.player.x = 50;
@@ -336,10 +340,13 @@ function loadLevel(worldIdx, levelIdx) {
   gameState.startTime = Date.now();
 
   updateHUD();
+  cancelAnimationFrame(animFrame);
   showScreen(gameScreen);
   gameState.gameRunning = true;
   gameState.paused = false;
-  gameLoop();
+  scaleGameCanvas();
+  lastTime = performance.now();
+  gameLoop(lastTime);
 }
 
 function updateHUD() {
@@ -422,7 +429,9 @@ function update(deltaTime) {
 
   // Update Enemies
   gameState.enemies.forEach(enemy => {
-    enemy.x += enemy.speed * (enemy.x > enemy.startX + enemy.range ? -1 : 1);
+    if (enemy.x >= enemy.startX + enemy.range) enemy.dir = -1;
+    if (enemy.x <= enemy.startX) enemy.dir = 1;
+    enemy.x += enemy.speed * enemy.dir;
 
     // Check collision with player
     if (checkCollision(player, enemy)) {
@@ -439,7 +448,7 @@ function update(deltaTime) {
   });
 
   // Collect Coins
-  gameState.coins.forEach(coin => {
+  gameState.coinItems.forEach(coin => {
     if (!coin.collected && checkCollision(player, { x: coin.x, y: coin.y, w: 30, h: 30 })) {
       coin.collected = true;
       gameState.coins++;
@@ -522,7 +531,7 @@ function render() {
   });
 
   // Draw Coins
-  gameState.coins.forEach(coin => {
+  gameState.coinItems.forEach(coin => {
     if (!coin.collected) {
       const div = document.createElement('div');
       div.className = 'coin';
@@ -727,6 +736,7 @@ playAgainBtn.addEventListener("click", () => {
   gameState.currentLevel = 0;
   gameState.score = 0;
   gameState.coins = 0;
+  gameState.coinItems = [];
   gameState.health = gameState.maxHealth;
   gameState.lives = 3;
   showScreen(startScreen);
@@ -786,6 +796,32 @@ function addMobileButton(button, key) {
 addMobileButton(btnLeft, "ArrowLeft");
 addMobileButton(btnRight, "ArrowRight");
 addMobileButton(btnJump, "Space");
+
+// Canvas Scaling
+const GAME_W = 1000;
+const GAME_H = 600;
+
+function scaleGameCanvas() {
+  const hudEl = gameScreen.querySelector('.hud');
+  const mobileEl = gameScreen.querySelector('.mobile-controls');
+
+  const hudH = hudEl ? hudEl.offsetHeight : 50;
+  const isMobile = window.innerWidth <= 768;
+  const mobileH = isMobile && mobileEl ? mobileEl.offsetHeight : 0;
+
+  const availW = gameScreen.clientWidth;
+  const availH = gameScreen.clientHeight - hudH - mobileH;
+
+  const scale = Math.min(availW / GAME_W, availH / GAME_H);
+  const offsetX = (availW - GAME_W * scale) / 2;
+  const offsetY = hudH + (availH - GAME_H * scale) / 2;
+
+  gameCanvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+}
+
+window.addEventListener('resize', () => {
+  if (gameState.gameRunning) scaleGameCanvas();
+});
 
 // Initialize
 unlockWorlds(loadProgress());

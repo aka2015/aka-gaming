@@ -1,0 +1,10 @@
+{
+  "id": "power-the-city",
+  "name": "Power the City",
+  "description": "Game puzzle logika untuk kelas 4-6: susun gerbang AND/OR/NOT untuk menyalakan lampu kota. Asah pemikiran logis sambil bermain!",
+  "category": "puzzle",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-01"
+}

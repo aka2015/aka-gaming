@@ -1,0 +1,10 @@
+{
+  "id": "math-quest",
+  "name": "Math Quest",
+  "description": "RPG matematika untuk kelas 4-6: kalahkan monster dengan jawab soal. Jelajahi 5 dunia, upgrade senjata, dan jadilah pahlawan angka!",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-02"
+}

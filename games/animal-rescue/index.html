@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animal Rescue</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="start-screen" class="panel screen active">
+      <div class="tag">Adventure Game</div>
+      <h1>Animal Rescue</h1>
+      <p class="lead">Jelajahi hutan, kumpulkan kunci, buka kandang, dan selamatkan hewan-hewan yang terjebak!</p>
+
+      <div class="intro-grid">
+        <article class="intro-card">
+          <div class="intro-icon">🎮</div>
+          <strong>Gerakkan karakter</strong>
+          <p>Gunakan tombol panah atau WASD untuk bergerak.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">🔑</div>
+          <strong>Kumpulkan kunci</strong>
+          <p>Pungut kunci untuk membuka kandang hewan.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">🦊</div>
+          <strong>Selamatkan hewan</strong>
+          <p>Buka kandang dan bebaskan semua hewan.</p>
+        </article>
+      </div>
+
+      <div class="tips-box">
+        <strong>Tips:</strong> Hindari monster merah! Mereka akan mengambil waktumu.
+      </div>
+
+      <button id="start-btn" class="primary-btn">Mulai Petualangan</button>
+    </section>
+
+    <section id="game-screen" class="screen hidden">
+      <header class="hud">
+        <div class="hud-card">
+          <span>Level</span>
+          <strong id="level-display">1</strong>
+        </div>
+        <div class="hud-card">
+          <span>Kunci</span>
+          <strong id="key-display">0</strong>
+        </div>
+        <div class="hud-card">
+          <span>Hewan</span>
+          <strong id="animal-display">0 / 3</strong>
+        </div>
+        <div class="hud-card">
+          <span>Waktu</span>
+          <strong id="timer-display">0:00</strong>
+        </div>
+      </header>
+
+      <div id="game-container" class="game-container">
+        <canvas id="game-canvas"></canvas>
+      </div>
+
+      <div class="mobile-controls">
+        <button class="ctrl-btn" data-dir="up">▲</button>
+        <div class="ctrl-row">
+          <button class="ctrl-btn" data-dir="left">◀</button>
+          <button class="ctrl-btn" data-dir="down">▼</button>
+          <button class="ctrl-btn" data-dir="right">▶</button>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="pause-btn" class="ghost-btn" type="button">Jeda</button>
+        <button id="quit-btn" class="ghost-btn" type="button">Keluar</button>
+      </div>
+    </section>
+
+    <section id="pause-screen" class="panel screen hidden">
+      <div class="tag">Paused</div>
+      <h2>Game Dijeda</h2>
+      <p class="lead">Ambil napas, lalu lanjutkan petualangan!</p>
+      <div class="action-row">
+        <button id="resume-btn" class="primary-btn" type="button">Lanjutkan</button>
+      </div>
+    </section>
+
+    <section id="result-screen" class="panel screen hidden">
+      <div class="tag">Mission Complete</div>
+      <h2 id="result-title">Hebat!</h2>
+      <p id="result-summary" class="lead"></p>
+
+      <div class="result-grid">
+        <div class="result-card">
+          <span>Bintang</span>
+          <strong id="final-stars">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Skor</span>
+          <strong id="final-score">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Waktu</span>
+          <strong id="final-time">0:00</strong>
+        </div>
+        <div class="result-card">
+          <span>Level</span>
+          <strong id="final-level">1</strong>
+        </div>
+      </div>
+
+      <div id="animal-facts" class="facts-panel"></div>
+
+      <div class="action-row">
+        <button id="next-level-btn" class="primary-btn" type="button">Level Berikutnya</button>
+        <button id="play-again-btn" class="ghost-btn" type="button">Ulang Level Ini</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/score-reporter.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

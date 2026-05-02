@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Robo Path</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       MENU SCREEN
+       ============================================================ -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-inner">
+      <h1 class="title">🤖 Robo Path</h1>
+      <p class="subtitle">Susun blok perintah. Pandu robot ke tujuan!</p>
+
+      <div class="stat-row">
+        <span>Skor: <strong id="total-score">0</strong></span>
+        <span>⭐ <strong id="total-stars">0</strong></span>
+        <span>Selesai: <strong id="levels-done">0</strong>/20</span>
+      </div>
+
+      <div id="level-grid" class="level-grid"></div>
+
+      <div class="menu-actions">
+        <button id="btn-shop" class="btn-primary">🛒 Toko Skin</button>
+        <button id="btn-mute-menu" class="btn-secondary">🔊 Suara</button>
+        <button id="reset-progress" class="btn-secondary">Reset Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SHOP SCREEN
+       ============================================================ -->
+  <div id="screen-shop" class="screen">
+    <header class="shop-header">
+      <button id="btn-shop-back" class="btn-icon" title="Kembali">←</button>
+      <div class="shop-title">🛒 Toko Skin Robot</div>
+      <div class="shop-stars">⭐ <span id="shop-stars">0</span></div>
+    </header>
+    <main class="shop-grid" id="shop-grid"></main>
+    <p class="shop-hint">Kumpulkan bintang dengan menyelesaikan level untuk membuka skin baru!</p>
+  </div>
+
+  <!-- ============================================================
+       GAME SCREEN
+       ============================================================ -->
+  <div id="screen-game" class="screen">
+    <header class="game-header">
+      <button id="btn-back" class="btn-icon" title="Kembali">←</button>
+      <div class="lvl-info">
+        <div class="lvl-title">Level <span id="lvl-num">1</span></div>
+        <div class="lvl-goal" id="lvl-goal">Goal di sini</div>
+      </div>
+      <div class="lvl-stats">
+        <div class="stat-blocks">📦 <span id="lvl-block-count">0</span></div>
+        <div class="stat-stars">⭐ <span id="lvl-star-count">0</span>/<span id="lvl-star-max">0</span></div>
+      </div>
+      <button id="btn-mute" class="btn-icon" title="Mute">🔊</button>
+    </header>
+
+    <main class="game-stage">
+      <div id="grid" class="grid"></div>
+    </main>
+
+    <section class="program-section">
+      <div class="program-header">
+        <div class="program-title">📜 Program</div>
+        <div class="program-actions">
+          <button id="btn-undo" class="btn-mini" title="Hapus blok terakhir">⌫</button>
+          <button id="btn-clear" class="btn-mini" title="Bersihkan">🗑</button>
+        </div>
+      </div>
+      <div id="program" class="program"></div>
+    </section>
+
+    <footer class="game-footer">
+      <div class="toolbox" id="toolbox"></div>
+      <div class="actions">
+        <button id="btn-hint" class="btn-secondary" title="Petunjuk">💡</button>
+        <button id="btn-reset-run" class="btn-secondary" title="Reset robot">↺</button>
+        <button id="btn-run" class="btn-primary" title="Jalankan">▶ Run</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============================================================
+       MODALS
+       ============================================================ -->
+  <div id="modal-win" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <h2>Robot Sampai Tujuan!</h2>
+      <div id="win-stars" class="big-stars"></div>
+      <div class="score-breakdown">
+        <div><span>Skor Level</span><strong id="win-base">0</strong></div>
+        <div><span>Bonus Efisiensi</span><strong id="win-eff">+0</strong></div>
+        <div><span>Bintang Terkumpul</span><strong id="win-star-bonus">+0</strong></div>
+        <div><span>Penalti Hint</span><strong id="win-pen">-0</strong></div>
+        <div class="total"><span>Total</span><strong id="win-total">0</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-replay" class="btn-secondary">↻ Ulangi</button>
+        <button id="btn-next" class="btn-primary">Lanjut →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-fail" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon" id="fail-icon">💥</div>
+      <h2 id="fail-title">Robot Gagal!</h2>
+      <p id="fail-text">Coba pikirkan lagi langkahnya.</p>
+      <div class="modal-actions">
+        <button id="btn-fail-close" class="btn-primary">Coba Lagi</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-hint" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">💡</div>
+      <h2>Petunjuk</h2>
+      <p id="hint-text">...</p>
+      <p class="hint-warn">Setiap petunjuk dipakai = -20 poin.</p>
+      <div class="modal-actions">
+        <button id="btn-hint-cancel" class="btn-secondary">Batal</button>
+        <button id="btn-hint-confirm" class="btn-primary">Pakai (-20)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-loop" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🔁</div>
+      <h2>Berapa Kali Loop?</h2>
+      <p>Pilih jumlah pengulangan:</p>
+      <div class="loop-options">
+        <button class="loop-opt" data-times="2">2×</button>
+        <button class="loop-opt" data-times="3">3×</button>
+        <button class="loop-opt" data-times="4">4×</button>
+        <button class="loop-opt" data-times="5">5×</button>
+        <button class="loop-opt" data-times="6">6×</button>
+        <button class="loop-opt" data-times="8">8×</button>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-loop-cancel" class="btn-secondary">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-done" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🏆</div>
+      <h2>Semua Level Selesai!</h2>
+      <p>Total skor: <strong id="done-total">0</strong></p>
+      <p>Bintang terkumpul: <strong id="done-stars">0</strong> ⭐</p>
+      <p class="hint-warn">Coba ulangi level untuk pecahkan rekor & kumpulkan bintang!</p>
+      <div class="modal-actions">
+        <button id="btn-done-back" class="btn-primary">Ke Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/score-reporter.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

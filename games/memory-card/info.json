@@ -1,0 +1,10 @@
+{
+  "id": "memory-card",
+  "name": "Memory Card",
+  "description": "Game kartu memori untuk anak: cocokkan pasangan emoji hewan, buah, dan benda. Latih daya ingat dan konsentrasi.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-02"
+}

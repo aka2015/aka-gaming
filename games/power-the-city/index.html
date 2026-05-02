@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Power the City</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Splash / Level Select -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-inner">
+      <h1 class="title">⚡ Power the City</h1>
+      <p class="subtitle">Susun gerbang logika. Nyalakan kota!</p>
+      <div class="stat-row">
+        <span>Total Skor: <strong id="total-score">0</strong></span>
+        <span>Selesai: <strong id="levels-done">0</strong>/12</span>
+      </div>
+      <div id="level-grid" class="level-grid"></div>
+      <div class="menu-actions">
+        <button id="btn-mute-menu" class="btn-secondary">🔊 Suara</button>
+        <button id="reset-progress" class="btn-secondary">Reset Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="screen-game" class="screen">
+    <header class="game-header">
+      <button id="btn-back" class="btn-icon" title="Kembali">←</button>
+      <div class="lvl-info">
+        <div class="lvl-title">Level <span id="lvl-num">1</span></div>
+        <div class="lvl-goal" id="lvl-goal">Goal di sini</div>
+      </div>
+      <div class="lvl-stats">
+        <div class="stat-time">⏱ <span id="lvl-timer">0</span>s</div>
+        <div class="stat-gates">🔧 <span id="lvl-gate-count">0</span></div>
+        <div class="stat-score">🏆 <span id="lvl-total-score">0</span></div>
+      </div>
+      <button id="btn-mute" class="btn-icon" title="Mute / unmute">🔊</button>
+    </header>
+
+    <main class="game-stage">
+      <!-- Wires SVG layer -->
+      <svg id="wire-layer" preserveAspectRatio="none"></svg>
+      <!-- Components container -->
+      <div id="canvas" class="canvas"></div>
+    </main>
+
+    <footer class="game-footer">
+      <div class="toolbox" id="toolbox"></div>
+      <div class="actions">
+        <button id="btn-hint" class="btn-secondary" title="Petunjuk">💡 Hint</button>
+        <button id="btn-clear" class="btn-secondary" title="Hapus semua gerbang">🗑 Clear</button>
+        <button id="btn-check" class="btn-primary" title="Cek solusi">✓ Cek</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Win Modal -->
+  <div id="modal-win" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <h2>Lampu Menyala!</h2>
+      <div class="score-breakdown">
+        <div><span>Skor Level</span><strong id="win-base">0</strong></div>
+        <div><span>Bonus Efisiensi</span><strong id="win-eff">+0</strong></div>
+        <div><span>Bonus Waktu</span><strong id="win-time">+0</strong></div>
+        <div><span>Penalti Hint</span><strong id="win-pen">-0</strong></div>
+        <div class="total"><span>Total</span><strong id="win-total">0</strong></div>
+        <div class="best" id="win-best-row"><span>Best Sebelumnya</span><strong id="win-best">0</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-replay" class="btn-secondary">↻ Ulangi</button>
+        <button id="btn-next" class="btn-primary">Lanjut →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hint Modal -->
+  <div id="modal-hint" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">💡</div>
+      <h2>Petunjuk</h2>
+      <p id="hint-text">...</p>
+      <p class="hint-warn">Skor level ini akan dikurangi 20 poin saat kamu menang.</p>
+      <div class="modal-actions">
+        <button id="btn-hint-close" class="btn-primary">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Done Modal -->
+  <div id="modal-done" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🏆</div>
+      <h2>Semua Level Selesai!</h2>
+      <p>Total skor kamu: <strong id="done-total">0</strong></p>
+      <p class="hint-warn">Coba ulangi level untuk pecahkan rekor!</p>
+      <div class="modal-actions">
+        <button id="btn-done-back" class="btn-primary">Ke Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/score-reporter.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

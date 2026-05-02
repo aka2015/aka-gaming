@@ -6,23 +6,19 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: #000;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
   overflow: hidden;
 }
 
 .game-container {
-  width: min(1000px, 100vw);
+  width: 100vw;
   height: 100vh;
-  max-height: 700px;
   position: relative;
   background: #fff;
-  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .screen {
@@ -42,7 +38,7 @@ body {
 }
 
 .screen.hidden {
-  display: none;
+  display: none !important;
 }
 
 .screen.overlay {
@@ -258,7 +254,7 @@ h1 {
 
 /* Game Screen */
 #game-screen {
-  background: #000;
+  background: #111;
 }
 
 .hud {
@@ -303,10 +299,13 @@ h1 {
 }
 
 .game-canvas {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  width: 1000px;
+  height: 600px;
+  position: absolute;
+  top: 0;
+  left: 0;
   overflow: hidden;
+  transform-origin: top left;
 }
 
 /* Game Objects */

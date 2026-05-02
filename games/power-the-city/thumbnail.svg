@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1a4a"/>
+      <stop offset="1" stop-color="#3d2a78"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe066" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffe066" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bldg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2d4a8a"/>
+      <stop offset="1" stop-color="#1a2e5c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky background -->
+  <rect width="400" height="300" fill="url(#sky)"/>
+
+  <!-- Stars -->
+  <circle cx="50" cy="40" r="1.5" fill="#fff"/>
+  <circle cx="120" cy="60" r="1" fill="#fff"/>
+  <circle cx="280" cy="35" r="1.2" fill="#fff"/>
+  <circle cx="350" cy="70" r="1.5" fill="#fff"/>
+  <circle cx="200" cy="50" r="1" fill="#fff"/>
+
+  <!-- Glowing lamps in sky -->
+  <circle cx="100" cy="120" r="35" fill="url(#glow)"/>
+  <circle cx="300" cy="100" r="40" fill="url(#glow)"/>
+
+  <!-- Buildings silhouette -->
+  <rect x="20"  y="180" width="50" height="120" fill="url(#bldg)" rx="3"/>
+  <rect x="80"  y="150" width="60" height="150" fill="url(#bldg)" rx="3"/>
+  <rect x="150" y="170" width="45" height="130" fill="url(#bldg)" rx="3"/>
+  <rect x="205" y="130" width="65" height="170" fill="url(#bldg)" rx="3"/>
+  <rect x="280" y="160" width="55" height="140" fill="url(#bldg)" rx="3"/>
+  <rect x="345" y="180" width="50" height="120" fill="url(#bldg)" rx="3"/>
+
+  <!-- Lit windows (yellow) -->
+  <g fill="#ffe066">
+    <rect x="32"  y="195" width="8" height="10" rx="1"/>
+    <rect x="48"  y="220" width="8" height="10" rx="1"/>
+    <rect x="92"  y="170" width="8" height="10" rx="1"/>
+    <rect x="108" y="200" width="8" height="10" rx="1"/>
+    <rect x="124" y="240" width="8" height="10" rx="1"/>
+    <rect x="218" y="150" width="10" height="12" rx="1"/>
+    <rect x="240" y="180" width="10" height="12" rx="1"/>
+    <rect x="218" y="220" width="10" height="12" rx="1"/>
+    <rect x="293" y="180" width="9" height="11" rx="1"/>
+    <rect x="312" y="210" width="9" height="11" rx="1"/>
+    <rect x="358" y="200" width="8" height="10" rx="1"/>
+    <rect x="374" y="230" width="8" height="10" rx="1"/>
+  </g>
+
+  <!-- Logic gate symbols floating in foreground -->
+  <g transform="translate(150, 80)">
+    <!-- AND gate -->
+    <path d="M0 0 L18 0 A14 14 0 0 1 18 28 L0 28 Z" fill="#fff" stroke="#3d2a78" stroke-width="2"/>
+    <text x="11" y="20" font-size="11" font-weight="bold" fill="#3d2a78" text-anchor="middle" font-family="sans-serif">AND</text>
+  </g>
+  <g transform="translate(220, 200)">
+    <!-- OR gate -->
+    <path d="M0 0 Q6 14 0 28 Q14 28 28 14 Q14 0 0 0 Z" fill="#ffd166" stroke="#3d2a78" stroke-width="2"/>
+    <text x="14" y="19" font-size="10" font-weight="bold" fill="#3d2a78" text-anchor="middle" font-family="sans-serif">OR</text>
+  </g>
+
+  <!-- Title -->
+  <text x="200" y="285" font-size="20" font-weight="bold" fill="#ffe066" text-anchor="middle" font-family="sans-serif" letter-spacing="2">POWER THE CITY</text>
+</svg>

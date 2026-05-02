@@ -1,0 +1,10 @@
+{
+  "id": "robo-path",
+  "name": "Robo Path",
+  "description": "Game visual programming untuk kelas 4-6: susun blok perintah supaya robot mencapai tujuan. Pelajari logika algoritma dengan menyenangkan!",
+  "category": "puzzle",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-01"
+}

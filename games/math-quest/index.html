@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Math Quest — Number Hunter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       MENU SCREEN
+       ============================================================ -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-inner">
+      <h1 class="title">⚔️ Math Quest</h1>
+      <p class="subtitle">Number Hunter — Pahlawan Angka</p>
+
+      <div class="hero-card">
+        <div class="hero-portrait" id="menu-hero-portrait">🧙</div>
+        <div class="hero-info">
+          <div class="hero-name" id="menu-hero-name">Petualang</div>
+          <div class="hero-stats">
+            <div>Lv <strong id="menu-hero-lv">1</strong></div>
+            <div>❤️ <strong id="menu-hero-hp">100</strong></div>
+            <div>⚔️ <strong id="menu-hero-atk">10</strong></div>
+            <div>🛡 <strong id="menu-hero-def">0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <span>💰 <strong id="total-coin">0</strong></span>
+        <span>🏆 <strong id="total-score">0</strong></span>
+        <span>Selesai: <strong id="levels-done">0</strong>/25</span>
+      </div>
+
+      <div class="menu-buttons">
+        <button id="btn-play" class="btn-primary big">▶ Lanjutkan Petualangan</button>
+        <button id="btn-shop" class="btn-secondary">🛒 Toko</button>
+        <button id="btn-mute-menu" class="btn-secondary">🔊 Suara</button>
+        <button id="reset-progress" class="btn-secondary small">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       WORLD MAP SCREEN
+       ============================================================ -->
+  <div id="screen-map" class="screen">
+    <header class="map-header">
+      <button id="btn-map-back" class="btn-icon" title="Kembali">←</button>
+      <div class="map-title" id="map-title">Pilih Level</div>
+      <div class="map-coin">💰 <span id="map-coin">0</span></div>
+    </header>
+    <div class="world-tabs" id="world-tabs"></div>
+    <main class="map-grid" id="map-grid"></main>
+  </div>
+
+  <!-- ============================================================
+       SHOP SCREEN
+       ============================================================ -->
+  <div id="screen-shop" class="screen">
+    <header class="shop-header">
+      <button id="btn-shop-back" class="btn-icon" title="Kembali">←</button>
+      <div class="shop-title">🛒 Toko Pahlawan</div>
+      <div class="shop-coin">💰 <span id="shop-coin">0</span></div>
+    </header>
+    <div class="shop-tabs">
+      <button class="shop-tab active" data-tab="weapon">⚔️ Senjata</button>
+      <button class="shop-tab" data-tab="armor">🛡 Armor</button>
+      <button class="shop-tab" data-tab="potion">🧪 Potion</button>
+      <button class="shop-tab" data-tab="skin">🎭 Skin</button>
+    </div>
+    <main class="shop-content" id="shop-content"></main>
+  </div>
+
+  <!-- ============================================================
+       BATTLE SCREEN
+       ============================================================ -->
+  <div id="screen-battle" class="screen">
+    <header class="battle-header">
+      <button id="btn-battle-quit" class="btn-icon" title="Mundur">←</button>
+      <div class="battle-title">Level <span id="battle-lvl">1</span> — <span id="battle-world">Hutan</span></div>
+      <button id="btn-mute-battle" class="btn-icon" title="Mute">🔊</button>
+    </header>
+
+    <main class="battle-stage" id="battle-stage">
+      <!-- Combatants row -->
+      <div class="combatants">
+        <div class="combatant hero" id="combatant-hero">
+          <div class="hp-bar">
+            <div class="hp-label">❤️ <span id="hero-hp">100</span>/<span id="hero-hp-max">100</span></div>
+            <div class="hp-track"><div class="hp-fill" id="hero-hp-fill"></div></div>
+          </div>
+          <div class="sprite hero-sprite" id="hero-sprite">🧙</div>
+          <div class="combo-badge hidden" id="hero-combo">x0</div>
+        </div>
+
+        <div class="combatant monster" id="combatant-monster">
+          <div class="hp-bar">
+            <div class="hp-label">❤️ <span id="mon-hp">50</span>/<span id="mon-hp-max">50</span></div>
+            <div class="hp-track"><div class="hp-fill enemy" id="mon-hp-fill"></div></div>
+          </div>
+          <div class="sprite monster-sprite" id="monster-sprite">👾</div>
+          <div class="monster-name" id="monster-name">Slime</div>
+        </div>
+      </div>
+
+      <!-- Floating damage numbers go here -->
+      <div class="fx-layer" id="fx-layer"></div>
+    </main>
+
+    <section class="question-card">
+      <div class="q-meta">
+        <span class="q-timer">⏱ <span id="q-timer">15</span>s</span>
+        <span class="q-streak">🔥 Combo: <span id="q-streak">0</span></span>
+        <span class="q-progress" id="q-progress"></span>
+      </div>
+      <div class="q-text" id="q-text">7 × 8 = ?</div>
+      <div class="q-options" id="q-options"></div>
+    </section>
+
+    <footer class="battle-footer">
+      <button id="btn-use-potion" class="btn-secondary">🧪 Potion (<span id="potion-count">0</span>)</button>
+      <button id="btn-skip" class="btn-secondary" title="Lewati pertanyaan (-HP)">⏭ Lewati</button>
+    </footer>
+  </div>
+
+  <!-- ============================================================
+       MODALS
+       ============================================================ -->
+  <div id="modal-victory" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🏆</div>
+      <h2>Monster Dikalahkan!</h2>
+      <div class="reward-list">
+        <div><span>💰 Koin</span><strong id="vic-coin">+0</strong></div>
+        <div><span>⭐ XP</span><strong id="vic-xp">+0</strong></div>
+        <div><span>🎯 Skor Level</span><strong id="vic-score">0</strong></div>
+        <div class="bonus" id="vic-levelup-row"><span>🆙 Level Up!</span><strong id="vic-newlv">2</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-vic-replay" class="btn-secondary">↻ Ulangi</button>
+        <button id="btn-vic-next" class="btn-primary">Lanjut →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-defeat" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">💀</div>
+      <h2>Pahlawan Tumbang!</h2>
+      <p>Jangan menyerah. Coba lagi dengan strategi baru atau upgrade peralatan dulu.</p>
+      <div class="modal-actions">
+        <button id="btn-def-shop" class="btn-secondary">🛒 Toko</button>
+        <button id="btn-def-retry" class="btn-primary">↻ Ulangi</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-world-cleared" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">🌟</div>
+      <h2 id="wc-title">Dunia Selesai!</h2>
+      <p id="wc-text">Dunia berikutnya terbuka.</p>
+      <div class="modal-actions">
+        <button id="btn-wc-continue" class="btn-primary">Lanjut →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-done" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">👑</div>
+      <h2>Sang Pahlawan Tertinggi!</h2>
+      <p>Kamu telah menaklukkan semua dunia.</p>
+      <p>Total Skor: <strong id="done-total">0</strong></p>
+      <div class="modal-actions">
+        <button id="btn-done-back" class="btn-primary">Ke Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-quit" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h2>Mundur dari Battle?</h2>
+      <p>Progress level ini akan hilang. Yakin?</p>
+      <div class="modal-actions">
+        <button id="btn-quit-cancel" class="btn-secondary">Lanjutkan</button>
+        <button id="btn-quit-confirm" class="btn-primary">Mundur</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/score-reporter.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e1b4b"/>
+      <stop offset="1" stop-color="#581c87"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#15803d"/>
+      <stop offset="1" stop-color="#166534"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fbbf24" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fbbf24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#sky)"/>
+
+  <!-- Stars -->
+  <g fill="#fff">
+    <circle cx="40" cy="30" r="1"/>
+    <circle cx="120" cy="50" r="1.5"/>
+    <circle cx="270" cy="40" r="1"/>
+    <circle cx="350" cy="60" r="1.5"/>
+    <circle cx="200" cy="25" r="1"/>
+  </g>
+
+  <!-- Distant mountains -->
+  <polygon points="0,180 60,120 120,170 180,110 240,160 300,100 360,150 400,140 400,210 0,210"
+           fill="#3b0764" opacity="0.7"/>
+
+  <!-- Ground -->
+  <rect x="0" y="200" width="400" height="100" fill="url(#ground)"/>
+
+  <!-- Trees silhouette -->
+  <g fill="#14532d">
+    <polygon points="50,200 30,170 70,170"/>
+    <polygon points="50,200 32,180 68,180"/>
+    <rect x="46" y="195" width="8" height="10" fill="#451a03"/>
+    <polygon points="350,200 332,175 368,175"/>
+    <rect x="346" y="195" width="8" height="10" fill="#451a03"/>
+  </g>
+
+  <!-- Battle scene: hero (left) vs monster (right) -->
+
+  <!-- Hero (knight character) -->
+  <g transform="translate(110, 215)">
+    <!-- Body -->
+    <rect x="-14" y="-26" width="28" height="34" rx="4" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+    <!-- Head -->
+    <circle cx="0" cy="-36" r="11" fill="#fcd34d" stroke="#a16207" stroke-width="1.5"/>
+    <!-- Hat / helmet -->
+    <path d="M-11,-37 L-11,-44 L0,-50 L11,-44 L11,-37 Z" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+    <rect x="-2" y="-50" width="4" height="-6" fill="#dc2626"/>
+    <!-- Eyes -->
+    <circle cx="-3.5" cy="-36" r="1.5" fill="#0f172a"/>
+    <circle cx="3.5" cy="-36" r="1.5" fill="#0f172a"/>
+    <!-- Sword (raised) -->
+    <line x1="14" y1="-30" x2="28" y2="-50" stroke="#94a3b8" stroke-width="3"/>
+    <rect x="11" y="-32" width="6" height="3" fill="#fbbf24"/>
+    <!-- Legs -->
+    <rect x="-9" y="6" width="6" height="10" fill="#1e3a8a"/>
+    <rect x="3" y="6" width="6" height="10" fill="#1e3a8a"/>
+  </g>
+
+  <!-- HP bar above hero -->
+  <g transform="translate(85, 165)">
+    <rect width="50" height="6" fill="#000" rx="2" opacity="0.5"/>
+    <rect width="40" height="6" fill="#22c55e" rx="2"/>
+  </g>
+
+  <!-- Math symbols flying between -->
+  <g font-family="sans-serif" font-weight="bold" fill="#fbbf24">
+    <text x="160" y="140" font-size="20" opacity="0.9" transform="rotate(-15 160 140)">7×8</text>
+    <text x="200" y="115" font-size="16" opacity="0.7">=?</text>
+    <text x="180" y="170" font-size="14" opacity="0.6" transform="rotate(10 180 170)">+</text>
+    <text x="220" y="155" font-size="14" opacity="0.7" transform="rotate(20 220 155)">÷</text>
+  </g>
+
+  <!-- Monster (right) - cute slime -->
+  <g transform="translate(290, 215)">
+    <ellipse cx="0" cy="-3" rx="32" ry="22" fill="#a855f7" stroke="#6b21a8" stroke-width="2"/>
+    <!-- Slime drips -->
+    <ellipse cx="-22" cy="6" rx="6" ry="8" fill="#a855f7"/>
+    <ellipse cx="22" cy="6" rx="6" ry="8" fill="#a855f7"/>
+    <!-- Eyes -->
+    <ellipse cx="-10" cy="-8" rx="6" ry="7" fill="#fff"/>
+    <ellipse cx="10" cy="-8" rx="6" ry="7" fill="#fff"/>
+    <ellipse cx="-9" cy="-6" rx="3" ry="3.5" fill="#0f172a"/>
+    <ellipse cx="11" cy="-6" rx="3" ry="3.5" fill="#0f172a"/>
+    <!-- Mouth (mean) -->
+    <path d="M-8,5 Q0,-1 8,5" fill="none" stroke="#0f172a" stroke-width="2"/>
+    <!-- Cheek glow -->
+    <circle cx="-18" cy="0" r="3" fill="#fbbf24" opacity="0.6"/>
+    <circle cx="18" cy="0" r="3" fill="#fbbf24" opacity="0.6"/>
+  </g>
+
+  <!-- HP bar above monster -->
+  <g transform="translate(265, 165)">
+    <rect width="50" height="6" fill="#000" rx="2" opacity="0.5"/>
+    <rect width="30" height="6" fill="#dc2626" rx="2"/>
+  </g>
+
+  <!-- Floating coin -->
+  <g transform="translate(340, 100)">
+    <circle r="12" fill="#fbbf24" stroke="#a16207" stroke-width="2"/>
+    <text y="4" font-size="14" font-weight="bold" fill="#a16207" text-anchor="middle" font-family="sans-serif">$</text>
+  </g>
+
+  <!-- Title -->
+  <text x="200" y="285" font-size="22" font-weight="bold" fill="#fbbf24" text-anchor="middle" font-family="sans-serif" letter-spacing="2">MATH QUEST</text>
+</svg>

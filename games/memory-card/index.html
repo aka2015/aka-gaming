@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Card</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="start-screen" class="panel screen active">
+      <div class="tag">Memory Game</div>
+      <h1>Memory Card</h1>
+      <p class="lead">Cocokkan pasangan kartu emoji dengan membalik dua kartu sekaligus.</p>
+
+      <div class="intro-grid">
+        <article class="intro-card">
+          <div class="intro-icon">1</div>
+          <strong>Balik kartu</strong>
+          <p>Klik kartu untuk melihat emoji di baliknya.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">2</div>
+          <strong>Cari pasangan</strong>
+          <p>Temukan dua kartu dengan emoji yang sama.</p>
+        </article>
+        <article class="intro-card">
+          <div class="intro-icon">3</div>
+          <strong>Kumpulkan bintang</strong>
+          <p>Semakin sedikit langkah, semakin banyak bintang.</p>
+        </article>
+      </div>
+
+      <div class="difficulty-selector">
+        <button class="diff-btn active" data-diff="easy">Mudah (6 pasang)</button>
+        <button class="diff-btn" data-diff="medium">Sedang (8 pasang)</button>
+        <button class="diff-btn" data-diff="hard">Sulit (12 pasang)</button>
+      </div>
+
+      <button id="start-btn" class="primary-btn">Mulai Bermain</button>
+    </section>
+
+    <section id="game-screen" class="screen hidden">
+      <header class="hud">
+        <div class="hud-card">
+          <span>Pasangan</span>
+          <strong id="match-count">0 / 6</strong>
+        </div>
+        <div class="hud-card">
+          <span>Langkah</span>
+          <strong id="move-count">0</strong>
+        </div>
+        <div class="hud-card">
+          <span>Waktu</span>
+          <strong id="timer-count">0:00</strong>
+        </div>
+      </header>
+
+      <div id="game-board" class="game-board"></div>
+
+      <div class="action-row">
+        <button id="quit-btn" class="ghost-btn" type="button">Keluar</button>
+      </div>
+    </section>
+
+    <section id="result-screen" class="panel screen hidden">
+      <div class="tag">Memory Result</div>
+      <h2 id="result-title">Hebat!</h2>
+      <p id="result-summary" class="lead"></p>
+
+      <div class="result-grid">
+        <div class="result-card">
+          <span>Bintang</span>
+          <strong id="final-stars">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Langkah</span>
+          <strong id="final-moves">0</strong>
+        </div>
+        <div class="result-card">
+          <span>Waktu</span>
+          <strong id="final-time">0:00</strong>
+        </div>
+        <div class="result-card">
+          <span>Skor</span>
+          <strong id="final-score">0</strong>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="play-again-btn" class="primary-btn" type="button">Main Lagi</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/score-reporter.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "id": "animal-rescue",
+  "name": "Animal Rescue",
+  "description": "Petualangan menyelamatkan hewan terjebak! Jelajahi hutan, kumpulkan kunci, buka kandang, dan hindari rintangan.",
+  "category": "adventure",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-02"
+}
