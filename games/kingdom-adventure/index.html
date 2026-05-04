@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Kingdom Adventure - RPG 2D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loadingScreen">
+        <div class="loading-container">
+            <canvas id="loadingCanvas" width="200" height="200"></canvas>
+            <h1 class="loading-title">Kingdom Adventure</h1>
+            <p class="loading-subtitle">Generating world...</p>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+            <p class="loading-percent" id="loadingPercent">0%</p>
+        </div>
+    </div>
+
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui" class="hidden">
+            <div id="hud-left">
+                <div id="playerInfo">
+                    <span id="playerName">Player</span>
+                    <span id="playerLevel">Lv.1</span>
+                </div>
+                <div id="xpBar">
+                    <div id="xpFill"></div>
+                    <span id="xpText">0/100 XP</span>
+                </div>
+            </div>
+            <div id="hud-right">
+                <div id="goldDisplay">
+                    <span class="gold-icon">💰</span>
+                    <span id="goldCount">0</span>
+                </div>
+                <div id="itemDisplay">
+                    <span class="item-icon">🎒</span>
+                    <span id="itemCount">0</span>
+                </div>
+                <div id="timeDisplay">☀️ 06:00</div>
+                <button id="musicToggleBtn" class="music-toggle-btn">🎵</button>
+            </div>
+            <div id="hud-bottom">
+                <div id="questDisplay">
+                    <span class="quest-icon">📜</span>
+                    <span id="questText">Quest: -</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainMenu" class="screen">
+            <h1>🏰 Kingdom Adventure</h1>
+            <p class="subtitle">Petualangan RPG 2D</p>
+            <div class="menu-buttons">
+                <button id="playBtn" class="menu-btn">▶️ Mulai Petualangan</button>
+                <button id="controlsBtn" class="menu-btn">🎮 Kontrol</button>
+                <button id="aboutBtn" class="menu-btn">ℹ️ Tentang</button>
+            </div>
+        </div>
+
+        <div id="characterSelectScreen" class="screen hidden">
+            <h1>Pilih Pahlawan Kamu</h1>
+            <p class="subtitle">Setiap karakter memiliki kemampuan unik</p>
+            <div class="character-select-container">
+                <div class="character-card" data-character="knight">
+                    <canvas id="knightPreview" width="96" height="96"></canvas>
+                    <h2 class="character-name knight">⚔️ Knight</h2>
+                    <p class="character-desc">Petarung tangguh dengan pertahanan tinggi</p>
+                    <div class="character-info">
+                        <div class="info-item"><span class="info-label">HP:</span><span class="info-value">⭐⭐⭐</span></div>
+                        <div class="info-item"><span class="info-label">SPD:</span><span class="info-value">⭐⭐</span></div>
+                        <div class="info-item"><span class="info-label">ATK:</span><span class="info-value">⭐⭐</span></div>
+                    </div>
+                    <button class="select-btn" data-character="knight">PILIH KNIGHT</button>
+                </div>
+                
+                <div class="character-card" data-character="mage">
+                    <canvas id="magePreview" width="96" height="96"></canvas>
+                    <h2 class="character-name mage">🔮 Mage</h2>
+                    <p class="character-desc">Ahli sihir dengan kekuatan magis</p>
+                    <div class="character-info">
+                        <div class="info-item"><span class="info-label">HP:</span><span class="info-value">⭐⭐</span></div>
+                        <div class="info-item"><span class="info-label">SPD:</span><span class="info-value">⭐⭐</span></div>
+                        <div class="info-item"><span class="info-label">ATK:</span><span class="info-value">⭐⭐⭐</span></div>
+                    </div>
+                    <button class="select-btn" data-character="mage">PILIH MAGE</button>
+                </div>
+                
+                <div class="character-card" data-character="archer">
+                    <canvas id="archerPreview" width="96" height="96"></canvas>
+                    <h2 class="character-name archer">🏹 Archer</h2>
+                    <p class="character-desc">Penembak jitu dengan kecepatan tinggi</p>
+                    <div class="character-info">
+                        <div class="info-item"><span class="info-label">HP:</span><span class="info-value">⭐⭐</span></div>
+                        <div class="info-item"><span class="info-label">SPD:</span><span class="info-value">⭐⭐⭐</span></div>
+                        <div class="info-item"><span class="info-label">ATK:</span><span class="info-value">⭐⭐</span></div>
+                    </div>
+                    <button class="select-btn" data-character="archer">PILIH ARCHER</button>
+                </div>
+            </div>
+            <button id="backToMenuFromCharSelect" class="menu-btn">⬅️ Kembali</button>
+        </div>
+
+        <div id="dialogBox" class="hidden">
+            <div id="dialogPortrait"></div>
+            <div id="dialogContent">
+                <div id="dialogSpeaker">NPC</div>
+                <div id="dialogText">...</div>
+                <div id="dialogHint">[SPACE] untuk lanjut</div>
+            </div>
+            <div id="dialogChoices" class="hidden"></div>
+        </div>
+
+        <div id="inventoryScreen" class="screen hidden">
+            <div class="inventory-header">
+                <h1>🎒 Inventory</h1>
+                <button id="closeInventoryBtn" class="close-btn">✕</button>
+            </div>
+            <div id="inventoryGrid" class="inventory-grid"></div>
+        </div>
+
+        <div id="questScreen" class="screen hidden">
+            <div class="quest-header">
+                <h1>📜 Quest Log</h1>
+                <button id="closeQuestBtn" class="close-btn">✕</button>
+            </div>
+            <div id="questList" class="quest-list"></div>
+        </div>
+
+        <div id="minimap" class="hidden">
+            <canvas id="minimapCanvas" width="150" height="150"></canvas>
+        </div>
+
+        <div id="controlsScreen" class="screen hidden">
+            <h1>🎮 Kontrol</h1>
+            <div class="instructions">
+                <div class="instruction-item">
+                    <span class="key-label">WASD / Arrow Keys</span>
+                    <span>Bergerak</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key-label">SPACE</span>
+                    <span>Interaksi dengan NPC / Serang Monster</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key-label">E</span>
+                    <span>Buka Inventory</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key-label">Q</span>
+                    <span>Buka Quest Log</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="key-label">M</span>
+                    <span>Toggle Minimap</span>
+                </div>
+            </div>
+            <button id="backToMenuFromControls" class="menu-btn">⬅️ Kembali</button>
+        </div>
+
+        <div id="aboutScreen" class="screen hidden">
+            <h1>ℹ️ Tentang</h1>
+            <div class="about-content">
+                <p>Kingdom Adventure adalah game petualangan RPG 2D dengan karakter fully animated.</p>
+                <p>Jelajahi dunia, berinteraksi dengan NPC, kumpulkan item, dan temukan rahasia kerajaan!</p>
+                <div class="features-list">
+                    <h3>Fitur:</h3>
+                    <ul>
+                        <li>3 Karakter unik dengan animasi 4 arah</li>
+                        <li>6 NPC dengan AI patrol</li>
+                        <li>5 jenis monster</li>
+                        <li>Quest system</li>
+                        <li>Inventory & item pickup</li>
+                        <li>Day/Night cycle</li>
+                        <li>Mini map</li>
+                        <li>Mobile support</li>
+                    </ul>
+                </div>
+                <p class="version">Version 1.0.0 | AKA Gaming</p>
+            </div>
+            <button id="backToMenuFromAbout" class="menu-btn">⬅️ Kembali</button>
+        </div>
+
+        <div id="joystickContainer" style="display: none;">
+            <div id="joystickBase">
+                <div id="joystickStick"></div>
+            </div>
+        </div>
+
+        <div id="mobileButtons" class="mobile-btns hidden">
+            <button id="mobileInteractBtn" class="mobile-action-btn">💬</button>
+            <button id="mobileInventoryBtn" class="mobile-action-btn">🎒</button>
+            <button id="mobileQuestBtn" class="mobile-action-btn">📜</button>
+        </div>
+
+        <div id="notification" class="hidden">
+            <span id="notificationText"></span>
+        </div>
+    </div>
+
+    <script src="src/data/game-data.js?v=7"></script>
+    <script src="src/system/audio.js?v=7"></script>
+    <script src="src/system/sprite-generator.js?v=7"></script>
+    <script src="src/system/game-state.js?v=7"></script>
+    <script src="src/system/input.js?v=7"></script>
+    <script src="src/system/joystick.js?v=7"></script>
+    <script src="src/render/renderer.js?v=7"></script>
+    <script src="src/render/camera.js?v=7"></script>
+    <script src="src/render/map-renderer.js?v=7"></script>
+    <script src="src/render/entity-renderer.js?v=7"></script>
+    <script src="src/game/player.js?v=7"></script>
+    <script src="src/game/npc.js?v=7"></script>
+    <script src="src/game/items.js?v=7"></script>
+    <script src="src/game/dialog.js?v=7"></script>
+    <script src="src/game/quest.js?v=7"></script>
+    <script src="src/game/particles.js?v=7"></script>
+    <script src="src/ui/ui-manager.js?v=7"></script>
+    <script src="src/main.js?v=7"></script>
+</body>
+</html>

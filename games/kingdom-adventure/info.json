@@ -1,0 +1,42 @@
+{
+  "id": "kingdom-adventure",
+  "name": "Kingdom Adventure",
+  "description": "Petualangan RPG 2D dengan karakter fully animated. Jelajahi dunia, berinteraksi dengan NPC, kumpulkan item, dan temukan rahasia kerajaan!",
+  "category": "adventure",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.png",
+  "createdAt": "2026-05-02",
+  "updatedAt": "2026-05-02",
+  "version": "1.0.0",
+  "features": [
+    "3 Playable Characters (Knight, Mage, Archer)",
+    "Full 4-Direction Walking Animations",
+    "Animated NPCs with AI Pathfinding",
+    "Interactive Dialog System",
+    "Item Collection System",
+    "Day/Night Cycle",
+    "Animated Environment (Water, Trees, Particles)",
+    "Mini Map",
+    "Quest System",
+    "Mobile Touch Controls"
+  ],
+  "controls": {
+    "desktop": "WASD / Arrow Keys untuk bergerak, SPACE untuk interaksi, E untuk inventory, M untuk map",
+    "mobile": "Virtual Joystick & Touch Buttons"
+  },
+  "assets": {
+    "characters": "Procedurally generated sprite sheets",
+    "environment": "Procedurally generated tiles",
+    "license": "All assets procedurally generated"
+  },
+  "technologies": [
+    "HTML5 Canvas",
+    "JavaScript (ES6+)",
+    "CSS3",
+    "Sprite Sheet Animation",
+    "Procedural Asset Generation"
+  ],
+  "author": "AKA Gaming",
+  "platform": "Web Browser (Desktop & Mobile)"
+}

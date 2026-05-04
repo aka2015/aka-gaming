@@ -1856,22 +1856,425 @@ body {
     padding: 20px 15px 15px;
     margin-top: 30px;
   }
-  
+
   .footer-content {
     padding: 15px 18px;
   }
-  
+
   .footer-disclaimer {
     font-size: 12px;
   }
-  
+
   .ai-badge {
     display: block;
     margin: 0 auto 8px;
     width: fit-content;
   }
-  
+
   .footer-disclaimer {
     text-align: center;
+  }
+}
+
+/* ===== FOOTER LINKS (Beranda, Dukung Kami) ===== */
+.footer-links {
+  margin: 12px 0 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
+}
+
+.footer-links a:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.footer-sep {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* ===== SUPPORT PAGE ===== */
+.support-hero {
+  padding: 50px 20px 30px;
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
+  text-align: center;
+}
+
+.support-audience-tag {
+  display: inline-block;
+  background: var(--primary-lt);
+  color: var(--primary);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  border: 1.5px solid rgba(124, 58, 237, 0.2);
+}
+
+.support-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.support-title .gradient-text {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.support-subtitle {
+  max-width: 720px;
+  margin: 0 auto;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.support-section {
+  padding: 24px 0;
+}
+
+.support-container {
+  max-width: 880px;
+}
+
+.support-card {
+  background: var(--surface);
+  border: 2px solid var(--primary-lt);
+  border-radius: var(--radius-lg);
+  padding: 32px 36px;
+  box-shadow: var(--shadow);
+}
+
+.support-section-title {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.support-card p {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.support-pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.pillar-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--bg);
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+}
+
+.pillar-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.pillar-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.support-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+}
+
+.support-list li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.support-list li:last-child {
+  border-bottom: none;
+}
+
+.list-marker {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--primary-lt);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* ===== DONATION CARD ===== */
+.donation-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, var(--primary-lt) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 32px 36px;
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.18);
+}
+
+.donation-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.donation-header p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.donation-body {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.qr-container {
+  text-align: center;
+}
+
+.qr-frame {
+  background: #FFFFFF;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 2.5px solid var(--primary);
+  display: inline-block;
+  box-shadow: var(--shadow);
+}
+
+.qr-frame img {
+  display: block;
+  border-radius: 6px;
+}
+
+.qr-caption {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.donation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tier-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tier-item {
+  background: #FFFFFF;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  text-align: center;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tier-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.tier-featured {
+  border-color: var(--primary);
+  background: linear-gradient(180deg, #FFFFFF 0%, var(--primary-lt) 100%);
+  position: relative;
+}
+
+.tier-featured::before {
+  content: 'Disarankan';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.tier-amount {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.tier-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.tier-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.btn-donate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--pink) 100%);
+  color: #FFFFFF;
+  padding: 14px 22px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 15px;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-donate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.45);
+}
+
+.btn-donate-arrow {
+  transition: transform 0.2s ease;
+}
+
+.btn-donate:hover .btn-donate-arrow {
+  transform: translateX(4px);
+}
+
+.donation-disclaimer {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  text-align: center;
+  margin: 0;
+  padding: 10px 0 0;
+  border-top: 1px dashed var(--border);
+}
+
+/* ===== FAQ ===== */
+.faq-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.faq-item:first-of-type {
+  padding-top: 4px;
+}
+
+.faq-question {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.faq-answer {
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  color: var(--text-muted) !important;
+  margin: 0 !important;
+}
+
+.support-contact .support-signature {
+  margin-top: 16px;
+  font-style: italic;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Support page mobile */
+@media (max-width: 720px) {
+  .support-hero {
+    padding: 32px 18px 22px;
+  }
+
+  .support-card,
+  .donation-card {
+    padding: 22px 20px;
+  }
+
+  .donation-body {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    text-align: center;
+  }
+
+  .qr-frame img {
+    width: 220px;
+    height: 220px;
+  }
+
+  .tier-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tier-featured::before {
+    top: -10px;
+  }
+
+  .support-pillars {
+    grid-template-columns: 1fr;
   }
 }
