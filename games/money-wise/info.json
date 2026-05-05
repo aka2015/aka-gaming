@@ -1,0 +1,10 @@
+{
+  "id": "money-wise",
+  "name": "Money Wise",
+  "description": "Game edukasi menjadi kasir handal! Hitung kembalian dan kumpulkan koin untuk beli item spesial.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-05"
+}

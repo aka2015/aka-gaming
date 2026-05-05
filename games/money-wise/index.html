@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Wise - Jadi Kasir Handal!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="loading-screen">
+      <div class="loader">
+        <div class="coin-animation">💰</div>
+        <p>Loading...</p>
+      </div>
+    </div>
+
+    <div id="main-menu" class="screen active">
+      <h1>💰 Money Wise</h1>
+      <p class="subtitle">Jadi Kasir Handal!</p>
+      <div class="menu-buttons">
+        <button class="btn-primary" onclick="startGame('easy')">🌱 Mulai Main</button>
+        <button class="btn-secondary" onclick="showShop()">🛒 Toko Item</button>
+        <button class="btn-info" onclick="showHelp()">❓ Cara Main</button>
+      </div>
+      <div class="player-stats">
+        <div class="stat-box">
+          <span class="stat-value" id="total-coins">0</span>
+          <span class="stat-label">💰 Koin</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="player-rank">Junior Cashier</span>
+          <span class="stat-label">Rank</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="shop-screen" class="screen">
+      <h2>🛒 Toko Item</h2>
+      <div class="shop-coins">
+        <span id="shop-coins-display">0</span> 💰
+      </div>
+      <div class="shop-items" id="shop-items"></div>
+      <button class="btn-back" onclick="closeShop()">⬅️ Kembali</button>
+    </div>
+
+    <div id="help-screen" class="screen">
+      <h2>❓ Cara Main</h2>
+      <div class="help-content">
+        <p>1. Customer datang dengan barang belanjaan</p>
+        <p>2. Lihat total harga dan uang yang dikasih customer</p>
+        <p>3. Hitung kembalian = UangCustomer - TotalHarga</p>
+        <p>4. Ketik jumlah kembalian yang benar!</p>
+        <p>5. Benar dapat 💰 koin,试试 streak multiplier!</p>
+        <hr>
+        <p><strong>💡 Tips:</strong></p>
+        <p>• Tingkatkan streak untuk dapat mehr koin!</p>
+        <p>• Beli item di shop untuk membantu</p>
+      </div>
+      <button class="btn-back" onclick="closeHelp()">⬅️ Kembali</button>
+    </div>
+
+    <div id="gameplay-screen" class="screen">
+      <div class="game-header">
+        <div class="stat">
+          <span id="game-coins">0</span> 💰
+        </div>
+        <div class="stat">
+          <span id="game-streak">0</span> 🔥 Streak
+        </div>
+        <div class="stat">
+          Level <span id="game-level">1</span>
+        </div>
+      </div>
+
+      <div class="game-content">
+        <div class="customer-area">
+          <div class="customer" id="customer">👨</div>
+          <div class="speech-bubble" id="customer-speech">
+            "Halo! Saya mau beli ini..."
+          </div>
+        </div>
+
+        <div class="cart-area">
+          <h3>📦 Keranjang Belanja</h3>
+          <div class="cart-items" id="cart-items"></div>
+          <div class="cart-total">
+            <span>Total:</span>
+            <span id="cart-total">Rp 0</span>
+          </div>
+        </div>
+
+        <div class="money-area">
+          <div class="money-given">
+            <p>💵 Customer kasih:</p>
+            <div class="money-display" id="money-given-display">Rp 0</div>
+          </div>
+          <div class="change-input">
+            <p>❓ Kembalian:</p>
+            <div class="input-wrapper">
+              <span>Rp</span>
+              <input type="number" id="change-input" placeholder="0" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="timer-area">
+          <div class="timer-bar">
+            <div class="timer-fill" id="timer-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-footer">
+        <button class="btn-check" onclick="checkAnswer()">✓ KIRIM</button>
+        <button class="btn-skip" onclick="skipLevel()">⏭ Lewati</button>
+      </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+      <div class="result-content">
+        <div class="result-icon" id="result-icon">✓</div>
+        <h2 id="result-title">Benar!</h2>
+        <p id="result-message">Kamu dapat +10 💰 coins!</p>
+        <div class="result-details">
+          <div class="detail">
+            <span>Streak:</span>
+            <span id="result-streak">0</span> 🔥
+          </div>
+          <div class="detail">
+            <span>Multiplier:</span>
+            <span id="result-multiplier">1x</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="nextLevel()">Lanjut ➡️</button>
+      </div>
+    </div>
+
+    <div id="gameover-screen" class="screen">
+      <h2>Sesi Selesai! 🎉</h2>
+      <div class="gameover-stats">
+        <div class="stat">
+          <span>Total Koin Didapat:</span>
+          <span id="final-coins">0</span> 💰
+        </div>
+        <div class="stat">
+          <span>Best Streak:</span>
+          <span id="best-streak">0</span> 🔥
+        </div>
+        <div class="stat">
+          <span>Level Tercapai:</span>
+          <span id="final-level">1</span>
+        </div>
+      </div>
+      <div class="menu-buttons">
+        <button class="btn-primary" onclick="backToMenu()">🏠 Menu Utama</button>
+        <button class="btn-secondary" onclick="startGame('easy')">🔄 Main Lagi</button>
+      </div>
+    </div>
+
+    <div id="item-popup" class="popup">
+      <div class="popup-content">
+        <p id="item-popup-message"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
