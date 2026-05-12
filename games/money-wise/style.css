@@ -165,6 +165,27 @@ button:active {
   box-shadow: 0 4px 0 #757575;
 }
 
+.btn-hint {
+  background: #FFC107;
+  color: #333;
+  box-shadow: 0 4px 0 #FFA000;
+  padding: 15px 20px;
+}
+
+.btn-hint:hover {
+  background: #FFA000;
+}
+
+.btn-endless {
+  background: #9C27B0;
+  color: white;
+  box-shadow: 0 4px 0 #7B1FA2;
+}
+
+.btn-endless:hover {
+  background: #7B1FA2;
+}
+
 .btn-back {
   background: #607D8B;
   color: white;
@@ -630,4 +651,379 @@ button:active {
     gap: 10px;
     justify-content: center;
   }
+}
+
+.difficulty-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.difficulty-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 3px solid transparent;
+}
+
+.difficulty-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.difficulty-card.easy { border-color: #4CAF50; }
+.difficulty-card.easy:hover { background: #E8F5E9; }
+.difficulty-card.medium { border-color: #FF9800; }
+.difficulty-card.medium:hover { background: #FFF3E0; }
+.difficulty-card.hard { border-color: #f44336; }
+.difficulty-card.hard:hover { background: #FFEBEE; }
+
+.diff-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.diff-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+.diff-desc {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.tutorial-content {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.tutorial-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+.tutorial-step h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.tutorial-step p {
+  font-size: 16px;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.tutorial-progress {
+  margin-top: 15px;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.tutorial-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.tutorial-buttons .btn-primary {
+  flex: 1;
+}
+
+.sound-toggle {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  margin: 20px 0;
+  transition: all 0.2s ease;
+}
+
+.sound-toggle:hover {
+  background: #f5f5f5;
+}
+
+.sound-toggle span {
+  font-size: 24px;
+  vertical-align: middle;
+}
+
+.streak-progress-bar {
+  background: #e0e0e0;
+  border-radius: 10px;
+  height: 20px;
+  position: relative;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.streak-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary) 0%, var(--danger) 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.streak-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 70vh;
+  overflow-y: auto;
+  margin: 15px 0;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  border: 2px solid #eee;
+  transition: all 0.2s ease;
+}
+
+.achievement-item.unlocked {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 100%);
+}
+
+.achievement-item.locked {
+  opacity: 0.6;
+}
+
+.achievement-item .ach-icon {
+  font-size: 40px;
+}
+
+.achievement-item .ach-info {
+  flex: 1;
+}
+
+.achievement-item .ach-name {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.achievement-item .ach-desc {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.achievement-item .ach-reward {
+  font-size: 14px;
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+
+.achievement-popup {
+  background: rgba(0,0,0,0.7);
+}
+
+.achievement-content {
+  text-align: center;
+  padding: 30px 40px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 100%);
+  border: 3px solid var(--gold);
+}
+
+.ach-popup-icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.ach-popup-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  color: var(--gold-dark);
+  margin-bottom: 5px;
+}
+
+.ach-popup-desc {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.ach-popup-reward {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.coin-pop {
+  animation: coin-pop 0.3s ease-out;
+}
+
+@keyframes coin-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.slide-out {
+  animation: slide-out 0.5s ease-out forwards;
+}
+
+.slide-in {
+  animation: slide-in 0.5s ease-out forwards;
+}
+
+@keyframes slide-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-100px); }
+}
+
+@keyframes slide-in {
+  0% { opacity: 0; transform: translateX(100px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.redeem-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 15px 0;
+}
+
+.redeem-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #eee;
+}
+
+.redeem-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.redeem-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.redeem-icon {
+  font-size: 40px;
+}
+
+.redeem-info {
+  flex: 1;
+}
+
+.redeem-name {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.redeem-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 3px;
+}
+
+.redeem-qty, .redeem-owned {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.redeem-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold-dark);
+}
+
+.inventory-bar {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.inventory-bar h4 {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.inventory-items {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inventory-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-item:hover {
+  background: #e0e0e0;
+}
+
+.inv-icon {
+  font-size: 20px;
+}
+
+.inv-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.inv-qty {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.empty-inventory {
+  font-size: 13px;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.vip-badge {
+  color: var(--gold) !important;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#inventory-count {
+  color: var(--primary);
 }

@@ -19,9 +19,14 @@
       <h1>💰 Money Wise</h1>
       <p class="subtitle">Jadi Kasir Handal!</p>
       <div class="menu-buttons">
-        <button class="btn-primary" onclick="startGame('easy')">🌱 Mulai Main</button>
+        <button class="btn-primary" onclick="showDifficulty()">🌱 Mulai Main</button>
         <button class="btn-secondary" onclick="showShop()">🛒 Toko Item</button>
-        <button class="btn-info" onclick="showHelp()">❓ Cara Main</button>
+        <button class="btn-secondary" onclick="showRedeem()">🎁 Tukar Reward</button>
+        <button class="btn-info" onclick="showSoundToggle()">🔊 Suara</button>
+        <button class="btn-secondary" onclick="showHelp()">❓ Cara Main</button>
+        <button class="btn-info" onclick="showAchievements()">🏆 Achievement</button>
+        <button class="btn-endless" onclick="startTutorial()">📖 Tutorial</button>
+        <button class="btn-endless" onclick="startEndless()">♾️ Endless Mode</button>
       </div>
       <div class="player-stats">
         <div class="stat-box">
@@ -31,6 +36,16 @@
         <div class="stat-box">
           <span class="stat-value" id="player-rank">Junior Cashier</span>
           <span class="stat-label">Rank</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="inventory-count">0</span>
+          <span class="stat-label">📦 Item</span>
+        </div>
+      </div>
+      <div class="inventory-bar" id="inventory-bar">
+        <h4>📦 Inventory</h4>
+        <div class="inventory-items" id="inventory-items">
+          <p class="empty-inventory">Belum punya item</p>
         </div>
       </div>
     </div>
@@ -44,6 +59,15 @@
       <button class="btn-back" onclick="closeShop()">⬅️ Kembali</button>
     </div>
 
+    <div id="redeem-screen" class="screen">
+      <h2>🎁 Tukar Reward</h2>
+      <div class="shop-coins">
+        <span id="redeem-coins-display">0</span> 💰
+      </div>
+      <div class="redeem-items" id="redeem-items"></div>
+      <button class="btn-back" onclick="closeRedeem()">⬅️ Kembali</button>
+    </div>
+
     <div id="help-screen" class="screen">
       <h2>❓ Cara Main</h2>
       <div class="help-content">
@@ -51,7 +75,7 @@
         <p>2. Lihat total harga dan uang yang dikasih customer</p>
         <p>3. Hitung kembalian = UangCustomer - TotalHarga</p>
         <p>4. Ketik jumlah kembalian yang benar!</p>
-        <p>5. Benar dapat 💰 koin,试试 streak multiplier!</p>
+        <p>5. Benar dapat 💰 koin, coba streak multiplier!</p>
         <hr>
         <p><strong>💡 Tips:</strong></p>
         <p>• Tingkatkan streak untuk dapat mehr koin!</p>
@@ -71,6 +95,11 @@
         <div class="stat">
           Level <span id="game-level">1</span>
         </div>
+      </div>
+
+      <div class="streak-progress-bar">
+        <div class="streak-progress-fill" id="streak-progress-fill"></div>
+        <span class="streak-progress-text" id="streak-progress-text">🔥 0/5</span>
       </div>
 
       <div class="game-content">
@@ -113,7 +142,8 @@
 
       <div class="game-footer">
         <button class="btn-check" onclick="checkAnswer()">✓ KIRIM</button>
-        <button class="btn-skip" onclick="skipLevel()">⏭ Lewati</button>
+        <button class="btn-skip" onclick="skipLevel()">⏭</button>
+        <button class="btn-hint" onclick="Game.showHint()">💡</button>
       </div>
     </div>
 
@@ -161,6 +191,70 @@
     <div id="item-popup" class="popup">
       <div class="popup-content">
         <p id="item-popup-message"></p>
+      </div>
+    </div>
+
+    <div id="difficulty-screen" class="screen">
+      <h2>🎯 Pilih Tingkat</h2>
+      <div class="difficulty-options">
+        <div class="difficulty-card easy" onclick="startGame('easy')">
+          <div class="diff-icon">🌱</div>
+          <div class="diff-name">Mudah</div>
+          <div class="diff-desc">45 detik, maks 2 item</div>
+        </div>
+        <div class="difficulty-card medium" onclick="startGame('medium')">
+          <div class="diff-icon">🌿</div>
+          <div class="diff-name">Sedang</div>
+          <div class="diff-desc">35 detik, maks 3 item</div>
+        </div>
+        <div class="difficulty-card hard" onclick="startGame('hard')">
+          <div class="diff-icon">🔥</div>
+          <div class="diff-name">Sulit</div>
+          <div class="diff-desc">25 detik, maks 4 item</div>
+        </div>
+      </div>
+      <button class="btn-back" onclick="closeDifficulty()">⬅️ Kembali</button>
+    </div>
+
+    <div id="tutorial-screen" class="screen">
+      <h2>📖 Tutorial</h2>
+      <div class="tutorial-content">
+        <div class="tutorial-step" id="tutorial-step">
+          <div class="tutorial-icon" id="tutorial-icon">👋</div>
+          <h3 id="tutorial-title">Selamat Datang!</h3>
+          <p id="tutorial-desc">Kamu akan menjadi kasir handal!</p>
+        </div>
+        <div class="tutorial-progress">
+          <span id="tutorial-current">1</span> / <span id="tutorial-total">6</span>
+        </div>
+      </div>
+      <div class="tutorial-buttons">
+        <button class="btn-back" id="tutorial-prev" onclick="prevTutorial()">⬅️ Sebelumnya</button>
+        <button class="btn-primary" id="tutorial-next" onclick="nextTutorial()">Berikutnya ➡️</button>
+      </div>
+    </div>
+
+    <div id="sound-screen" class="screen">
+      <h2>🔊 Pengaturan Suara</h2>
+      <div class="sound-toggle" onclick="toggleSound()">
+        <span id="sound-icon">🔊</span>
+        <span id="sound-status">Nyala</span>
+      </div>
+      <button class="btn-back" onclick="closeSound()">⬅️ Kembali</button>
+    </div>
+
+    <div id="achievements-screen" class="screen">
+      <h2>🏆 Achievement</h2>
+      <div class="achievements-list" id="achievements-list"></div>
+      <button class="btn-back" onclick="closeAchievements()">⬅️ Kembali</button>
+    </div>
+
+    <div id="achievement-popup" class="popup achievement-popup">
+      <div class="popup-content achievement-content">
+        <div class="ach-popup-icon" id="ach-icon">🏆</div>
+        <div class="ach-popup-name" id="ach-name">Achievement Unlocked!</div>
+        <div class="ach-popup-desc" id="ach-desc">Deskripsi</div>
+        <div class="ach-popup-reward" id="ach-reward">+50 💰</div>
       </div>
     </div>
   </div>
