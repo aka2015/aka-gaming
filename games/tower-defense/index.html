@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tower Defense Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="game-canvas"></canvas>
+    <canvas id="particle-canvas"></canvas>
+    <canvas id="ui-canvas"></canvas>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="screen active">
+      <div class="loader-content">
+        <div class="logo-container">
+          <span class="logo-icon">🏰</span>
+          <h1 class="logo-text">TOWER DEFENSE</h1>
+          <p class="logo-sub">PRO EDITION</p>
+        </div>
+        <div class="loading-bar">
+          <div class="loading-fill" id="loading-fill"></div>
+        </div>
+        <p class="loading-text" id="loading-text">Loading assets...</p>
+      </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen">
+      <div class="menu-bg"></div>
+      <div class="menu-content">
+        <div class="menu-header">
+          <span class="menu-icon">🏰</span>
+          <h1>TOWER DEFENSE</h1>
+          <p>PRO EDITION</p>
+        </div>
+        <div class="menu-buttons">
+          <button class="btn-play" onclick="Game.startGame()">
+            <span class="btn-icon">▶</span>
+            <span class="btn-text">MULAI GAME</span>
+          </button>
+          <button class="btn-tower" onclick="Game.showTowerInfo()">
+            <span class="btn-icon">🗼</span>
+            <span class="btn-text">INFO TOWER</span>
+          </button>
+          <button class="btn-sound" id="btn-sound" onclick="Game.toggleSound()">
+            <span class="btn-icon">🔊</span>
+            <span class="btn-text">SUARA</span>
+          </button>
+        </div>
+        <div class="menu-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="menu-highscore">0</span>
+            <span class="stat-label">HIGH SCORE</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="menu-wave">0</span>
+            <span class="stat-label">WAVE TERSELESAIKAN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game HUD -->
+    <div id="game-hud" class="hud hidden">
+      <div class="hud-top">
+        <div class="hud-item gold">
+          <span class="hud-icon">💰</span>
+          <span class="hud-value" id="hud-gold">100</span>
+        </div>
+        <div class="hud-item wave">
+          <span class="hud-label">WAVE</span>
+          <span class="hud-value" id="hud-wave">1</span>
+        </div>
+        <div class="hud-item lives">
+          <span class="hud-icon">❤️</span>
+          <span class="hud-value" id="hud-lives">20</span>
+        </div>
+        <div class="hud-item score">
+          <span class="hud-label">SCORE</span>
+          <span class="hud-value" id="hud-score">0</span>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <div class="tower-panel">
+          <div class="tower-btn selected" data-tower="arrow" onclick="Game.selectTower('arrow')">
+            <span class="tower-icon">🏹</span>
+            <span class="tower-name">Arrow</span>
+            <span class="tower-cost">💰25</span>
+          </div>
+          <div class="tower-btn" data-tower="cannon" onclick="Game.selectTower('cannon')">
+            <span class="tower-icon">💣</span>
+            <span class="tower-name">Cannon</span>
+            <span class="tower-cost">💰50</span>
+          </div>
+          <div class="tower-btn" data-tower="ice" onclick="Game.selectTower('ice')">
+            <span class="tower-icon">❄️</span>
+            <span class="tower-name">Ice</span>
+            <span class="tower-cost">💰40</span>
+          </div>
+          <div class="tower-btn" data-tower="magic" onclick="Game.selectTower('magic')">
+            <span class="tower-icon">✨</span>
+            <span class="tower-name">Magic</span>
+            <span class="tower-cost">💰75</span>
+          </div>
+        </div>
+        <div class="action-panel">
+          <button class="btn-action wave-start" id="btn-wave" onclick="Game.startWave()">
+            <span class="btn-text">START WAVE</span>
+          </button>
+          <button class="btn-action speed" id="btn-speed" onclick="Game.toggleSpeed()">
+            <span class="btn-text">1X</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+      <div class="gameover-content">
+        <h2 class="gameover-title">GAME OVER</h2>
+        <div class="gameover-stats">
+          <div class="stat-row">
+            <span class="stat-name">Wave</span>
+            <span class="stat-value" id="go-wave">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">Score</span>
+            <span class="stat-value" id="go-score">0</span>
+          </div>
+          <div class="stat-row highlight">
+            <span class="stat-name">High Score</span>
+            <span class="stat-value" id="go-highscore">0</span>
+          </div>
+        </div>
+        <div class="gameover-buttons">
+          <button class="btn-retry" onclick="Game.restart()">
+            <span>🔄</span> MAIN LAGI
+          </button>
+          <button class="btn-menu" onclick="Game.backToMenu()">
+            <span>🏠</span> MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tower Info Modal -->
+    <div id="tower-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>🗼 TIPE TOWER</h2>
+        <div class="tower-info-list">
+          <div class="tower-info-item">
+            <span class="info-icon">🏹</span>
+            <div class="info-content">
+              <h4>Arrow Tower</h4>
+              <p>Damage: 10 | Range: 120 | Speed: Fast</p>
+              <p>Towers cepat, damage rendah. Bagus untuk early game.</p>
+            </div>
+          </div>
+          <div class="tower-info-item">
+            <span class="info-icon">💣</span>
+            <div class="info-content">
+              <h4>Cannon Tower</h4>
+              <p>Damage: 40 | Range: 100 | Speed: Slow</p>
+              <p>Damage tinggi, AOE. Efektif untuk group enemy.</p>
+            </div>
+          </div>
+          <div class="tower-info-item">
+            <span class="info-icon">❄️</span>
+            <div class="info-content">
+              <h4>Ice Tower</h4>
+              <p>Damage: 5 | Range: 110 | Speed: Medium</p>
+              <p>Melambatkan enemy. Cocok dikombinasikan dengan tower lain.</p>
+            </div>
+          </div>
+          <div class="tower-info-item">
+            <span class="info-icon">✨</span>
+            <div class="info-content">
+              <h4>Magic Tower</h4>
+              <p>Damage: 25 | Range: 140 | Speed: Medium</p>
+              <p>Damage sedang, range jauh. Serangan piercing.</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn-close" onclick="Game.closeTowerInfo()">TUTUP</button>
+      </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div id="upgrade-modal" class="modal hidden">
+      <div class="modal-content upgrade-content">
+        <h2>⬆️ UPGRADE TOWER</h2>
+        <div class="upgrade-info" id="upgrade-info"></div>
+        <div class="upgrade-buttons">
+          <button class="btn-upgrade" id="btn-upgrade" onclick="Game.upgradeTower()">
+            UPGRADE (💰<span id="upgrade-cost">0</span>)
+          </button>
+          <button class="btn-sell" onclick="Game.sellTower()">
+            JUAL (💰<span id="sell-value">0</span>)
+          </button>
+        </div>
+        <button class="btn-close" onclick="Game.closeUpgrade()">TUTUP</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAEWUD-B5cF1ac1COTxKVoCks9s6tzUzQ",
+      authDomain: "game-portal-fb78e.firebaseapp.com",
+      projectId: "game-portal-fb78e",
+      storageBucket: "game-portal-fb78e.firebasestorage.app",
+      messagingSenderId: "404337933327",
+      appId: "1:404337933327:web:aa17284f67d3899784777a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const fireDb = getFirestore(app);
+    const auth = getAuth(app);
+
+    window.FireScore = {
+      user: null,
+      async save(score, wave) {
+        try {
+          const data = {
+            score, wave,
+            game: 'tower-defense',
+            timestamp: Date.now(),
+            playerName: this.user?.displayName || 'Anonymous',
+            uid: this.user?.uid || null
+          };
+          await addDoc(collection(fireDb, 'scores'), data);
+        } catch (e) { console.log('Score save failed:', e); }
+      },
+      async getLeaderboard() {
+        try {
+          const q = query(collection(fireDb, 'scores'), orderBy('score', 'desc'), limit(10));
+          const snap = await getDocs(q);
+          return snap.docs.map(d => d.data());
+        } catch (e) { return []; }
+      }
+    };
+
+    onAuthStateChanged(auth, (user) => { window.FireScore.user = user; });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

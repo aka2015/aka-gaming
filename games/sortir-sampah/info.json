@@ -1,0 +1,11 @@
+{
+  "id": "sortir-sampah",
+  "name": "Sortir Sampah",
+  "description": "Pelajari cara memilah sampah dengan benar! Drag sampah ke tempat yang tepat: organik, anorganik, atau daur ulang.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-13",
+  "author": "AKA Gaming"
+}

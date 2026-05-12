@@ -243,6 +243,11 @@ function buildGameCard(game) {
   card.querySelector(".game-comments-count").textContent =
     `💬 ${game.commentsCount || 0}`;
 
+  const authorEl = card.querySelector(".author-name");
+  if (authorEl) {
+    authorEl.textContent = game.author || "Unknown";
+  }
+
   const badge = card.querySelector(".game-badge");
   if (game.badge) {
     badge.textContent = badgeLabel(game.badge);
@@ -266,7 +271,8 @@ function buildGameCard(game) {
       'puzzle': ['🧩 Logic', '🧠 Brain Teaser', '⭐ Fun'],
       'educational': ['📚 Learn', '🎓 Educational', '✨ Interactive'],
       'adventure': ['🗺️ Explore', '🎮 Adventure', '🌟 Story'],
-      'sport': ['⚽ Sports', '🏅 Competition', '🎯 Skill']
+      'sport': ['⚽ Sports', '🏅 Competition', '🎯 Skill'],
+      'strategy': ['🏰 Strategy', '🧠 Planning', '⚔️ Defense']
     };
     const defaults = defaultFeatures[game.category] || ['🎮 Fun', '⭐ Enjoy', '🏆 Play'];
     featuresContainer.innerHTML = defaults.map(f => 
@@ -341,7 +347,7 @@ function showLoginModal(gameUrl = null) {
 //  HELPERS
 // ────────────────────────────────────────────────────────────
 function catLabel(cat) {
-  const map = { puzzle:"Puzzle", action:"Aksi", educational:"Edukasi", adventure:"Petualangan", sport:"Olahraga" };
+  const map = { puzzle:"Puzzle", action:"Aksi", educational:"Edukasi", adventure:"Petualangan", sport:"Olahraga", strategy:"Strategi" };
   return map[cat] || cat || "Umum";
 }
 

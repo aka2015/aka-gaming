@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robot Builder - Belajar Coding!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="loading-screen">
+      <div class="loader">
+        <div class="robot-animation">🤖</div>
+        <p>Loading...</p>
+      </div>
+    </div>
+
+    <div id="main-menu" class="screen active">
+      <h1>🤖 Robot Builder</h1>
+      <p class="subtitle">Belajar Coding dengan Cara Seru!</p>
+      <div class="menu-buttons">
+        <button class="btn-primary" onclick="showLevelSelect()">🎯 Mulai Main</button>
+        <button class="btn-secondary" onclick="showHelp()">❓ Cara Main</button>
+        <button class="btn-sound" id="btn-sound" onclick="toggleSound()">🔊 Suara</button>
+      </div>
+      <div class="player-stats">
+        <div class="stat-box">
+          <span class="stat-value" id="total-levels">0</span>
+          <span class="stat-label">🎯 Level Selesai</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="total-stars">0</span>
+          <span class="stat-label">⭐ Bintang</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="level-screen" class="screen">
+      <h2>🎯 Pilih Level</h2>
+      <div class="levels-grid" id="levels-grid"></div>
+      <button class="btn-back" onclick="closeLevelSelect()">⬅️ Kembali</button>
+    </div>
+
+    <div id="help-screen" class="screen">
+      <h2>❓ Cara Main</h2>
+      <div class="help-content">
+        <p>1. 🤖 Robot harus mencapai bendera 🚩</p>
+        <p>2. 🧩 Susun perintah di panel perintah</p>
+        <p>3. ▶️ Tekan tombol untuk eksekusi</p>
+        <p>4. 📊 Dapat bintang berdasarkan jumlah langkah</p>
+        <hr>
+        <p><strong>Perintah:</strong></p>
+        <p>⬆️ Maju - Robot bergerak maju 1 langkah</p>
+        <p>⬅️ Belok Kiri - Robot berputar kiri</p>
+        <p>➡️ Belok Kanan - Robot berputar kanan</p>
+        <hr>
+        <p><strong>💡 Tips:</strong></p>
+        <p>• Kurang langkah = lebih banyak bintang!</p>
+        <p>• Rencanakan route sebelum susun</p>
+      </div>
+      <button class="btn-back" onclick="closeHelp()">⬅️ Kembali</button>
+    </div>
+
+    <div id="gameplay-screen" class="screen">
+      <div class="game-header">
+        <div class="stat">
+          Level <span id="current-level">1</span>
+        </div>
+        <div class="stat">
+          <span id="move-count">0</span> langkah
+        </div>
+        <div class="stat">
+          <span id="star-preview">☆☆☆</span>
+        </div>
+      </div>
+
+      <div class="game-area">
+        <div class="maze-container">
+          <div class="maze-grid" id="maze-grid"></div>
+          <div class="robot" id="robot">🤖</div>
+          <div class="goal-marker" id="goal-marker">🚩</div>
+        </div>
+      </div>
+
+      <div class="command-area">
+        <h3>🧩 Panel Perintah</h3>
+        <div class="command-blocks" id="command-blocks"></div>
+        <div class="command-buttons">
+          <button class="cmd-btn" onclick="addCommand('forward')">⬆️ Maju</button>
+          <button class="cmd-btn" onclick="addCommand('left')">⬅️ Kiri</button>
+          <button class="cmd-btn" onclick="addCommand('right')">➡️ Kanan</button>
+        </div>
+        <div class="command-actions">
+          <button class="btn-clear" onclick="clearCommands()">🗑️ Hapus</button>
+          <button class="btn-undo" onclick="undoCommand()">↩️ Undo</button>
+        </div>
+      </div>
+
+      <div class="game-footer">
+        <button class="btn-run" onclick="runProgram()">▶️ JALANKAN</button>
+        <button class="btn-reset" onclick="resetLevel()">🔄 Reset</button>
+      </div>
+
+      <div class="code-display">
+        <span class="code-label">Kode:</span>
+        <span id="code-text">_</span>
+      </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+      <div class="result-content">
+        <div class="result-icon" id="result-icon">✓</div>
+        <h2 id="result-title">Berhasil!</h2>
+        <p id="result-message">Robot sampai di tujuan!</p>
+        <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+        <div class="result-details">
+          <div class="detail">
+            <span>Langkah terpakai:</span>
+            <span id="result-moves">0</span>
+          </div>
+          <div class="detail">
+            <span>Optimal:</span>
+            <span id="result-optimal">0</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="nextLevel()">Level Berikutnya ➡️</button>
+        <button class="btn-secondary" onclick="backToMenu()">🏠 Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

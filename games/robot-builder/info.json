@@ -1,0 +1,11 @@
+{
+  "id": "robot-builder",
+  "name": "Robot Builder",
+  "description": "Game programming visual! Susun perintah untuk menggerakkan robot dan selesaikan misi di labirin. Pelajari dasar-dasar coding dengan cara yang seru!",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-12",
+  "author": "AKA Gaming"
+}

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+  <rect width="300" height="200" rx="12" fill="#e8f5e9"/>
+  <!-- Green bin -->
+  <rect x="30" y="90" width="60" height="80" rx="6" fill="#66bb6a"/>
+  <rect x="35" y="85" width="50" height="12" rx="4" fill="#43a047"/>
+  <text x="60" y="140" text-anchor="middle" font-size="24">🌿</text>
+  <!-- Red bin -->
+  <rect x="120" y="90" width="60" height="80" rx="6" fill="#ef5350"/>
+  <rect x="125" y="85" width="50" height="12" rx="4" fill="#c62828"/>
+  <text x="150" y="140" text-anchor="middle" font-size="24">🥤</text>
+  <!-- Blue bin -->
+  <rect x="210" y="90" width="60" height="80" rx="6" fill="#42a5f5"/>
+  <rect x="215" y="85" width="50" height="12" rx="4" fill="#1976d2"/>
+  <text x="240" y="140" text-anchor="middle" font-size="24">📦</text>
+  <!-- Floating trash -->
+  <text x="80" y="55" font-size="28">🍌</text>
+  <text x="140" y="40" font-size="28">📰</text>
+  <text x="200" y="55" font-size="28">🛍️</text>
+  <!-- Title -->
+  <text x="150" y="190" text-anchor="middle" font-size="14" font-family="sans-serif" fill="#2e7d32" font-weight="bold">Sortir Sampah ♻️</text>
+</svg>

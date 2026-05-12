@@ -738,11 +738,30 @@ body {
 .cat-educational { background: #DCFCE7; color: #15803D; }
 .cat-adventure   { background: #FEF9C3; color: #854D0E; }
 .cat-sport       { background: #DBEAFE; color: #1D4ED8; }
+.cat-strategy    { background: #F3E8FF; color: #7C3AED; }
 
 .game-comments-count {
   font-size: .8rem;
   color: var(--text-muted);
   font-weight: 600;
+}
+
+.game-author {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+
+.author-icon {
+  font-size: .8rem;
+}
+
+.author-name {
+  font-weight: 600;
+  color: var(--primary);
 }
 
 /* ===== LOADING / EMPTY ===== */

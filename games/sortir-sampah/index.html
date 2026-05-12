@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sortir Sampah - AKA Gaming</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- Start Screen -->
+        <div id="screen-start" class="screen active">
+            <div class="start-content">
+                <div class="logo-area">
+                    <div class="logo-icon">♻️</div>
+                    <h1>Sortir Sampah</h1>
+                    <p class="tagline">Selamatkan Bumi, Satu Sampah Setiap Saat!</p>
+                </div>
+                <div class="level-select">
+                    <h3>Pilih Level</h3>
+                    <div class="level-buttons" id="level-buttons">
+                        <button class="level-btn unlocked" data-level="1">
+                            <span class="lvl-num">1</span>
+                            <span class="lvl-stars">---</span>
+                        </button>
+                        <button class="level-btn locked" data-level="2">
+                            <span class="lvl-num">2</span>
+                            <span class="lvl-stars">🔒</span>
+                        </button>
+                        <button class="level-btn locked" data-level="3">
+                            <span class="lvl-num">3</span>
+                            <span class="lvl-stars">🔒</span>
+                        </button>
+                        <button class="level-btn locked" data-level="4">
+                            <span class="lvl-num">4</span>
+                            <span class="lvl-stars">🔒</span>
+                        </button>
+                        <button class="level-btn locked" data-level="5">
+                            <span class="lvl-num">5</span>
+                            <span class="lvl-stars">🔒</span>
+                        </button>
+                    </div>
+                </div>
+                <button id="btn-play" class="btn-play">▶ MULAI</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="screen-game" class="screen">
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="score-display">
+                        <span class="score-label">SKOR</span>
+                        <span class="score-value" id="hud-score">0</span>
+                    </div>
+                    <div class="combo-display hidden" id="combo-display">
+                        <span class="combo-value" id="combo-value">x2</span>
+                        <span class="combo-label">COMBO</span>
+                    </div>
+                </div>
+                <div class="hud-center">
+                    <div class="level-indicator">Level <span id="hud-level">1</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div class="lives-display" id="hud-lives">
+                        <span class="heart">❤️</span>
+                        <span class="heart">❤️</span>
+                        <span class="heart">❤️</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trash-area" id="trash-area">
+                <div class="trash-card" id="drop-zone"></div>
+            </div>
+
+            <div class="bins-area" id="bins-area"></div>
+
+            <div class="feedback-popup hidden" id="feedback-popup">
+                <span class="feedback-text" id="feedback-text"></span>
+            </div>
+
+            <div id="particles-container"></div>
+        </div>
+
+        <!-- Level Complete Screen -->
+        <div id="screen-level-complete" class="screen">
+            <div class="level-complete-content">
+                <h2>Level Selesai! 🎉</h2>
+                <div class="stars-display" id="stars-display">
+                    <span class="star">☆</span>
+                    <span class="star">☆</span>
+                    <span class="star">☆</span>
+                </div>
+                <div class="level-stats">
+                    <div class="stat-row"><span>Benar</span><span id="stat-correct">0</span></div>
+                    <div class="stat-row"><span>Salah</span><span id="stat-wrong">0</span></div>
+                    <div class="stat-row"><span>Combo Terbaik</span><span id="stat-combo">0</span></div>
+                    <div class="stat-row"><span>Skor</span><span id="stat-score">0</span></div>
+                </div>
+                <div class="fact-box" id="fact-box">
+                    <div class="fact-icon">💡</div>
+                    <p class="fact-text" id="fact-text"></p>
+                </div>
+                <div class="level-complete-buttons">
+                    <button id="btn-next-level" class="btn-play">Level Berikutnya ▶</button>
+                    <button id="btn-back-menu" class="btn-secondary">Menu Utama</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="screen-gameover" class="screen">
+            <div class="gameover-content">
+                <div class="gameover-icon">💔</div>
+                <h2>Game Over</h2>
+                <p class="gameover-score">Skor: <strong id="go-score">0</strong></p>
+                <p class="gameover-msg" id="go-msg"></p>
+                <div class="gameover-buttons">
+                    <button id="btn-retry" class="btn-play">🔄 Coba Lagi</button>
+                    <button id="btn-go-menu" class="btn-secondary">Menu Utama</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "id": "tower-defense",
+  "name": "Tower Defense Pro",
+  "description": "Tower defense profesional dengan grafik vector, efek partikel, dan berbagai tipe tower. Pertahankan basismu dari gelombang musuh!",
+  "category": "strategy",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-13",
+  "author": "AKA Gaming"
+}
