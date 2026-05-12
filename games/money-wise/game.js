@@ -430,13 +430,7 @@ const Game = {
         setTimeout(() => el.remove(), 1000);
       }, i * 100);
     }
-  },
-  
-  nextLevel() {
-    this.currentLevel++;
-    Audio.click();
-    this.nextLevel();
-  },
+},
   
   skipLevel() {
     clearInterval(this.timerInterval);
@@ -539,4 +533,18 @@ const Game = {
 };
 
 window.Game = Game;
+window.startGame = (difficulty) => Game.startGame(difficulty);
+window.showShop = () => Game.showShop();
+window.showHelp = () => Game.showHelp();
+window.closeShop = () => Game.closeShop();
+window.closeHelp = () => Game.closeHelp();
+window.checkAnswer = () => Game.checkAnswer();
+window.skipLevel = () => Game.skipLevel();
+window.continueLevel = () => {
+  Game.currentLevel++;
+  Game.nextLevel();
+};
+window.nextLevel = () => Game.nextLevel();
+window.backToMenu = () => Game.backToMenu();
+window.buyItem = (itemId) => Game.buyItem(itemId);
 window.addEventListener('load', () => Game.init());

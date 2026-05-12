@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+  <rect fill="#1a1a2e" width="300" height="200"/>
+  <circle cx="150" cy="100" r="30" fill="#ff4444"/>
+  <circle cx="140" cy="95" r="5" fill="#ffaa44"/>
+  <rect x="170" y="95" width="25" height="8" fill="#444" rx="2"/>
+  <circle cx="80" cy="60" r="15" fill="#aa0000"/>
+  <circle cx="220" cy="140" r="15" fill="#aa0000"/>
+  <circle cx="250" cy="70" r="20" fill="#444"/>
+  <text x="150" y="185" font-family="Arial" font-size="14" fill="#ff4444" text-anchor="middle">BATTLE ROYALE</text>
+</svg>

@@ -1,0 +1,10 @@
+{
+  "id": "battle-royale-arena",
+  "name": "Battle Royale Arena",
+  "description": "Game battle royale! Kumpulkan senjata, kalahkan musuh, dan jadi yang terakhir bertahan!",
+  "category": "action",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-09"
+}

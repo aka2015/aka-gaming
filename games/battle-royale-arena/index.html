@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Royale Arena</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="900" height="600"></canvas>
+        
+        <div id="main-menu" class="screen">
+            <div class="menu-header">
+                <div class="logo-container">
+                    <div class="logo-icon">&#9733;</div>
+                    <h1>BATTLE ROYALE ARENA</h1>
+                    <div class="logo-icon">&#9733;</div>
+                </div>
+                <p class="subtitle">Jelajahi map besar, kumpulkan senjata, kalahkan semua musuh!</p>
+            </div>
+            <div class="menu-content">
+                <div class="weapons-showcase">
+                    <div class="weapon-card" data-weapon="knife">
+                        <span class="w-icon">&#9876;</span>
+                        <span class="w-name">Pisau</span>
+                    </div>
+                    <div class="weapon-card" data-weapon="glock">
+                        <span class="w-icon">&#9641;</span>
+                        <span class="w-name">Glock 19</span>
+                    </div>
+                    <div class="weapon-card" data-weapon="ak47">
+                        <span class="w-icon">&#9618;</span>
+                        <span class="w-name">AK-47</span>
+                    </div>
+                    <div class="weapon-card" data-weapon="m16">
+                        <span class="w-icon">&#9643;</span>
+                        <span class="w-name">M-16</span>
+                    </div>
+                    <div class="weapon-card" data-weapon="ar15">
+                        <span class="w-icon">&#9635;</span>
+                        <span class="w-name">AR-15</span>
+                    </div>
+                    <div class="weapon-card" data-weapon="m1">
+                        <span class="w-icon">&#9617;</span>
+                        <span class="w-name">M1 MG</span>
+                    </div>
+                    <div class="weapon-card" data-weapon="minigun">
+                        <span class="w-icon">&#9632;</span>
+                        <span class="w-name">Minigun</span>
+                    </div>
+                    <div class="weapon-card vehicle" data-weapon="tank">
+                        <span class="w-icon">&#9651;</span>
+                        <span class="w-name">M1 Tank</span>
+                    </div>
+                </div>
+                <button id="start-btn" class="menu-btn">MULAI PERMAINAN</button>
+                <button id="tutorial-btn" class="menu-btn secondary">TUTORIAL</button>
+            </div>
+            <div class="controls-info">
+                <div class="control-item"><span class="key">WASD</span> Gerak</div>
+                <div class="control-item"><span class="key">Mouse</span> Aim & Shoot</div>
+                <div class="control-item"><span class="key">1-7</span> Ganti Senjata</div>
+                <div class="control-item"><span class="key">R</span> Reload</div>
+                <div class="control-item"><span class="key">E</span> Keluar Tank</div>
+            </div>
+        </div>
+        
+        <div id="hud" class="screen hidden">
+            <button id="pause-btn" class="pause-button">||</button>
+            <div id="vehicle-indicator" class="hidden">
+                <span>TANK MODE</span>
+            </div>
+            <div class="hud-top">
+                <div class="health-bar">
+                    <div id="health-fill"></div>
+                </div>
+                <div class="ammo-display">
+                    <span id="ammo-count">∞</span>
+                    <span id="weapon-name">Pisau</span>
+                </div>
+            </div>
+            <div class="hud-bottom">
+                <div class="inventory-container">
+                    <div class="inventory-slots">
+                        <div class="inv-slot" data-slot="0">1</div>
+                        <div class="inv-slot" data-slot="1">2</div>
+                        <div class="inv-slot" data-slot="2">3</div>
+                    </div>
+                    <div class="knuckle-slot">🔪</div>
+                </div>
+                <div class="score-display">
+                    Kill: <span id="kill-count">0</span>
+                    | Wave: <span id="wave-count">1</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="pause-menu" class="screen hidden">
+            <h2>PAUSED</h2>
+            <button id="resume-btn" class="menu-btn">LANJUT</button>
+            <button id="restart-btn" class="menu-btn">MULAI ULANG</button>
+            <button id="quit-btn" class="menu-btn secondary">KELUAR</button>
+        </div>
+        
+        <div id="game-over" class="screen hidden">
+            <h2 id="game-over-title">GAME OVER</h2>
+            <p>Kamu eliminasi!</p>
+            <p class="stats">Total Kill: <span id="final-kills">0</span></p>
+            <p class="stats">Wave Tercapai: <span id="final-wave">0</span></p>
+            <button id="retry-btn" class="menu-btn">COBA LAGI</button>
+            <button id="menu-btn" class="menu-btn">MENU UTAMA</button>
+        </div>
+
+        <div id="weapon-pickup" class="hidden">
+            <span id="pickup-text"></span>
+        </div>
+
+        <div id="tutorial-modal" class="modal hidden">
+            <div class="modal-content">
+                <button id="close-tutorial" class="close-btn">&times;</button>
+                <h2>TUTORIAL</h2>
+                <div class="tutorial-section">
+                    <h3>Cara Bermain</h3>
+                    <p>Jelajahi map besar, kumpulkan senjata, dan kalahkan semua musuh untuk jadi pemenangnya!</p>
+                </div>
+                <div class="tutorial-section">
+                    <h3>Kontrol</h3>
+                    <div class="tutorial-row">
+                        <span class="t-key">W A S D</span>
+                        <span>Gerak karakter</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">Mouse</span>
+                        <span>Arahkan & Tembak</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">Klik Kiri</span>
+                        <span>Tembak / Serang</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">1 - 3</span>
+                        <span>Pilih slot inventory</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">Tab</span>
+                        <span>Ganti slot inventory</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">Click</span>
+                        <span>Klik slot inventory</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">Shift+1/2/3</span>
+                        <span>Tukar senjata</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">X / G</span>
+                        <span>Buang senjata</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">RClick</span>
+                        <span>Buang dari slot</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">R</span>
+                        <span>Reload senjata / Tank</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">E</span>
+                        <span>Keluar dari Tank</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">F</span>
+                        <span>Ganti mode Tank (Cannon/MG)</span>
+                    </div>
+                    <div class="tutorial-row">
+                        <span class="t-key">ESC</span>
+                        <span>Pause game</span>
+                    </div>
+                </div>
+                <div class="tutorial-section">
+                    <h3>Sistem Inventory</h3>
+                    <ul class="tips-list">
+                        <li>Punya <strong>3 slot inventory</strong> seperti FreeFire/PUBG</li>
+                        <li>Ambil senjata = otomatis masuk ke slot kosong</li>
+                        <li>Ambil senjata yang sudah ada = +ammo</li>
+                        <li>Pisau selalu tersedia (slot knuckle)</li>
+                        <li><strong>Shift + 1/2/3</strong> = Tukar senjata dengan slot</li>
+                        <li><strong>X atau G</strong> = Buang senjata saat ini</li>
+                        <li><strong>Right Click</strong> = Buang senjata dari slot</li>
+                    </ul>
+                </div>
+                <div class="tutorial-section">
+                    <h3>Senjata</h3>
+                    <div class="weapon-list">
+                        <div class="weapon-item"><span>1.</span> Pisau - Serangan jarak dekat</div>
+                        <div class="weapon-item"><span>2.</span> Glock 19 - Pistol</div>
+                        <div class="weapon-item"><span>3.</span> AK-47 - Assault Rifle</div>
+                        <div class="weapon-item"><span>4.</span> M-16 - Assault Rifle</div>
+                        <div class="weapon-item"><span>5.</span> AR-15 - Assault Rifle</div>
+                        <div class="weapon-item"><span>6.</span> M1 Machine Gun - Mesin</div>
+                        <div class="weapon-item"><span>7.</span> Minigun - Mesin berat</div>
+                    </div>
+                </div>
+                <div class="tutorial-section">
+                    <h3>Gedung & Tank</h3>
+                    <ul class="tips-list">
+                        <li><strong>Tank HANYA ada di dalam gedung!</strong></li>
+                        <li>Gedung ada di seluruh map (kotak abu-abu)</li>
+                        <li>Masuk gedung = 5% dapat tank!</li>
+                        <li>Gedung dengan tank ada tulisan "TANK" di atasnya</li>
+                    </ul>
+                </div>
+                <div class="tutorial-section">
+                    <h3>Mode Tank (M1 Abrams)</h3>
+                    <ul class="tips-list">
+                        <li><strong>Cannon Mode:</strong> Damage 50, range 400, fire rate 500ms</li>
+                        <li><strong>Machine Gun Mode:</strong> Damage 15, range 250, fire rate 50ms</li>
+                        <li>Tekan <strong>F</strong> untuk switch mode</li>
+                        <li>Setiap mode punya ammo terpisah</li>
+                    </ul>
+                </div>
+                <div class="tutorial-section">
+                    <h3>Tips</h3>
+                    <ul class="tips-list">
+                        <li>Kumpulkan senjata dari drop (lingkaran warna)</li>
+                        <li>Cari Tank (lingkaran hijau besar atau di gedung)</li>
+                        <li>Setiap 8 kill = Wave naik + HP recovery</li>
+                        <li>Reload saat ammo habis otomatis, atau tekan R manual</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
