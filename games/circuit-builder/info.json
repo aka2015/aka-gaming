@@ -1,0 +1,18 @@
+{
+  "id": "circuit-builder",
+  "name": "Circuit Builder",
+  "description": "Belajar rangkaian listrik! Susun komponen seperti baterai, saklar, lampu, dan gerbang logika untuk menyalakan lampu. Pelajari konsep listrik dan logika AND/OR/NOT!",
+  "howToPlay": [
+    "Tap slot kosong di papan rangkaian, lalu pilih komponen dari toolbox",
+    "Komponen terhubung secara otomatis dengan tetangganya",
+    "Tap saklar untuk menghidupkan/mematikan",
+    "Tekan TEST untuk menyalakan rangkaian dan lihat apakah lampu menyala",
+    "Gunakan gerbang AND/OR/NOT untuk rangkaian yang lebih kompleks"
+  ],
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-13",
+  "author": "Abi AKA"
+}

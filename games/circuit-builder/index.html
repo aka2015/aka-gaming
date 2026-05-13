@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Circuit Builder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <section id="start-screen" class="screen active">
+      <div class="start-content">
+        <div class="start-icon">🔌</div>
+        <h1>Circuit Builder</h1>
+        <p class="subtitle">Belajar rangkaian listrik dengan menyenangkan!</p>
+        <div class="how-to-play">
+          <div class="step">
+            <span class="step-icon">🔋</span>
+            <span>Pilih komponen untuk slot kosong</span>
+          </div>
+          <div class="step">
+            <span class="step-icon">🔗</span>
+            <span>Komponen terhubung otomatis</span>
+          </div>
+          <div class="step">
+            <span class="step-icon">💡</span>
+            <span>Tekan TEST untuk menyalakan lampu</span>
+          </div>
+        </div>
+        <button id="start-btn" class="btn-primary">Mulai 🔌</button>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen">
+      <header class="hud">
+        <div class="hud-item">
+          <span class="hud-label">Level</span>
+          <span class="hud-value" id="level-num">1/10</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Skor</span>
+          <span class="hud-value" id="score">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">⭐</span>
+          <span class="hud-value" id="stars">0</span>
+        </div>
+      </header>
+
+      <div class="level-goal" id="level-goal">Hubungkan baterai ke lampu!</div>
+
+      <div class="board-container">
+        <div id="circuit-board" class="circuit-board"></div>
+        <div id="power-indicator" class="power-indicator">
+          <span class="power-dot" id="power-dot"></span>
+          <span id="power-text">Tekan TEST untuk menjalankan</span>
+        </div>
+      </div>
+
+      <div class="toolbox-section">
+        <div class="toolbox-title">Komponen:</div>
+        <div id="toolbox" class="toolbox"></div>
+      </div>
+
+      <div class="action-bar">
+        <button id="btn-test" class="btn-primary btn-test">▶ TEST</button>
+        <button id="btn-reset" class="btn-secondary">↺ Reset</button>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen">
+      <div class="result-content">
+        <div class="result-icon" id="result-icon">🎉</div>
+        <h2 id="result-title">Selamat!</h2>
+        <p class="result-sub" id="result-sub">Kamu hebat!</p>
+        <div class="result-stats">
+          <div class="stat">
+            <span class="stat-label">Skor</span>
+            <span class="stat-value" id="final-score">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Bintang</span>
+            <span class="stat-value" id="final-stars">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Level</span>
+            <span class="stat-value" id="final-level">0/10</span>
+          </div>
+        </div>
+        <button id="replay-btn" class="btn-primary">Main Lagi 🔄</button>
+      </div>
+    </section>
+  </div>
+
+  <template id="picker-template">
+    <div class="picker-overlay">
+      <div class="picker-card">
+        <div class="picker-title">Pilih Komponen</div>
+        <div id="picker-options" class="picker-options"></div>
+        <button id="picker-cancel" class="btn-secondary">Batal</button>
+      </div>
+    </div>
+  </template>
+
+  <script src="../shared/score-reporter.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
