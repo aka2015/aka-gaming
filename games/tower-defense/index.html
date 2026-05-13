@@ -84,26 +84,45 @@
         </div>
       </div>
       <div class="hud-bottom">
-        <div class="tower-panel">
-          <div class="tower-btn selected" data-tower="arrow" onclick="Game.selectTower('arrow')">
-            <span class="tower-icon">🏹</span>
-            <span class="tower-name">Arrow</span>
-            <span class="tower-cost">💰25</span>
+        <div class="hud-bottom-left">
+          <div class="tower-panel">
+            <div class="tower-btn selected" data-tower="arrow" onclick="Game.selectTower('arrow')">
+              <span class="tower-icon">🏹</span>
+              <span class="tower-name">Arrow</span>
+              <span class="tower-cost">💰25</span>
+            </div>
+            <div class="tower-btn" data-tower="cannon" onclick="Game.selectTower('cannon')">
+              <span class="tower-icon">💣</span>
+              <span class="tower-name">Cannon</span>
+              <span class="tower-cost">💰50</span>
+            </div>
+            <div class="tower-btn" data-tower="ice" onclick="Game.selectTower('ice')">
+              <span class="tower-icon">❄️</span>
+              <span class="tower-name">Ice</span>
+              <span class="tower-cost">💰40</span>
+            </div>
+            <div class="tower-btn" data-tower="magic" onclick="Game.selectTower('magic')">
+              <span class="tower-icon">✨</span>
+              <span class="tower-name">Magic</span>
+              <span class="tower-cost">💰75</span>
+            </div>
           </div>
-          <div class="tower-btn" data-tower="cannon" onclick="Game.selectTower('cannon')">
-            <span class="tower-icon">💣</span>
-            <span class="tower-name">Cannon</span>
-            <span class="tower-cost">💰50</span>
-          </div>
-          <div class="tower-btn" data-tower="ice" onclick="Game.selectTower('ice')">
-            <span class="tower-icon">❄️</span>
-            <span class="tower-name">Ice</span>
-            <span class="tower-cost">💰40</span>
-          </div>
-          <div class="tower-btn" data-tower="magic" onclick="Game.selectTower('magic')">
-            <span class="tower-icon">✨</span>
-            <span class="tower-name">Magic</span>
-            <span class="tower-cost">💰75</span>
+          <div class="item-panel">
+            <div class="item-btn" data-item="heal" onclick="Game.selectItem('heal')">
+              <span class="item-icon">💚</span>
+              <span class="item-name">Heal</span>
+              <span class="item-cost">💰30</span>
+            </div>
+            <div class="item-btn" data-item="defenseUp" onclick="Game.selectItem('defenseUp')">
+              <span class="item-icon">🛡️</span>
+              <span class="item-name">Defense</span>
+              <span class="item-cost">💰50</span>
+            </div>
+            <div class="item-btn" data-item="attackUp" onclick="Game.selectItem('attackUp')">
+              <span class="item-icon">⚡</span>
+              <span class="item-name">Attack</span>
+              <span class="item-cost">💰40</span>
+            </div>
           </div>
         </div>
         <div class="action-panel">

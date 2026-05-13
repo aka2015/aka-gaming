@@ -114,13 +114,48 @@ const TOWER_TYPES = {
 };
 
 const ENEMY_TYPES = {
-  basic: { health: 50, speed: 1.5, reward: 5, color: '#EF4444', size: 12 },
-  fast: { health: 30, speed: 3, reward: 8, color: '#FACC15', size: 10 },
-  tank: { health: 150, speed: 0.8, reward: 15, color: '#6B7280', size: 18 },
-  miniBoss: { health: 300, speed: 0.6, reward: 30, color: '#9333EA', size: 22, isBoss: true, canFreezeTower: true, freezeRange: 100, freezeDuration: 3000, freezeCooldown: 5000, canDestroyTower: true, attackPower: 25, attackRange: 50 },
-  boss: { health: 500, speed: 0.5, reward: 50, color: '#DC2626', size: 28, isBoss: true },
-  eliteBoss: { health: 1000, speed: 0.4, reward: 100, color: '#FFD700', size: 35, isBoss: true },
-  destroyerBoss: { health: 800, speed: 0.3, reward: 150, color: '#FF0066', size: 40, isBoss: true, canDestroyTower: true, attackPower: 50, attackRange: 60 }
+  basic: { health: 50, speed: 1.5, reward: 3, color: '#EF4444', size: 12 },
+  fast: { health: 30, speed: 3, reward: 4, color: '#FACC15', size: 10 },
+  tank: { health: 150, speed: 0.8, reward: 8, color: '#6B7280', size: 18 },
+  miniBoss: { health: 300, speed: 0.6, reward: 15, color: '#9333EA', size: 22, isBoss: true, canFreezeTower: true, freezeRange: 100, freezeDuration: 3000, freezeCooldown: 5000, canDestroyTower: true, attackPower: 25, attackRange: 50 },
+  boss: { health: 500, speed: 0.5, reward: 25, color: '#DC2626', size: 28, isBoss: true, canDestroyTower: true, attackPower: 30, attackRange: 50 },
+  eliteBoss: { health: 1000, speed: 0.4, reward: 50, color: '#FFD700', size: 35, isBoss: true, canDestroyTower: true, attackPower: 40, attackRange: 55 },
+  destroyerBoss: { health: 800, speed: 0.6, reward: 75, color: '#FF0066', size: 40, isBoss: true, canDestroyTower: true, attackPower: 50, attackRange: 60 }
+};
+
+const ITEMS = {
+  heal: {
+    name: 'Heal',
+    cost: 30,
+    description: 'Heals all towers in area',
+    radius: 120,
+    color: '#10B981',
+    icon: '💚',
+    effect: 'heal',
+    healAmount: 50
+  },
+  defenseUp: {
+    name: 'Defense',
+    cost: 50,
+    description: 'Boosts tower defense in area',
+    radius: 120,
+    color: '#6366F1',
+    icon: '🛡️',
+    effect: 'defense',
+    duration: 12000,
+    defenseBoost: 0.5
+  },
+  attackUp: {
+    name: 'Attack',
+    cost: 40,
+    description: 'Boosts tower attack in area',
+    radius: 120,
+    color: '#EF4444',
+    icon: '⚡',
+    effect: 'attack',
+    duration: 12000,
+    attackBoost: 0.5
+  }
 };
 
 const WAVES = [
@@ -194,7 +229,7 @@ class Projectile {
     this.target = target;
     this.tower = tower;
     this.speed = tower.config.projectileSpeed;
-    this.damage = tower.damage;
+    this.damage = tower.getEffectiveDamage();
     this.color = tower.config.projectileColor;
     this.aoe = tower.config.aoe || 0;
     this.slow = tower.config.slow;
@@ -427,7 +462,8 @@ class Enemy {
   performTowerAttack(game) {
     if (!this.attackTarget) return;
 
-    this.attackTarget.health -= this.config.attackPower;
+    const dmg = Math.floor(this.config.attackPower * this.attackTarget.defenseMultiplier);
+    this.attackTarget.health -= dmg;
     game.createAttackEffect(this.attackTarget.x, this.attackTarget.y);
     game.showTowerDamaged(this.attackTarget);
 
@@ -521,7 +557,7 @@ class Enemy {
         ctx.font = `bold ${this.config.size * 0.4}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('⚔️', 0, 0);
+        ctx.fillText('🔥', 0, 0);
 
         if (this.isAttacking) {
           ctx.strokeStyle = '#FF0066';
@@ -602,6 +638,40 @@ class Tower {
     this.health = 100;
     this.id = Date.now() + Math.random();
     this.sprite = TOWER_SPRITES[type];
+    this.attackMultiplier = 1;
+    this.defenseMultiplier = 1;
+    this.buffTimers = {};
+  }
+
+  applyBuff(type, config) {
+    if (type === 'heal') {
+      this.health = Math.min(this.maxHealth, this.health + config.healAmount);
+      return;
+    }
+    if (type === 'attack') {
+      this.attackMultiplier = 1 + (config.attackBoost || 0);
+      this.buffTimers.attack = Date.now() + config.duration;
+    }
+    if (type === 'defense') {
+      this.defenseMultiplier = 1 - (config.defenseBoost || 0);
+      this.buffTimers.defense = Date.now() + config.duration;
+    }
+  }
+
+  updateBuffs() {
+    const now = Date.now();
+    if (this.buffTimers.attack && now > this.buffTimers.attack) {
+      this.attackMultiplier = 1;
+      delete this.buffTimers.attack;
+    }
+    if (this.buffTimers.defense && now > this.buffTimers.defense) {
+      this.defenseMultiplier = 1;
+      delete this.buffTimers.defense;
+    }
+  }
+
+  getEffectiveDamage() {
+    return Math.floor(this.damage * this.attackMultiplier);
   }
 
   findTarget(enemies) {
@@ -743,6 +813,34 @@ class Tower {
       ctx.restore();
     }
 
+    // Buff indicators
+    if (this.buffTimers.attack) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.strokeStyle = '#EF4444';
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.4 + Math.sin(Date.now() / 200) * 0.3;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.arc(0, 0, size + 6, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+    if (this.buffTimers.defense) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.strokeStyle = '#6366F1';
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.4 + Math.sin(Date.now() / 200) * 0.3;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.arc(0, 0, size + 10, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
     if (this.health < this.maxHealth) {
       const barWidth = 30;
       const barHeight = 4;
@@ -780,8 +878,12 @@ const Audio = {
   enabled: true,
 
   init() {
-    if (this.enabled && !this.ctx) {
+    if (!this.enabled) return;
+    if (!this.ctx) {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
     }
   },
 
@@ -852,6 +954,7 @@ class TowerDefenseGame {
     this.gameSpeed = 1;
 
     this.selectedTower = 'arrow';
+    this.selectedItem = null;
     this.selectedTowerOnMap = null;
     this.hoveredCell = null;
 
@@ -884,8 +987,13 @@ class TowerDefenseGame {
     this.uiCanvas.style.height = window.innerHeight + 'px';
     this.uiCtx.scale(dpr, dpr);
 
+    const maxGridWidth = window.innerWidth - 20;
+    const maxGridHeight = window.innerHeight - 160;
+    const newGridSize = Math.floor(Math.min(maxGridWidth / 15, maxGridHeight / 10, 45));
+    CONFIG.GRID_SIZE = Math.max(newGridSize, 20);
+
     this.gridOffsetX = (window.innerWidth - CONFIG.GRID_SIZE * 15) / 2;
-    this.gridOffsetY = 80;
+    this.gridOffsetY = Math.max(50, (window.innerHeight - CONFIG.GRID_SIZE * 10) / 2 - 20);
     this.generatePath();
   }
 
@@ -949,6 +1057,25 @@ class TowerDefenseGame {
         }
       }
     });
+
+    this.uiCanvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 1) return;
+      e.preventDefault();
+      const rect = this.uiCanvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      this.handleClick(x, y);
+    }, { passive: false });
+
+    this.uiCanvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const rect = this.uiCanvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      this.handleMouseMove(x, y);
+    }, { passive: false });
   }
 
   handleMouseMove(x, y) {
@@ -979,6 +1106,11 @@ class TowerDefenseGame {
 
     const cellCenterX = this.gridOffsetX + gridX * gx + gx / 2;
     const cellCenterY = this.gridOffsetY + gridY * gx + gx / 2;
+
+    if (this.selectedItem) {
+      this.dropItem(cellCenterX, cellCenterY);
+      return;
+    }
 
     const clickedTower = this.towers.find(t => 
       Math.abs(t.x - cellCenterX) < gx / 2 && Math.abs(t.y - cellCenterY) < gx / 2
@@ -1029,6 +1161,31 @@ class TowerDefenseGame {
     this.towers.push(new Tower(x, y, this.selectedTower));
     this.gold -= cost;
     Audio.play('place');
+    this.updateHUD();
+  }
+
+  dropItem(x, y) {
+    const item = ITEMS[this.selectedItem];
+    if (!item) return;
+    if (this.gold < item.cost) return;
+
+    this.gold -= item.cost;
+    this.createItemDropEffect(x, y, item);
+
+    this.towers.forEach(tower => {
+      const dx = tower.x - x;
+      const dy = tower.y - y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < item.radius) {
+        tower.applyBuff(item.effect, item);
+      }
+    });
+
+    this.selectedItem = null;
+    document.querySelectorAll('.item-btn').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+    Audio.play('upgrade');
     this.updateHUD();
   }
 
@@ -1085,8 +1242,25 @@ class TowerDefenseGame {
 
   selectTower(type) {
     this.selectedTower = type;
+    this.selectedItem = null;
     document.querySelectorAll('.tower-btn').forEach(btn => {
       btn.classList.toggle('selected', btn.dataset.tower === type);
+    });
+    document.querySelectorAll('.item-btn').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+  }
+
+  selectItem(type) {
+    this.selectedItem = type;
+    this.selectedTower = null;
+    this.selectedTowerOnMap = null;
+    this.closeUpgrade();
+    document.querySelectorAll('.item-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.item === type);
+    });
+    document.querySelectorAll('.tower-btn').forEach(btn => {
+      btn.classList.remove('selected');
     });
   }
 
@@ -1125,7 +1299,7 @@ class TowerDefenseGame {
       'destroyerBoss': 'DESTROYER BOSS'
     };
 
-    const waveData = WAVES[this.currentWave];
+    const waveData = WAVES[(this.wave - 1) % WAVES.length];
     const isDestroyerWave = waveData?.isDestroyerWave;
 
     const bossType = this.spawnQueue.find(type => ENEMY_TYPES[type]?.isBoss);
@@ -1137,7 +1311,7 @@ class TowerDefenseGame {
       <div class="boss-text">
         <span class="boss-label" style="${isDestroyerWave ? 'color: #FF0066; text-shadow: 0 0 20px #FF0066;' : ''}">${isDestroyerWave ? '🚨 DESTROYER WARNING 🚨' : '⚠️ WARNING ⚠️'}</span>
         <span class="boss-name">${bossName}</span>
-        <span class="boss-desc">${isDestroyerWave ? 'Can destroy towers!' : 'Incoming!'}</span>
+        <span class="boss-desc">${isDestroyerWave ? 'Can destroy towers!' : 'Can attack towers!'}</span>
       </div>
     `;
     document.body.appendChild(announcement);
@@ -1226,6 +1400,8 @@ class TowerDefenseGame {
     this.enemies = [];
     this.projectiles = [];
     this.particles = [];
+
+    Audio.init();
 
     document.getElementById('game-hud').classList.remove('hidden');
     document.getElementById('btn-wave').classList.remove('disabled');
@@ -1321,7 +1497,10 @@ class TowerDefenseGame {
 
 this.enemies = this.enemies.filter(e => !e.isDead && !e.reachedEnd);
 
-    this.towers.forEach(tower => tower.update(this.enemies, this.projectiles));
+    this.towers.forEach(tower => {
+      tower.updateBuffs();
+      tower.update(this.enemies, this.projectiles);
+    });
 
     this.projectiles = this.projectiles.filter(p => !p.update(this.enemies, this.particles));
 
@@ -1401,6 +1580,37 @@ this.enemies = this.enemies.filter(e => !e.isDead && !e.reachedEnd);
         '#FF0066',
         4,
         500
+      ));
+    }
+  }
+
+  createItemDropEffect(x, y, item) {
+    for (let i = 0; i < 24; i++) {
+      const angle = (Math.PI * 2 * i) / 24;
+      const dist = item.radius * (0.3 + Math.random() * 0.7);
+      this.particles.push(new Particle(
+        x + Math.cos(angle) * dist,
+        y + Math.sin(angle) * dist,
+        item.color,
+        { x: Math.cos(angle) * 1.5, y: Math.sin(angle) * 1.5 },
+        30, 4
+      ));
+    }
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 3;
+      this.particles.push(new Particle(
+        x, y, item.color,
+        { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed },
+        25, 5
+      ));
+    }
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 * i) / 12;
+      this.particles.push(new Particle(
+        x, y, '#FFFFFF',
+        { x: Math.cos(angle) * 2, y: Math.sin(angle) * 2 },
+        15, 3
       ));
     }
   }
@@ -1553,6 +1763,31 @@ this.enemies = this.enemies.filter(e => !e.isDead && !e.reachedEnd);
     const gx = CONFIG.GRID_SIZE;
     const x = this.gridOffsetX + this.hoveredCell.x * gx;
     const y = this.gridOffsetY + this.hoveredCell.y * gx;
+    const centerX = x + gx / 2;
+    const centerY = y + gx / 2;
+
+    if (this.selectedItem) {
+      const item = ITEMS[this.selectedItem];
+      if (!item) return;
+      const canAfford = this.gold >= item.cost;
+
+      this.ctx.fillStyle = canAfford ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+      this.ctx.strokeStyle = canAfford ? item.color : '#EF4444';
+      this.ctx.lineWidth = 2;
+      this.ctx.setLineDash([6, 4]);
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, item.radius, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+
+      this.ctx.fillStyle = canAfford ? item.color : '#EF4444';
+      this.ctx.globalAlpha = 0.5;
+      this.ctx.fillRect(centerX - 2, centerY - 14, 4, 28);
+      this.ctx.fillRect(centerX - 14, centerY - 2, 28, 4);
+      this.ctx.globalAlpha = 1;
+      return;
+    }
 
     const valid = this.isValidPlacement(this.hoveredCell.x, this.hoveredCell.y);
     const canAfford = this.gold >= TOWER_TYPES[this.selectedTower].cost;
@@ -1565,8 +1800,6 @@ this.enemies = this.enemies.filter(e => !e.isDead && !e.reachedEnd);
     this.ctx.strokeRect(x, y, gx, gx);
 
     if (valid && canAfford) {
-      const centerX = x + gx / 2;
-      const centerY = y + gx / 2;
       const range = TOWER_TYPES[this.selectedTower].range;
 
       this.ctx.fillStyle = 'rgba(99, 102, 241, 0.1)';
