@@ -240,6 +240,9 @@ class CircuitBuilder {
       }
     }
 
+    // Clone available so mutations don't affect original LEVELS
+    this.levelAvailable = [...data.available];
+
     this.$('level-num').textContent = `${this.level + 1}/${this.totalLevels}`;
     this.$('score').textContent = this.score;
     this.$('stars').textContent = this.stars;
@@ -250,7 +253,7 @@ class CircuitBuilder {
     dot.className = 'power-dot';
 
     this.renderBoard();
-    this.renderToolbox(data.available);
+    this.renderToolbox(this.levelAvailable);
   }
 
   // ----- Rendering -----
@@ -376,7 +379,7 @@ class CircuitBuilder {
       this.useComponent(this.selectedTool);
       this.clearTestState();
       this.renderBoard();
-      this.renderToolbox(LEVELS[this.level].available);
+      this.renderToolbox(this.levelAvailable);
     } else {
       // If slot has a component but no tool selected, remove it
       if (cell.type) {
@@ -384,23 +387,21 @@ class CircuitBuilder {
         cell.type = null;
         this.clearTestState();
         this.renderBoard();
-        this.renderToolbox(LEVELS[this.level].available);
+        this.renderToolbox(this.levelAvailable);
       }
     }
   }
 
   useComponent(id) {
-    const data = LEVELS[this.level];
-    const idx = data.available.indexOf(id);
+    const idx = this.levelAvailable.indexOf(id);
     if (idx >= 0) {
-      data.available.splice(idx, 1);
+      this.levelAvailable.splice(idx, 1);
     }
     this.selectedTool = null;
   }
 
   returnComponent(id) {
-    const data = LEVELS[this.level];
-    data.available.push(id);
+    this.levelAvailable.push(id);
   }
 
   toggleSwitch(r, c) {
@@ -557,17 +558,17 @@ class CircuitBuilder {
     const lvl = this.level + 1;
     const data = LEVELS[this.level];
 
-    // Stars: 3 if solved with all available (efficient), fewer if extras unused
-    const totalComponents = data.available.length + data.slots.filter(s => {
+    // Stars based on remaining unused components
+    const placedCount = data.slots.filter(s => {
       const cell = this.grid[s.r]?.[s.c];
       return cell && cell.type !== null;
     }).length;
-    const unused = data.available.length;
-    const placed = totalComponents - unused;
+    const unused = this.levelAvailable.length;
     const optimalCount = data.slots.length;
+    const eff = optimalCount - unused; // 0 = all placed (efficient)
     let earnedStars;
-    if (placed <= optimalCount) earnedStars = 3;
-    else if (placed <= optimalCount + 2) earnedStars = 2;
+    if (eff >= optimalCount) earnedStars = 3;
+    else if (eff >= optimalCount - 1) earnedStars = 2;
     else earnedStars = 1;
 
     const prev = this.progress[lvl];
@@ -615,25 +616,10 @@ class CircuitBuilder {
 
   resetLevel() {
     if (this.isTesting) {
-      // Just clear test state
       this.clearTestState();
       this.renderBoard();
       return;
     }
-
-    // Full reset - reload level
-    const data = LEVELS[this.level];
-    // Reset available components
-    const originalTotal = data.optimal;
-    // Count currently placed
-    let placed = 0;
-    for (let r = 0; r < this.grid.length; r++) {
-      for (let c = 0; c < (this.grid[r] || []).length; c++) {
-        const cell = this.grid[r][c];
-        if (cell && !cell.fixed && cell.type) placed++;
-      }
-    }
-    // Reset
     this.loadLevel();
   }
 
