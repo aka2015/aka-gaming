@@ -1,7 +1,14 @@
 {
   "id": "robot-builder",
   "name": "Robot Builder",
-  "description": "Game programming visual! Susun perintah untuk menggerakkan robot dan selesaikan misi di labirin. Pelajari dasar-dasar coding dengan cara yang seru!",
+  "description": "Game programming visual! Susun blok perintah untuk menggerakkan robot melewati 35 level labirin, rintangan, dan teka-teki logika. Pelajari coding dari dasar hingga loop dan kondisi!",
+  "howToPlay": [
+    "Seret blok perintah (Maju, Belok, Loop, Jika) dari toolbox ke program",
+    "Robot akan mengikuti perintah dari atas ke bawah",
+    "Gunakan Loop untuk mengulang langkah yang sama",
+    "Gunakan Jika-Dinding untuk menghadapi rintangan",
+    "Kumpulkan bintang untuk membuka skin robot baru di toko!"
+  ],
   "category": "educational",
   "badge": "new",
   "gameFile": "index.html",
