@@ -271,6 +271,7 @@ h1 {
 
 .bubble.dragging {
   cursor: grabbing;
+}
 
 @keyframes floatBubble {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
