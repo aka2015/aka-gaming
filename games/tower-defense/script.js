@@ -117,7 +117,7 @@ const ENEMY_TYPES = {
   basic: { health: 50, speed: 1.5, reward: 5, color: '#EF4444', size: 12 },
   fast: { health: 30, speed: 3, reward: 8, color: '#FACC15', size: 10 },
   tank: { health: 150, speed: 0.8, reward: 15, color: '#6B7280', size: 18 },
-  miniBoss: { health: 300, speed: 0.6, reward: 30, color: '#9333EA', size: 22, isBoss: true, canFreezeTower: true, freezeRange: 100, freezeDuration: 3000, freezeCooldown: 5000 },
+  miniBoss: { health: 300, speed: 0.6, reward: 30, color: '#9333EA', size: 22, isBoss: true, canFreezeTower: true, freezeRange: 100, freezeDuration: 3000, freezeCooldown: 5000, canDestroyTower: true, attackPower: 25, attackRange: 50 },
   boss: { health: 500, speed: 0.5, reward: 50, color: '#DC2626', size: 28, isBoss: true },
   eliteBoss: { health: 1000, speed: 0.4, reward: 100, color: '#FFD700', size: 35, isBoss: true },
   destroyerBoss: { health: 800, speed: 0.3, reward: 150, color: '#FF0066', size: 40, isBoss: true, canDestroyTower: true, attackPower: 50, attackRange: 60 }
@@ -359,6 +359,23 @@ class Enemy {
   }
 
   updateDestroyerBehavior(towers, game) {
+    // Freeze towers if capable
+    if (this.config.canFreezeTower) {
+      if (Date.now() - (this.lastFreezeTime || 0) > this.config.freezeCooldown) {
+        for (const tower of towers) {
+          const dx = tower.x - this.x;
+          const dy = tower.y - this.y;
+          if (Math.sqrt(dx * dx + dy * dy) < this.config.freezeRange) {
+            tower.frozenUntil = Date.now() + this.config.freezeDuration;
+            this.lastFreezeTime = Date.now();
+            game.createFreezeEffect(tower.x, tower.y);
+            Audio.play('freeze');
+            break;
+          }
+        }
+      }
+    }
+
     const inRangeTower = this.findTowerInRange(towers);
 
     if (inRangeTower) {
@@ -909,7 +926,28 @@ class TowerDefenseGame {
 
     this.uiCanvas.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      this.selectedTowerOnMap = null;
+      if (!this.gameRunning) return;
+      const rect = this.uiCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const gx = CONFIG.GRID_SIZE;
+      const gridX = Math.floor((x - this.gridOffsetX) / gx);
+      const gridY = Math.floor((y - this.gridOffsetY) / gx);
+      if (gridX >= 0 && gridX < 15 && gridY >= 0 && gridY < 10) {
+        const cellCenterX = this.gridOffsetX + gridX * gx + gx / 2;
+        const cellCenterY = this.gridOffsetY + gridY * gx + gx / 2;
+        const tower = this.towers.find(t =>
+          Math.abs(t.x - cellCenterX) < gx / 2 && Math.abs(t.y - cellCenterY) < gx / 2
+        );
+        if (tower) {
+          const value = tower.getSellValue();
+          this.gold += value;
+          this.towers = this.towers.filter(t => t !== tower);
+          this.selectedTowerOnMap = null;
+          this.closeUpgrade();
+          this.updateHUD();
+        }
+      }
     });
   }
 
@@ -1118,6 +1156,12 @@ class TowerDefenseGame {
 
   spawnEnemy(type) {
     const enemy = new Enemy(type, this.path, this.enemyIdCounter++);
+    // Scale HP with wave: +15% per wave
+    const hpScale = 1 + (this.wave - 1) * 0.15;
+    enemy.health = Math.floor(enemy.config.health * hpScale);
+    enemy.maxHealth = enemy.health;
+    // Scale reward: +5% per wave (slower than HP growth)
+    enemy.reward = Math.floor(enemy.config.reward * (1 + (this.wave - 1) * 0.05));
     this.enemies.push(enemy);
   }
 
