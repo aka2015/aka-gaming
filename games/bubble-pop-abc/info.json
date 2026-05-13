@@ -1,0 +1,11 @@
+{
+  "id": "bubble-pop-abc",
+  "name": "Bubble Pop ABC",
+  "description": "Belajar membaca dengan memecahkan balon huruf! Cocok untuk anak usia 5 tahun. Susun huruf dengan memecahkan balon sesuai urutan kata.",
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-13",
+  "author": "AKA Gaming"
+}
