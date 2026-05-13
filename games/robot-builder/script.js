@@ -517,13 +517,14 @@ function renderMenu() {
     const stars = state.progress.bestStarsPerLevel[i] || 0;
     const lvl = LEVELS[i - 1];
     const maxStars = lvl ? lvl.stars.length : 0;
+    const displayMax = maxStars > 0 ? maxStars : 3;
     const locked = i > unlocked;
     if (locked) btn.classList.add("locked");
     if (score !== undefined) btn.classList.add("done");
 
     let starHtml = "";
-    if (maxStars > 0 && !locked) {
-      starHtml = `<div class="lvl-stars">${"⭐".repeat(stars)}${"☆".repeat(maxStars - stars)}</div>`;
+    if (stars > 0 && !locked) {
+      starHtml = `<div class="lvl-stars">${"⭐".repeat(stars)}${"☆".repeat(displayMax - stars)}</div>`;
     }
     btn.innerHTML = `<div class="lvl-num">${locked ? "🔒" : i}</div>${starHtml}`;
     btn.disabled = locked;
@@ -1015,8 +1016,21 @@ function calcScore(starsCollected) {
 
 function onWin() {
   playSfx("win");
-  const stars = state.collectedStars.size;
-  const score = calcScore(stars);
+  const bonusStars = state.collectedStars.size;
+  const hasBonusStars = state.level.stars.length > 0;
+  const used = countBlocks(state.program);
+  const score = calcScore(bonusStars);
+
+  // Stars: bonus stars OR efficiency stars (for maze levels)
+  let stars;
+  if (hasBonusStars) {
+    stars = bonusStars;
+  } else {
+    if (used <= state.level.optimal) stars = 3;
+    else if (used <= state.level.optimal + 3) stars = 2;
+    else stars = 1;
+  }
+
   const lvlNum = state.level.id;
   const prevBest = state.progress.bestPerLevel[lvlNum] || 0;
   const prevStars = state.progress.bestStarsPerLevel[lvlNum] || 0;
@@ -1034,10 +1048,10 @@ function onWin() {
   }
 
   // Display modal
-  const maxStars = state.level.stars.length;
+  const displayMax = hasBonusStars ? state.level.stars.length : 3;
   let starHtml = "";
-  for (let i = 0; i < maxStars; i++) starHtml += i < stars ? "⭐" : "☆";
-  document.getElementById("win-stars").innerHTML = starHtml || "—";
+  for (let i = 0; i < displayMax; i++) starHtml += i < stars ? "⭐" : "☆";
+  document.getElementById("win-stars").innerHTML = starHtml;
   document.getElementById("win-base").textContent = score.base;
   document.getElementById("win-eff").textContent  = "+" + score.eff;
   document.getElementById("win-star-bonus").textContent = "+" + score.starBonus;
