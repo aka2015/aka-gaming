@@ -501,6 +501,15 @@ class SiapaAlien {
     this.$('final-streak').textContent = this.maxStreak;
 
     this.showScreen('result-screen');
+
+    // Report score to Firebase leaderboard
+    if (window.AkaScoreReporter) {
+      window.AkaScoreReporter.report('siapa-alien', this.score, {
+        correctRounds: this.correctCount,
+        maxStreak: this.maxStreak,
+        totalRounds: this.totalRounds
+      });
+    }
   }
 }
 
