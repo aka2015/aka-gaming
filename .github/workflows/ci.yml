@@ -117,13 +117,22 @@ jobs:
 
     steps:
       - name: Git pull di server
-        uses: appleboy/ssh-action@main
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || '22' }}
-          script: |
-            cd /opt/aka-gaming
-            git pull
-            echo "✅ Deploy sukses"
+        env:
+          HOST: ${{ secrets.SSH_HOST }}
+          USER: ${{ secrets.SSH_USER }}
+          KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PORT: ${{ secrets.SSH_PORT || '22' }}
+        run: |
+          if [ -z "$HOST" ] || [ -z "$USER" ] || [ -z "$KEY" ]; then
+            echo "⚠️  Secrets SSH belum diisi. Lewati deploy."
+            echo "   Tambahkan di: Settings → Secrets → SSH_HOST, SSH_USER, SSH_PRIVATE_KEY"
+            exit 0
+          fi
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -p "$PORT" "$USER@$HOST" "
+            cd /opt/aka-gaming && git pull
+          "
+          echo "✅ Deploy sukses ke $HOST"
