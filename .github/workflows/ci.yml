@@ -123,6 +123,7 @@ jobs:
           KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           PORT: ${{ secrets.SSH_PORT || '22' }}
         run: |
+          sudo su
           if [ -z "$HOST" ] || [ -z "$USER" ] || [ -z "$KEY" ]; then
             echo "⚠️  Secrets SSH belum diisi. Lewati deploy."
             echo "   Tambahkan di: Settings → Secrets → SSH_HOST, SSH_USER, SSH_PRIVATE_KEY"
