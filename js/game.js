@@ -163,6 +163,15 @@ async function loadGame() {
     document.title = `${game.name} - AKA GAMING`;
     if (gameTitleDisplay) gameTitleDisplay.textContent = game.name;
 
+    // Update meta tags for SEO
+    const desc = game.description || "Game edukasi seru untuk anak Indonesia.";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (metaDesc) metaDesc.content = desc;
+    if (ogTitle) ogTitle.content = `${game.name} - AKA GAMING`;
+    if (ogDesc) ogDesc.content = desc;
+
     if (gameCatDisplay) {
       gameCatDisplay.textContent = catLabel(game.category);
       gameCatDisplay.className   = `game-cat-tag cat-${game.category || ""}`;
