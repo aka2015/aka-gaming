@@ -1,0 +1,127 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Validate Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate JS Syntax (All Games)
+        run: |
+          echo "=== Game Scripts ==="
+          for f in games/*/script.js; do
+            if node -c "$f" 2>/dev/null; then
+              echo "  ✅ $f"
+            else
+              echo "  ❌ $f"
+              node -c "$f"
+              exit 1
+            fi
+          done
+          echo "=== Shared Scripts ==="
+          for f in games/shared/*.js; do
+            if node -c "$f" 2>/dev/null; then
+              echo "  ✅ $f"
+            else
+              echo "  ❌ $f"
+              node -c "$f"
+              exit 1
+            fi
+          done
+          echo "=== Root Scripts ==="
+          for f in js/*.js; do
+            if node -c "$f" 2>/dev/null; then
+              echo "  ✅ $f"
+            else
+              echo "  ❌ $f"
+              node -c "$f"
+              exit 1
+            fi
+          done
+
+      - name: Validate JSON
+        run: |
+          for f in games/*/info.json games/index.json; do
+            if node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" 2>/dev/null; then
+              echo "  ✅ $f"
+            else
+              echo "  ❌ $f"
+              node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))"
+              exit 1
+            fi
+          done
+
+      - name: Validate CSS Braces
+        run: |
+          for f in games/*/style.css css/*.css; do
+            if [ -f "$f" ]; then
+              O=$(grep -o '{' "$f" | wc -l)
+              C=$(grep -o '}' "$f" | wc -l)
+              if [ "$O" -eq "$C" ]; then
+                echo "  ✅ $f ($O braces)"
+              else
+                echo "  ❌ $f ($O open, $C close)"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Validate HTML (basic structure check)
+        run: |
+          for f in index.html game.html support.html admin.html; do
+            if [ -f "$f" ]; then
+              if grep -q '<!DOCTYPE html>' "$f" && grep -q '</html>' "$f"; then
+                echo "  ✅ $f"
+              else
+                echo "  ❌ $f missing DOCTYPE or closing html"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Check for broken game references
+        run: |
+          node -e "
+            const idx = JSON.parse(require('fs').readFileSync('games/index.json','utf8'));
+            let ok = true;
+            idx.forEach(id => {
+              try {
+                const info = JSON.parse(require('fs').readFileSync('games/'+id+'/info.json','utf8'));
+                if (info.id !== id) { console.log('  ❌ ID mismatch in '+id); ok = false; }
+                else console.log('  ✅ '+id);
+              } catch(e) {
+                console.log('  ❌ games/'+id+'/info.json missing or invalid');
+                ok = false;
+              }
+            });
+            if (!ok) process.exit(1);
+          "
+
+  deploy:
+    name: Deploy to Vercel
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
