@@ -117,7 +117,7 @@ jobs:
 
     steps:
       - name: Git pull di server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@main
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
