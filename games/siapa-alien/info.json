@@ -1,0 +1,17 @@
+{
+  "id": "siapa-alien",
+  "name": "Siapa Alien?",
+  "description": "Cari alien yang menyamar di antara warga desa! Gunakan petunjuk dan tebak siapa yang bukan manusia.",
+  "howToPlay": [
+    "Tap warga satu per satu untuk investigasi dan lihat petunjuk keanehan",
+    "Tandai yang mencurigakan sebagai 👽 Alien atau ✅ Aman",
+    "Setelah semua diperiksa, tap tombol Selesai Periksa",
+    "Lihat hasil: temukan alien untuk dapat poin!"
+  ],
+  "category": "educational",
+  "badge": "new",
+  "gameFile": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "createdAt": "2026-05-13",
+  "author": "Ummi AKA"
+}

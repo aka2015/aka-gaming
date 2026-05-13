@@ -1239,6 +1239,110 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
+/* Game Detail Section */
+.game-detail {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.04), rgba(124, 58, 237, 0.06));
+  border: 1px solid rgba(0, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  margin-bottom: 20px;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.game-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.game-detail-section {
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 255, 255, 0.08);
+}
+
+.detail-label {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  color: #00FFFF;
+  margin-bottom: 8px;
+}
+
+.detail-text {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+}
+
+.detail-author {
+  font-weight: 700;
+  color: #C084FC;
+}
+
+#how-to-play-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.how-to-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.5;
+}
+
+.how-to-step .step-marker {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #00FFFF;
+}
+
+.btn-play-game {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 32px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7C3AED, #A855F7);
+  color: white;
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.45);
+  letter-spacing: 1px;
+}
+
+.btn-play-game:active {
+  transform: scale(0.97);
+}
+
+.btn-play-icon {
+  font-size: 1.5rem;
+}
+
 /* Game Frame Container - Enhanced */
 .game-frame-container {
   position: relative;

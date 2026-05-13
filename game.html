@@ -62,8 +62,30 @@
         </div>
       </div>
 
-      <!-- Game Frame -->
-      <div class="game-frame-container" id="game-frame-container">
+      <!-- Game Detail (shown first before playing) -->
+      <div id="game-detail" class="game-detail">
+        <div class="game-detail-body">
+          <div class="game-detail-section">
+            <div class="detail-label">📖 Tentang Game</div>
+            <p id="game-description" class="detail-text"></p>
+          </div>
+          <div id="how-to-play-section" class="game-detail-section hidden">
+            <div class="detail-label">🎮 Cara Bermain</div>
+            <div id="how-to-play-content" class="detail-text"></div>
+          </div>
+          <div class="game-detail-section">
+            <div class="detail-label">✍️ Author</div>
+            <p id="game-author" class="detail-text detail-author"></p>
+          </div>
+        </div>
+        <button id="btn-play-game" class="btn-play-game">
+          <span class="btn-play-icon">▶️</span>
+          <span class="btn-play-label">Mulai Main</span>
+        </button>
+      </div>
+
+      <!-- Game Frame (hidden initially) -->
+      <div class="game-frame-container hidden" id="game-frame-container">
         <div class="game-frame-glow"></div>
         <div class="game-frame-wrapper" id="game-frame-wrapper">
           <div id="game-loading" class="game-loading">

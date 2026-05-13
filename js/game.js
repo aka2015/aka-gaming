@@ -9,6 +9,17 @@ import {
   query, orderBy, limit, startAfter, serverTimestamp, where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { initPlayerTracking, subscribeToPlayerCount } from "./player-tracker.js";
+ 
+// ────────────────────────────────────────────────────────────
+//  DETAIL ELEMENTS
+// ────────────────────────────────────────────────────────────
+const gameDetail        = document.getElementById("game-detail");
+const gameDesc          = document.getElementById("game-description");
+const gameAuthor        = document.getElementById("game-author");
+const howToPlaySection  = document.getElementById("how-to-play-section");
+const howToPlayContent  = document.getElementById("how-to-play-content");
+const btnPlayGame       = document.getElementById("btn-play-game");
+const gameFrameContainer= document.getElementById("game-frame-container");
 
 // ────────────────────────────────────────────────────────────
 //  PARAMS
@@ -138,6 +149,8 @@ function updateAuthUI(user) {
 // ────────────────────────────────────────────────────────────
 //  LOAD GAME DATA
 // ────────────────────────────────────────────────────────────
+let gameUrl = null;
+
 async function loadGame() {
   try {
     const res = await fetch(`games/${gameId}/info.json`);
@@ -155,22 +168,48 @@ async function loadGame() {
       gameCatDisplay.className   = `game-cat-tag cat-${game.category || ""}`;
     }
 
-    // Load iframe — game file ada di dalam folder game itu sendiri
-    const gameUrl = `games/${gameId}/${game.gameFile || "index.html"}`;
-    loadGameIframe(gameUrl);
+    // Populate detail section
+    if (gameDesc) gameDesc.textContent = game.description || "Tidak ada deskripsi.";
+    if (gameAuthor) gameAuthor.textContent = game.author || "AKA Gaming";
+
+    // How to play
+    if (game.howToPlay && howToPlaySection && howToPlayContent) {
+      howToPlaySection.classList.remove("hidden");
+      howToPlayContent.innerHTML = "";
+      const steps = Array.isArray(game.howToPlay) ? game.howToPlay : [game.howToPlay];
+      steps.forEach((step, i) => {
+        const div = document.createElement("div");
+        div.className = "how-to-step";
+        div.innerHTML = `<span class="step-marker">${i + 1}</span><span>${step}</span>`;
+        howToPlayContent.appendChild(div);
+      });
+    }
+
+    // Store URL, don't load yet
+    gameUrl = `games/${gameId}/${game.gameFile || "index.html"}`;
+
   } catch(e) {
     console.error("Load game error:", e);
     showGameError();
   }
 }
 
-function loadGameIframe(url) {
+function loadGameIframe() {
+  if (!gameUrl) return;
+
+  if (gameDetail) gameDetail.classList.add("hidden");
+  if (gameFrameContainer) gameFrameContainer.classList.remove("hidden");
+
   gameIframe.onload = () => {
     if (gameLoading) gameLoading.classList.add("hidden");
     gameIframe.classList.remove("hidden");
   };
   gameIframe.onerror = showGameError;
-  gameIframe.src = url;
+  gameIframe.src = gameUrl;
+}
+
+if (btnPlayGame) {
+  btnPlayGame.addEventListener("click", loadGameIframe);
 }
 
 function showGameError() {
