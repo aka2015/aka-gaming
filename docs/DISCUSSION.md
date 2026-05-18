@@ -60,6 +60,17 @@ Alasan memilih Next.js dibanding Laravel:
 - Rating/like dari user lain
 - Fork game (opsional, nanti)
 
+## Keputusan: LLM untuk AI Game Builder
+
+### Awalnya: OpenRouter (cloud, free model)
+### Final: LLM Lokal (9Router/LM Studio-like)
+
+- Endpoint: `http://localhost:20128/v1`
+- Model yang dipakai: `kr/deepseek-3.2`
+- Format: OpenAI-compatible API
+- Keuntungan: gratis, tidak ada rate limit, privacy data terjaga
+- Model lain tersedia: Claude, GPT, Gemini, Qwen (bisa switch kapan saja)
+
 ## Langkah Selanjutnya
 
 Mulai eksekusi dari Phase 1 (Setup Project). Lihat `docs/TASKS.md` untuk detail.

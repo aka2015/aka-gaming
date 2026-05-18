@@ -4,18 +4,19 @@
 
 ## Phase 1: Setup Project & Fondasi
 
-- [ ] Init project Next.js 14+ dengan TypeScript
-- [ ] Setup Tailwind CSS
-- [ ] Setup ESLint + Prettier
-- [ ] Konfigurasi environment variables (.env.local)
-- [ ] Setup Firebase project (Auth + Firestore)
-- [ ] Integrasi NextAuth.js + Google Provider
-- [ ] Buat layout dasar (Navbar, Footer)
-- [ ] Setup PM2 + Nginx config (untuk deploy nanti)
+- [x] Init project Next.js 16+ dengan TypeScript
+- [x] Setup Tailwind CSS 4
+- [x] Setup ESLint
+- [x] Konfigurasi environment variables (.env.local)
+- [x] Setup Firebase project (Auth + Firestore)
+- [x] Integrasi NextAuth.js v5 + Google Provider
+- [x] Buat layout dasar (Navbar, Footer) — design colorful seperti portal lama
+- [x] Integrasi LLM lokal (port 20128, model deepseek-3.2)
+- [x] Deploy ke branch dev
 
 ## Phase 2: Portal Game (Core)
 
-- [ ] Halaman homepage — daftar game (grid cards)
+- [ ] Halaman homepage — daftar game dari Firestore (grid cards)
 - [ ] Komponen GameCard (thumbnail, judul, author, plays)
 - [ ] Halaman game/[id] — iframe player + info game
 - [ ] Sistem komentar (Firestore subcollection)
@@ -24,11 +25,10 @@
 
 ## Phase 3: AI Game Builder
 
-- [ ] Setup OpenRouter API (pilih free model)
-- [ ] API route: POST /api/generate (proxy ke OpenRouter)
-- [ ] Halaman /create — form input prompt
+- [x] Setup LLM API (lokal port 20128, deepseek-3.2)
+- [x] API route: POST /api/generate (proxy ke LLM lokal)
+- [ ] Halaman /create — form input prompt + preview iframe
 - [ ] Prompt template/contoh untuk user
-- [ ] Preview game di iframe (sandbox)
 - [ ] Simpan game HTML ke VPS filesystem
 - [ ] Regenerate / edit prompt iteratif
 - [ ] Enforce limit 3 game per user

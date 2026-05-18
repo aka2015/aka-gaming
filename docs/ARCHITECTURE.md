@@ -25,7 +25,7 @@ Portal game untuk anak-anak yang memungkinkan user membuat game sendiri via prom
 | Auth | Firebase Auth (Google Provider) | Cloud (free) |
 | Database | Firestore | Cloud (free) |
 | Game Storage | Filesystem + Nginx | VPS |
-| AI | OpenRouter (free model) | Cloud (free) |
+| AI | LLM Lokal (port 20128, deepseek-3.2) | VPS/Lokal (gratis) |
 | Styling | Tailwind CSS | - |
 | Language | TypeScript | - |
 
