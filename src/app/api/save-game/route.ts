@@ -2,26 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
-
-// Firebase Admin init
-if (!getApps().length && process.env.FIREBASE_PRIVATE_KEY) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || "",
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
-    }),
-  });
-}
-
-function getAdminDb() {
-  if (!getApps().length) {
-    throw new Error("Firebase Admin belum dikonfigurasi. Isi FIREBASE_PRIVATE_KEY di .env.local");
-  }
-  return getFirestore();
-}
+import { getAdminDb } from "@/lib/firebase-admin";
 
 const GAMES_DIR = process.env.GAMES_DIR || "/var/www/games";
 const MAX_GAMES_PER_USER = 3;
