@@ -21,6 +21,11 @@ export default function Navbar() {
           <Link href="/create" className="font-bold text-gray-500 hover:text-purple-600 hover:bg-purple-50 px-4 py-1.5 rounded-full text-sm transition">
             🤖 Buat Game
           </Link>
+          {session && (
+            <Link href="/my-games" className="font-bold text-gray-500 hover:text-purple-600 hover:bg-purple-50 px-4 py-1.5 rounded-full text-sm transition">
+              🎮 Game Saya
+            </Link>
+          )}
         </nav>
 
         <div className="ml-auto">
