@@ -16,12 +16,12 @@
 
 ## Phase 2: Portal Game (Core)
 
-- [ ] Halaman homepage — daftar game dari Firestore (grid cards)
-- [ ] Komponen GameCard (thumbnail, judul, author, plays)
-- [ ] Halaman game/[id] — iframe player + info game
-- [ ] Sistem komentar (Firestore subcollection)
-- [ ] Pencarian & filter berdasarkan kategori
-- [ ] Like/play counter
+- [x] Halaman homepage — daftar game dari Firestore (grid cards)
+- [x] Komponen GameCard (thumbnail emoji, judul, author, plays)
+- [x] Halaman game/[id] — iframe player + info game
+- [x] Sistem komentar (Firestore subcollection)
+- [x] Pencarian & filter berdasarkan kategori
+- [x] API route serve game HTML dari filesystem
 
 ## Phase 3: AI Game Builder
 
