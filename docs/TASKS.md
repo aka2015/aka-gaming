@@ -27,11 +27,11 @@
 
 - [x] Setup LLM API (lokal port 20128, deepseek-3.2)
 - [x] API route: POST /api/generate (proxy ke LLM lokal)
-- [ ] Halaman /create — form input prompt + preview iframe
-- [ ] Prompt template/contoh untuk user
-- [ ] Simpan game HTML ke VPS filesystem
-- [ ] Regenerate / edit prompt iteratif
-- [ ] Enforce limit 3 game per user
+- [x] Halaman /create — form input prompt + preview iframe
+- [x] Prompt template/contoh untuk user (6 template)
+- [x] Simpan game HTML ke VPS filesystem + metadata Firestore
+- [x] Regenerate / edit prompt iteratif
+- [x] Enforce limit 3 game per user (server-side)
 
 ## Phase 4: User Dashboard
 
