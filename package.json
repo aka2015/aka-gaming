@@ -1,20 +1,28 @@
 {
   "name": "aka-gaming",
-  "version": "1.0.0",
-  "description": "Portal gaming untuk anak-anak",
-  "type": "module",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "build:config": "node build-config.js",
-    "setup:env": "cp .env.example .env && echo '✅ .env file created. Please update with your Firebase config.'"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "keywords": [
-    "gaming",
-    "portal",
-    "firebase"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "firebase-admin": "^13.8.0"
+    "firebase": "^10.12.2",
+    "next": "16.2.6",
+    "next-auth": "^5.0.0-beta.31",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

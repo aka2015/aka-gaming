@@ -1,47 +1,51 @@
-# ──────────────────────────────────────────────
-# Environment & Secret Config
-# ──────────────────────────────────────────────
-.env
-.env.local
-.env.*.local
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Firebase configs that may contain secrets
-firebase-config.js
-service-account.json
-service-account-*.json
-*.key
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
 *.pem
-firebase-adminsdk.json
 
-# ──────────────────────────────────────────────
-# Dependencies & Build
-# ──────────────────────────────────────────────
-node_modules/
-dist/
-build/
-
-# ──────────────────────────────────────────────
-# OS & Editor
-# ──────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# ──────────────────────────────────────────────
-# AI / Assistant Tools
-# ──────────────────────────────────────────────
-.claude/
-.qwen/
-.codex
-
-# ──────────────────────────────────────────────
-# Misc / Generated
-# ──────────────────────────────────────────────
-*.log
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# firebase
+firebase-config.js
+service-account.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
