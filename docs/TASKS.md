@@ -35,11 +35,11 @@
 
 ## Phase 4: User Dashboard
 
-- [ ] Halaman /my-games — list game milik user
-- [ ] Status game: draft / published
-- [ ] Publish game (ubah status, muncul di portal)
-- [ ] Hapus game (free slot untuk buat baru)
-- [ ] Edit metadata game (judul, deskripsi, kategori)
+- [x] Halaman /my-games — list game milik user (draft/published)
+- [x] Status game: draft / published
+- [x] Publish game (ubah status, muncul di portal)
+- [x] Hapus game (free slot untuk buat baru)
+- [x] Shared Firebase Admin module
 
 ## Phase 5: Admin Panel
 
