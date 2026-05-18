@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
+  const { data: session } = useSession();
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-purple-100 shadow-sm">
       <div className="max-w-[1200px] mx-auto px-5 h-16 flex items-center gap-6">
@@ -21,11 +24,22 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto">
-          <button className="flex items-center gap-2 px-5 py-2 bg-white border-2 border-gray-200 rounded-full font-bold text-sm cursor-pointer hover:border-purple-600 hover:text-purple-600 hover:shadow-md transition">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" height="18" />
-            Masuk
-          </button>
+          {session ? (
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={session.user?.image || ""} alt="avatar" width="32" height="32" className="rounded-full border-2 border-purple-500" />
+              <span className="font-bold text-sm text-gray-700 max-w-[100px] truncate">{session.user?.name}</span>
+              <button onClick={() => signOut()} className="px-3 py-1 border-2 border-red-400 text-red-500 rounded-full text-xs font-bold hover:bg-red-500 hover:text-white transition">
+                Keluar
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => signIn("google")} className="flex items-center gap-2 px-5 py-2 bg-white border-2 border-gray-200 rounded-full font-bold text-sm cursor-pointer hover:border-purple-600 hover:text-purple-600 hover:shadow-md transition">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" height="18" />
+              Masuk
+            </button>
+          )}
         </div>
       </div>
     </header>
