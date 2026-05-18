@@ -1,5 +1,103 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --primary: #7C3AED;
+  --primary-lt: #EDE9FE;
+  --secondary: #F59E0B;
+  --accent: #10B981;
+  --pink: #EC4899;
+}
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Nunito', sans-serif;
+  background: #F5F3FF;
+  color: #1F2937;
+}
+
+.font-head {
+  font-family: 'Fredoka One', cursive;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #FCD34D, #FFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F59E0B 100%);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+@keyframes bounce-art {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-wobble { animation: wobble 2s infinite; }
+.animate-bounce-art { animation: bounce-art 2s ease-in-out infinite; }
+
+.btn-primary-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--primary), #9333EA);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+
+.btn-primary-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.45);
+}
+
+.cat-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 2px solid #E5E7EB;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6B7280;
+}
+
+.cat-btn:hover, .cat-btn.active {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-lt);
+}
+
+.game-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
+  transition: all 0.3s;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.2);
 }

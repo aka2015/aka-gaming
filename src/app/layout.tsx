@@ -4,8 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "AKA Gaming — Portal Game untuk Anak-anak",
-  description: "Buat dan mainkan game seru langsung di browser",
+  title: "AKA GAMING - Portal Game Seru untuk Anak",
+  description: "AKA GAMING adalah portal game edukasi anak Indonesia. Mainkan game seru sambil belajar!",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="min-h-screen flex flex-col bg-gray-950 text-white">
+      <body className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
