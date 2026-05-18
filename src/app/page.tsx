@@ -33,7 +33,8 @@ export default function Home() {
             Mainkan game seru, atau buat game sendiri dengan AI! 🤖
           </p>
           <button className="btn-primary-custom">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width={22} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="22" height="22" />
             Masuk &amp; Main Sekarang!
           </button>
           <div className="text-3xl mt-10 opacity-80 tracking-[8px] animate-bounce-art">
