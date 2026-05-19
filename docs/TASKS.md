@@ -43,11 +43,11 @@
 
 ## Phase 5: Admin Panel
 
-- [ ] Halaman /admin (protected, role-based)
-- [ ] List semua game (filter by status)
-- [ ] Moderasi: approve / reject / takedown game
-- [ ] Kelola komentar (hapus komentar inappropriate)
-- [ ] User management (ban user jika perlu)
+- [x] Halaman /admin (protected, role-based via ADMIN_EMAILS)
+- [x] List semua game (filter by status: all/published/draft)
+- [x] Moderasi: approve / takedown / hapus game
+- [x] Hapus komentar (API ready)
+- [x] Role-based access via email whitelist
 
 ## Phase 6: Deploy & Optimasi
 
