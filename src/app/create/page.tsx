@@ -76,9 +76,8 @@ export default function CreateGame() {
     setWatchingAd(true);
     setError("");
     try {
-      // Placeholder: simulasi nonton ads (3 detik)
-      // Nanti diganti dengan Google AdSense Rewarded Ads API
-      await new Promise((r) => setTimeout(r, 3000));
+      // Tunggu 15 detik (user lihat banner ad)
+      await new Promise((r) => setTimeout(r, 15000));
 
       const res = await fetch("/api/credits", {
         method: "POST",
@@ -179,13 +178,28 @@ export default function CreateGame() {
             </div>
             <p className="text-xs text-gray-400">Generate: {COST_GENERATE} credit</p>
             {credits.canWatchAds ? (
-              <button
-                onClick={handleWatchAd}
-                disabled={watchingAd}
-                className="mt-2 w-full text-xs font-bold py-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-400 text-white hover:from-yellow-500 hover:to-orange-500 transition disabled:opacity-50"
-              >
-                {watchingAd ? "⏳ Nonton Ads..." : "📺 Tonton Ads (+20)"}
-              </button>
+              <>
+                <button
+                  onClick={handleWatchAd}
+                  disabled={watchingAd}
+                  className="mt-2 w-full text-xs font-bold py-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-400 text-white hover:from-yellow-500 hover:to-orange-500 transition disabled:opacity-50"
+                >
+                  {watchingAd ? "⏳ Nonton Ads..." : "📺 Tonton Ads (+20)"}
+                </button>
+                {watchingAd && (
+                  <div className="mt-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                    <ins
+                      className="adsbygoogle"
+                      style={{ display: "block", textAlign: "center" }}
+                      data-ad-layout="in-article"
+                      data-ad-format="fluid"
+                      data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+                      data-ad-slot={process.env.NEXT_PUBLIC_ADSENSE_BANNER_SLOT || ""}
+                    />
+                    <p className="text-center text-xs text-gray-400 mt-1">Tunggu 15 detik untuk dapat credit...</p>
+                  </div>
+                )}
+              </>
             ) : (
               <p className="text-xs text-gray-400 mt-1 text-center">Batas ads hari ini tercapai</p>
             )}

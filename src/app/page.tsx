@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Game } from "@/lib/types";
 import GameCard from "@/components/GameCard";
@@ -26,14 +26,13 @@ export default function Home() {
       try {
         const q = query(
           collection(db, "games"),
-          where("status", "==", "published"),
-          orderBy("publishedAt", "desc")
+          where("status", "==", "published")
         );
         const snap = await getDocs(q);
         const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Game));
+        data.sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0));
         setGames(data);
       } catch {
-        // Firestore belum dikonfigurasi — tampilkan kosong
         setGames([]);
       } finally {
         setLoading(false);

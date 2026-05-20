@@ -74,9 +74,9 @@ export default function GamePage() {
       {/* Game iframe */}
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
         <iframe
-          src={`/api/game-file/${game.id}`}
-          sandbox="allow-scripts"
-          className="w-full h-[500px] border-0"
+          src={`/games/${game.id}/index.html`}
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          className="w-full h-[700px] border-0"
           title={game.title}
         />
       </div>
