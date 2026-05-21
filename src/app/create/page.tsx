@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 
 const TEMPLATES = [
@@ -35,27 +35,23 @@ export default function CreateGame() {
   const [loadingCredits, setLoadingCredits] = useState(true);
   const [watchingAd, setWatchingAd] = useState(false);
 
-  const [creditsLoaded, setCreditsLoaded] = useState(false);
-
-  async function loadCredits() {
-    if (!session || creditsLoaded) return;
-    setCreditsLoaded(true);
-    try {
-      const res = await fetch("/api/credits");
-      if (res.ok) {
-        const data = await res.json();
-        setCredits({ credits: data.credits, adsWatchedToday: data.adsWatchedToday, canWatchAds: data.canWatchAds });
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    async function loadCredits() {
+      try {
+        const res = await fetch("/api/credits");
+        if (res.ok) {
+          const data = await res.json();
+          setCredits({ credits: data.credits, adsWatchedToday: data.adsWatchedToday, canWatchAds: data.canWatchAds });
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoadingCredits(false);
       }
-    } catch {
-      // ignore
-    } finally {
-      setLoadingCredits(false);
     }
-  }
-
-  if (session && !creditsLoaded) {
-    void loadCredits();
-  }
+    loadCredits();
+  }, [session?.user?.email]);
 
   if (!session) {
     return (

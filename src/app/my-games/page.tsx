@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Game } from "@/lib/types";
 import Link from "next/link";
@@ -18,11 +18,12 @@ export default function MyGames() {
       try {
         const q = query(
           collection(db, "games"),
-          where("authorId", "==", session!.user!.email),
-          orderBy("createdAt", "desc")
+          where("authorId", "==", session!.user!.email)
         );
         const snap = await getDocs(q);
-        setGames(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game)));
+        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game));
+        data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        setGames(data);
       } catch {
         setGames([]);
       } finally {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { doc, getDoc, updateDoc, increment, collection, query, orderBy, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment, collection, getDocs, addDoc } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { db } from "@/lib/firebase";
 import { Game, Comment } from "@/lib/types";
@@ -21,14 +21,14 @@ export default function GamePage() {
         const snap = await getDoc(doc(db, "games", id));
         if (snap.exists()) {
           setGame({ id: snap.id, ...snap.data() } as Game);
-          // Increment play count
           await updateDoc(doc(db, "games", id), { plays: increment(1) });
         }
-        // Load comments
         const cSnap = await getDocs(
-          query(collection(db, "games", id, "comments"), orderBy("createdAt", "desc"))
+          collection(db, "games", id, "comments")
         );
-        setComments(cSnap.docs.map((d) => ({ id: d.id, ...d.data() } as Comment)));
+        const commentsData = cSnap.docs.map((d) => ({ id: d.id, ...d.data() } as Comment));
+        commentsData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        setComments(commentsData);
       } catch {
         // Firestore error
       } finally {

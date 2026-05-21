@@ -14,10 +14,26 @@ export default function AdminPage() {
   const [creditAmount, setCreditAmount] = useState(100);
   const [creditMsg, setCreditMsg] = useState("");
   const [search, setSearch] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState<{ email: string; displayName: string; photoURL: string; lastSeen: number }[]>([]);
 
   useEffect(() => {
     fetchGames();
+    fetchOnlineUsers();
+    const interval = setInterval(fetchOnlineUsers, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  async function fetchOnlineUsers() {
+    try {
+      const res = await fetch("/api/online");
+      if (res.ok) {
+        const data = await res.json();
+        setOnlineUsers(data.users);
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   async function fetchGames() {
     setLoading(true);
@@ -84,6 +100,27 @@ export default function AdminPage() {
     <div className="max-w-[1100px] mx-auto px-5 py-10">
       <h1 className="font-head text-3xl text-gray-800 mb-2">👨‍💼 Admin Panel</h1>
       <p className="text-gray-500 text-sm mb-6">Kelola semua game dan komentar</p>
+
+      {/* Online Users */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-sm p-5 mb-6 border border-green-100">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-gray-800">🟢 User Online</h2>
+          <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">{onlineUsers.length} online</span>
+        </div>
+        {onlineUsers.length === 0 ? (
+          <p className="text-sm text-gray-400">Tidak ada user online</p>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {onlineUsers.map((u) => (
+              <div key={u.email} className="flex items-center gap-2 bg-white rounded-full px-3 py-1.5 border border-green-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {u.photoURL ? <img src={u.photoURL} alt="" width="24" height="24" className="rounded-full w-6 h-6" /> : <span className="text-sm">👤</span>}
+                <span className="text-sm font-semibold text-gray-700 truncate max-w-[150px]">{u.displayName || u.email}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Add Credits Section */}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-sm p-5 mb-6 border border-purple-100">

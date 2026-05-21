@@ -53,7 +53,9 @@ export async function POST(req: NextRequest) {
 
   // Save HTML file
   await mkdir(GAMES_DIR, { recursive: true });
-  const filePath = join(GAMES_DIR, `${gameDoc.id}.html`);
+  const gameDir = join(GAMES_DIR, gameDoc.id);
+  await mkdir(gameDir, { recursive: true });
+  const filePath = join(gameDir, "index.html");
   await writeFile(filePath, html, "utf-8");
 
   return NextResponse.json({ id: gameDoc.id });
