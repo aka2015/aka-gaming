@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getUserCredits, addCreditsFromAd } from "@/lib/credits";
+import { getUserCredits, addCreditsFromAd, claimDailyCheckin } from "@/lib/credits";
 
 export async function GET() {
   const session = await auth();
@@ -26,6 +26,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
     return NextResponse.json({ credits: result.credits, adsWatchedToday: result.adsWatchedToday });
+  }
+
+  if (action === "checkin") {
+    const result = await claimDailyCheckin(session.user.email);
+    return NextResponse.json(result);
   }
 
   return NextResponse.json({ error: "Action tidak valid" }, { status: 400 });

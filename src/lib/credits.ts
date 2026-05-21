@@ -8,10 +8,17 @@ export const CREDIT_CONFIG = {
   REWARD_PER_AD: 20,
   MAX_ADS_PER_DAY: 5,
   MAX_CREDIT_ROLLOVER: 200,
+  CHECKIN_REWARDS: [10, 10, 30, 10, 10, 10, 50],
 };
 
 function getTodayKey(): string {
   return new Date().toISOString().split("T")[0];
+}
+
+function getYesterdayKey(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split("T")[0];
 }
 
 export async function getUserCredits(userId: string): Promise<{
@@ -19,6 +26,9 @@ export async function getUserCredits(userId: string): Promise<{
   adsWatchedToday: number;
   canWatchAds: boolean;
   lastReset: string;
+  checkinStreak: number;
+  lastCheckin: string;
+  canCheckin: boolean;
 }> {
   const adminDb = getAdminDb();
   const userRef = adminDb.collection("users").doc(userId);
@@ -42,6 +52,9 @@ export async function getUserCredits(userId: string): Promise<{
       adsWatchedToday: 0,
       canWatchAds: true,
       lastReset: today,
+      checkinStreak: 0,
+      lastCheckin: "",
+      canCheckin: true,
     };
   }
 
@@ -49,6 +62,8 @@ export async function getUserCredits(userId: string): Promise<{
   let credits = data.credits ?? CREDIT_CONFIG.DAILY_CREDITS;
   let adsWatchedToday = data.adsWatchedToday ?? 0;
   let lastReset = data.lastReset ?? today;
+  let checkinStreak = data.checkinStreak ?? 0;
+  let lastCheckin = data.lastCheckin ?? "";
 
   if (lastReset !== today) {
     const rollover = Math.min(credits, CREDIT_CONFIG.MAX_CREDIT_ROLLOVER);
@@ -63,6 +78,9 @@ export async function getUserCredits(userId: string): Promise<{
     adsWatchedToday,
     canWatchAds: adsWatchedToday < CREDIT_CONFIG.MAX_ADS_PER_DAY,
     lastReset,
+    checkinStreak,
+    lastCheckin,
+    canCheckin: lastCheckin !== today,
   };
 }
 
@@ -126,5 +144,47 @@ export async function addCreditsFromAd(userId: string): Promise<{ success: boole
     adsWatchedToday += 1;
     transaction.update(userRef, { credits, adsWatchedToday, lastReset });
     return { success: true, credits, adsWatchedToday };
+  });
+}
+
+export async function claimDailyCheckin(userId: string): Promise<{
+  success: boolean;
+  credits: number;
+  streak: number;
+  reward: number;
+  alreadyClaimed: boolean;
+  error?: string;
+}> {
+  const adminDb = getAdminDb();
+  const userRef = adminDb.collection("users").doc(userId);
+  const today = getTodayKey();
+  const yesterday = getYesterdayKey();
+
+  return adminDb.runTransaction(async (transaction) => {
+    const snap = await transaction.get(userRef);
+    if (!snap.exists) {
+      return { success: false, credits: 0, streak: 0, reward: 0, alreadyClaimed: false, error: "User tidak ditemukan" };
+    }
+
+    const data = snap.data() || {};
+    let credits = data.credits ?? 0;
+    let streak = data.checkinStreak ?? 0;
+    let lastCheckin = data.lastCheckin ?? "";
+
+    if (lastCheckin === today) {
+      return { success: true, credits, streak, reward: 0, alreadyClaimed: true };
+    }
+
+    if (lastCheckin !== yesterday && lastCheckin !== today) {
+      streak = 0;
+    }
+
+    streak += 1;
+    const rewardIndex = Math.min(streak - 1, CREDIT_CONFIG.CHECKIN_REWARDS.length - 1);
+    const reward = CREDIT_CONFIG.CHECKIN_REWARDS[rewardIndex];
+    credits += reward;
+
+    transaction.update(userRef, { credits, checkinStreak: streak, lastCheckin: today });
+    return { success: true, credits, streak, reward, alreadyClaimed: false };
   });
 }

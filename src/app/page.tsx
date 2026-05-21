@@ -5,6 +5,8 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Game } from "@/lib/types";
 import GameCard from "@/components/GameCard";
+import DailyCheckin from "@/components/DailyCheckin";
+import { useSession } from "next-auth/react";
 
 const categories = [
   { id: "all", label: "🎮 Semua" },
@@ -16,10 +18,52 @@ const categories = [
 ];
 
 export default function Home() {
+  const { data: session } = useSession();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [onlineEmails, setOnlineEmails] = useState<Set<string>>(new Set());
+  const [showCheckin, setShowCheckin] = useState(false);
+  const [checkinStreak, setCheckinStreak] = useState(0);
+  const [canCheckin, setCanCheckin] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    async function fetchCheckinStatus() {
+      try {
+        const res = await fetch("/api/credits");
+        if (res.ok) {
+          const data = await res.json();
+          setCheckinStreak(data.checkinStreak || 0);
+          setCanCheckin(data.canCheckin);
+          if (data.canCheckin) {
+            setShowCheckin(true);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+    fetchCheckinStatus();
+  }, [session?.user?.email]);
+
+  useEffect(() => {
+    async function fetchOnline() {
+      try {
+        const res = await fetch("/api/online");
+        if (res.ok) {
+          const data = await res.json();
+          setOnlineEmails(new Set(data.users.map((u: { email: string }) => u.email)));
+        }
+      } catch {
+        // ignore
+      }
+    }
+    fetchOnline();
+    const interval = setInterval(fetchOnline, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     async function fetchGames() {
@@ -113,7 +157,7 @@ export default function Home() {
         ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((game) => (
-              <GameCard key={game.id} game={game} />
+              <GameCard key={game.id} game={game} isOnline={onlineEmails.has(game.authorId)} />
             ))}
           </div>
         ) : (
@@ -124,6 +168,18 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {showCheckin && session && (
+        <DailyCheckin
+          streak={checkinStreak}
+          canCheckin={canCheckin}
+          onClaim={() => {
+            setCanCheckin(false);
+            setCheckinStreak((s) => s + 1);
+          }}
+          onClose={() => setShowCheckin(false)}
+        />
+      )}
     </>
   );
 }

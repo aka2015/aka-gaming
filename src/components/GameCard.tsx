@@ -1,11 +1,25 @@
 import Link from "next/link";
 import { Game } from "@/lib/types";
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({ game, isOnline }: { game: Game; isOnline?: boolean }) {
   return (
     <Link href={`/game/${game.id}`} className="game-card block no-underline">
-      <div className="h-40 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl">
-        {game.emoji || "🎮"}
+      <div className="h-40 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center overflow-hidden relative">
+        <img
+          src={`/games/${game.id}/thumbnail.svg`}
+          alt={game.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = "none";
+            const parent = (e.target as HTMLImageElement).parentElement;
+            if (parent) {
+              const fallback = document.createElement("span");
+              fallback.className = "text-5xl";
+              fallback.textContent = game.emoji || "🎮";
+              parent.appendChild(fallback);
+            }
+          }}
+        />
       </div>
       <div className="p-4">
         <h3 className="font-bold text-gray-800 mb-1">{game.title}</h3>
@@ -16,8 +30,13 @@ export default function GameCard({ game }: { game: Game }) {
           </span>
           <span className="text-xs text-gray-400">▶ {game.plays} plays</span>
         </div>
-        <div className="mt-2 text-xs text-gray-400">
-          👤 {game.authorName}
+        <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+          {isOnline ? (
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          ) : (
+            <span className="inline-block w-2 h-2 rounded-full bg-gray-300" />
+          )}
+          <span>{game.authorName}</span>
         </div>
       </div>
     </Link>
