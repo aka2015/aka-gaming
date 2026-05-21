@@ -2,9 +2,19 @@
 
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const [credits, setCredits] = useState(0);
+
+  useEffect(() => {
+    if (!session) return;
+    fetch("/api/credits")
+      .then((r) => r.json())
+      .then((d) => setCredits(d.credits))
+      .catch(() => {});
+  }, [session]);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-purple-100 shadow-sm">
@@ -28,16 +38,23 @@ export default function Navbar() {
           )}
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          {session && credits > 0 && (
+            <div className="flex items-center gap-1 bg-gradient-to-r from-purple-50 to-pink-50 px-3 py-1 rounded-full border border-purple-100">
+              <span className="text-sm">💎</span>
+              <span className="font-bold text-sm text-purple-700">{credits}</span>
+            </div>
+          )}
+
           {session ? (
-            <div className="flex items-center gap-3">
+            <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={session.user?.image || ""} alt="avatar" width="32" height="32" className="rounded-full border-2 border-purple-500" />
               <span className="font-bold text-sm text-gray-700 max-w-[100px] truncate">{session.user?.name}</span>
               <button onClick={() => signOut()} className="px-3 py-1 border-2 border-red-400 text-red-500 rounded-full text-xs font-bold hover:bg-red-500 hover:text-white transition">
                 Keluar
               </button>
-            </div>
+            </>
           ) : (
             <button onClick={() => signIn("google")} className="flex items-center gap-2 px-5 py-2 bg-white border-2 border-gray-200 rounded-full font-bold text-sm cursor-pointer hover:border-purple-600 hover:text-purple-600 hover:shadow-md transition">
               {/* eslint-disable-next-line @next/next/no-img-element */}

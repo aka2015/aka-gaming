@@ -9,7 +9,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   // Sanitize id to prevent path traversal
   const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "");
-  const filePath = join(GAMES_DIR, `${safeId}.html`);
+  const filePath = join(GAMES_DIR, safeId, "index.html");
 
   try {
     const html = await readFile(filePath, "utf-8");

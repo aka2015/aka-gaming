@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 
 const TEMPLATES = [
@@ -11,6 +11,14 @@ const TEMPLATES = [
   { label: "🔢 Math", prompt: "Buatkan game matematika dimana pemain menjawab soal tambah/kurang/kali, ada timer dan level makin susah" },
   { label: "🃏 Memory", prompt: "Buatkan game memory card matching dengan emoji, 4x4 grid, hitung jumlah percobaan" },
 ];
+
+const COST_GENERATE = 10;
+
+interface CreditInfo {
+  credits: number;
+  adsWatchedToday: number;
+  canWatchAds: boolean;
+}
 
 export default function CreateGame() {
   const { data: session } = useSession();
@@ -23,6 +31,27 @@ export default function CreateGame() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [credits, setCredits] = useState<CreditInfo>({ credits: 0, adsWatchedToday: 0, canWatchAds: false });
+  const [loadingCredits, setLoadingCredits] = useState(true);
+  const [watchingAd, setWatchingAd] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    async function loadCredits() {
+      try {
+        const res = await fetch("/api/credits");
+        if (res.ok) {
+          const data = await res.json();
+          setCredits({ credits: data.credits, adsWatchedToday: data.adsWatchedToday, canWatchAds: data.canWatchAds });
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoadingCredits(false);
+      }
+    }
+    loadCredits();
+  }, [session?.user?.email]);
 
   if (!session) {
     return (
@@ -39,8 +68,34 @@ export default function CreateGame() {
     );
   }
 
-  async function handleGenerate() {
+  async function handleWatchAd() {
+    setWatchingAd(true);
+    setError("");
+    try {
+      // Tunggu 15 detik (user lihat banner ad)
+      await new Promise((r) => setTimeout(r, 15000));
+
+      const res = await fetch("/api/credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "watch-ad" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setCredits({ credits: data.credits, adsWatchedToday: data.adsWatchedToday, canWatchAds: data.adsWatchedToday < 5 });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Gagal claim credit");
+    } finally {
+      setWatchingAd(false);
+    }
+  }
+
+  async function handleGenerate(isRegenerate = false) {
     if (!prompt.trim()) return;
+    if (credits.credits < COST_GENERATE) {
+      setError("Credit tidak cukup! Tonton ads untuk dapat credit tambahan.");
+      return;
+    }
     setGenerating(true);
     setError("");
     setPreview(null);
@@ -48,11 +103,14 @@ export default function CreateGame() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, isRegenerate }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setPreview(data.html);
+      if (data.credits !== undefined) {
+        setCredits((prev) => ({ ...prev, credits: data.credits }));
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Gagal generate game");
     } finally {
@@ -93,10 +151,57 @@ export default function CreateGame() {
     );
   }
 
+  const creditPercent = Math.min((credits.credits / 200) * 100, 100);
+  const creditColor = credits.credits <= 20 ? "bg-red-500" : credits.credits <= 50 ? "bg-yellow-500" : "bg-green-500";
+
   return (
     <div className="max-w-[900px] mx-auto px-5 py-10">
-      <h1 className="font-head text-3xl text-gray-800 mb-2">🤖 Buat Game dengan AI</h1>
-      <p className="text-gray-500 mb-8">Deskripsikan game yang ingin kamu buat, AI akan membuatkannya!</p>
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h1 className="font-head text-3xl text-gray-800 mb-1">🤖 Buat Game dengan AI</h1>
+          <p className="text-gray-500 text-sm">Deskripsikan game yang ingin kamu buat, AI akan membuatkannya!</p>
+        </div>
+
+        {/* Credit display */}
+        {!loadingCredits && (
+          <div className="bg-white rounded-xl shadow-md px-4 py-3 min-w-[180px]">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">💎</span>
+              <span className="font-bold text-sm text-gray-700">{credits.credits} Credit</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
+              <div className={`${creditColor} h-2 rounded-full transition-all`} style={{ width: `${creditPercent}%` }} />
+            </div>
+            <p className="text-xs text-gray-400">Generate: {COST_GENERATE} credit</p>
+            {credits.canWatchAds ? (
+              <>
+                <button
+                  onClick={handleWatchAd}
+                  disabled={watchingAd}
+                  className="mt-2 w-full text-xs font-bold py-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-400 text-white hover:from-yellow-500 hover:to-orange-500 transition disabled:opacity-50"
+                >
+                  {watchingAd ? "⏳ Nonton Ads..." : "📺 Tonton Ads (+20)"}
+                </button>
+                {watchingAd && (
+                  <div className="mt-2 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                    <ins
+                      className="adsbygoogle"
+                      style={{ display: "block", textAlign: "center" }}
+                      data-ad-layout="in-article"
+                      data-ad-format="fluid"
+                      data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+                      data-ad-slot={process.env.NEXT_PUBLIC_ADSENSE_BANNER_SLOT || ""}
+                    />
+                    <p className="text-center text-xs text-gray-400 mt-1">Tunggu 15 detik untuk dapat credit...</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-gray-400 mt-1 text-center">Batas ads hari ini tercapai</p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Template */}
       <div className="mb-6">
@@ -119,11 +224,11 @@ export default function CreateGame() {
       />
 
       <button
-        onClick={handleGenerate}
-        disabled={generating || !prompt.trim()}
+        onClick={() => handleGenerate(false)}
+        disabled={generating || !prompt.trim() || credits.credits < COST_GENERATE}
         className="btn-primary-custom disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {generating ? "⏳ Generating..." : "🚀 Generate Game"}
+        {generating ? "⏳ Generating..." : `🚀 Generate Game (${COST_GENERATE} 💎)`}
       </button>
 
       {error && <p className="text-red-500 text-sm mt-3">❌ {error}</p>}
@@ -181,8 +286,12 @@ export default function CreateGame() {
               >
                 {saving ? "⏳ Menyimpan..." : "💾 Simpan Game"}
               </button>
-              <button onClick={handleGenerate} disabled={generating} className="cat-btn">
-                🔄 Regenerate
+              <button
+                onClick={() => handleGenerate(true)}
+                disabled={generating || credits.credits < COST_GENERATE}
+                className="cat-btn disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                🔄 Regenerate ({COST_GENERATE} 💎)
               </button>
             </div>
           </div>
