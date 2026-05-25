@@ -1575,11 +1575,10 @@ this.enemies = this.enemies.filter(e => !e.isDead && !e.reachedEnd);
       const angle = (Math.PI * 2 * i) / 8;
       this.particles.push(new Particle(
         x, y,
-        Math.cos(angle) * 3,
-        Math.sin(angle) * 3,
         '#FF0066',
-        4,
-        500
+        { x: Math.cos(angle) * 3, y: Math.sin(angle) * 3 },
+        20,
+        4
       ));
     }
   }
@@ -1671,11 +1670,10 @@ this.enemies = this.enemies.filter(e => !e.isDead && !e.reachedEnd);
       const speed = Math.random() * 4 + 2;
       this.particles.push(new Particle(
         x, y,
-        Math.cos(angle) * speed,
-        Math.sin(angle) * speed,
         color,
-        Math.random() * 4 + 2,
-        1000
+        { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed },
+        60,
+        4
       ));
     }
   }
