@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
@@ -73,6 +73,14 @@ interface CreditInfo {
 }
 
 export default function CreateGame() {
+    return (
+        <Suspense fallback={<div className="text-center py-12 text-gray-400">⏳ Memuat...</div>}>
+            <CreateGameContent />
+        </Suspense>
+    );
+}
+
+function CreateGameContent() {
     const { data: session } = useSession();
     const searchParams = useSearchParams();
     const forkId = searchParams.get("forkId");
@@ -167,6 +175,7 @@ export default function CreateGame() {
                 adsWatchedToday: data.adsWatchedToday,
                 canWatchAds: data.adsWatchedToday < 5,
             });
+            window.dispatchEvent(new Event("credits-updated"));
         } catch (e) {
             setError(e instanceof Error ? e.message : "Gagal claim credit");
         } finally {
@@ -213,6 +222,7 @@ export default function CreateGame() {
                 setPreview(data.html);
                 if (data.credits !== undefined) {
                     setCredits((prev) => ({ ...prev, credits: data.credits }));
+                    window.dispatchEvent(new Event("credits-updated"));
                 }
             } catch (e) {
                 setError(
