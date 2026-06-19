@@ -9,7 +9,7 @@ const GAMES_DIR = process.env.GAMES_DIR || "/var/www/games";
 const MAX_GAMES_PER_USER = 3;
 
 function generateThumbnail(emoji: string, title: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
@@ -23,76 +23,103 @@ function generateThumbnail(emoji: string, title: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Login diperlukan" }, { status: 401 });
-  }
+    const session = await auth();
+    if (!session?.user?.email) {
+        return NextResponse.json(
+            { error: "Login diperlukan" },
+            { status: 401 },
+        );
+    }
 
-  const { title, description, emoji, category, html } = await req.json();
+    const {
+        title,
+        description,
+        emoji,
+        category,
+        html,
+        forkedFrom,
+        forkedFromTitle,
+    } = await req.json();
 
-  if (!title || !html) {
-    return NextResponse.json({ error: "Judul dan HTML diperlukan" }, { status: 400 });
-  }
+    if (!title || !html) {
+        return NextResponse.json(
+            { error: "Judul dan HTML diperlukan" },
+            { status: 400 },
+        );
+    }
 
-  // Sanitize HTML to prevent XSS
-  const cleanHtml = sanitizeHtml(html);
+    // Sanitize HTML to prevent XSS
+    const cleanHtml = sanitizeHtml(html);
 
-  const userId = session.user.email;
-  const adminDb = getAdminDb();
+    const userId = session.user.email;
+    const adminDb = getAdminDb();
 
-  // Check limit 3 games per user
-  const userGames = await adminDb
-    .collection("games")
-    .where("authorId", "==", userId)
-    .get();
+    // Check limit 3 games per user
+    const userGames = await adminDb
+        .collection("games")
+        .where("authorId", "==", userId)
+        .get();
 
-  if (userGames.size >= MAX_GAMES_PER_USER) {
-    return NextResponse.json(
-      { error: `Maksimal ${MAX_GAMES_PER_USER} game per user. Hapus game lama untuk membuat baru.` },
-      { status: 403 }
+    if (userGames.size >= MAX_GAMES_PER_USER) {
+        return NextResponse.json(
+            {
+                error: `Maksimal ${MAX_GAMES_PER_USER} game per user. Hapus game lama untuk membuat baru.`,
+            },
+            { status: 403 },
+        );
+    }
+
+    // Save to Firestore
+    const gameData: Record<string, unknown> = {
+        title,
+        description: description || "",
+        prompt: description || "",
+        authorId: userId,
+        authorName: session.user.name || "Anonim",
+        status: "draft",
+        category: category || "puzzle",
+        emoji: emoji || "🎮",
+        likes: 0,
+        plays: 0,
+        createdAt: Date.now(),
+        publishedAt: null,
+    };
+
+    if (forkedFrom && typeof forkedFrom === "string") {
+        gameData.forkedFrom = forkedFrom;
+        gameData.forkedFromTitle = forkedFromTitle || "";
+    }
+
+    const gameDoc = await adminDb.collection("games").add(gameData);
+
+    // Save game files
+    const gameDir = join(GAMES_DIR, gameDoc.id);
+    await mkdir(gameDir, { recursive: true });
+
+    // index.html (sanitized)
+    await writeFile(join(gameDir, "index.html"), cleanHtml, "utf-8");
+
+    // info.json
+    const infoJson = JSON.stringify(
+        {
+            id: gameDoc.id,
+            name: title,
+            description: description || "",
+            category: category || "puzzle",
+            badge: "new",
+            gameFile: "index.html",
+            thumbnail: "thumbnail.svg",
+            createdAt: new Date().toISOString().split("T")[0],
+            author: session.user.name || "AKA Gaming",
+        },
+        null,
+        2,
     );
-  }
+    await writeFile(join(gameDir, "info.json"), infoJson, "utf-8");
 
-  // Save to Firestore
-  const gameDoc = await adminDb.collection("games").add({
-    title,
-    description: description || "",
-    prompt: description || "",
-    authorId: userId,
-    authorName: session.user.name || "Anonim",
-    status: "draft",
-    category: category || "puzzle",
-    emoji: emoji || "🎮",
-    likes: 0,
-    plays: 0,
-    createdAt: Date.now(),
-    publishedAt: null,
-  });
+    // thumbnail.svg
+    const thumbnailSvg = generateThumbnail(emoji || "🎮", title);
+    await writeFile(join(gameDir, "thumbnail.svg"), thumbnailSvg, "utf-8");
 
-  // Save game files
-  const gameDir = join(GAMES_DIR, gameDoc.id);
-  await mkdir(gameDir, { recursive: true });
-
-  // index.html (sanitized)
-  await writeFile(join(gameDir, "index.html"), cleanHtml, "utf-8");
-
-  // info.json
-  const infoJson = JSON.stringify({
-    id: gameDoc.id,
-    name: title,
-    description: description || "",
-    category: category || "puzzle",
-    badge: "new",
-    gameFile: "index.html",
-    thumbnail: "thumbnail.svg",
-    createdAt: new Date().toISOString().split("T")[0],
-    author: session.user.name || "AKA Gaming",
-  }, null, 2);
-  await writeFile(join(gameDir, "info.json"), infoJson, "utf-8");
-
-  // thumbnail.svg
-  const thumbnailSvg = generateThumbnail(emoji || "🎮", title);
-  await writeFile(join(gameDir, "thumbnail.svg"), thumbnailSvg, "utf-8");
-
-  return NextResponse.json({ id: gameDoc.id });
+    return NextResponse.json({ id: gameDoc.id });
 }

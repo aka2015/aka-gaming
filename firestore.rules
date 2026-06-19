@@ -46,6 +46,19 @@ service cloud.firestore {
       // Only admin can delete
       allow delete: if isAdmin();
 
+      // ===== LIKES SUBCOLLECTION =====
+      match /likes/{likeId} {
+        // Anyone can read likes (for count)
+        allow read: if true;
+        // Authenticated users can create their own like
+        allow create: if isAuthenticated()
+          && request.resource.data.userId == request.auth.token.email;
+        // Only the like owner can delete
+        allow delete: if resource.data.userId == request.auth.token.email;
+        // Likes are not updatable
+        allow update: if false;
+      }
+
       // ===== COMMENTS SUBCOLLECTION =====
       match /comments/{commentId} {
         // Anyone can read comments
