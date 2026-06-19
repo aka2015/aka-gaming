@@ -36,6 +36,56 @@ const COST_GENERATE = 10;
 const COST_REGENERATE = 10;
 const COST_ITERATE = 5;
 
+const GENERATING_STEPS = [
+    { icon: "🧠", text: "AI membaca ide game kamu..." },
+    { icon: "💭", text: "Membayangkan gameplay seru..." },
+    { icon: "✍️", text: "Menulis kode HTML..." },
+    { icon: "🎨", text: "Menambahkan warna dan gaya..." },
+    { icon: "⚡", text: "Menambahkan animasi keren..." },
+    { icon: "🧪", text: "Menguji coba game..." },
+    { icon: "✨", text: "Memastikan semua berfungsi..." },
+    { icon: "🎀", text: "Mempercantik tampilan..." },
+    { icon: "🛡️", text: "Memeriksa keamanan..." },
+];
+
+function GeneratingOverlay() {
+    const [stepIndex, setStepIndex] = useState(0);
+    const [dots, setDots] = useState("");
+
+    useEffect(() => {
+        const stepTimer = setInterval(() => {
+            setStepIndex((prev) => (prev + 1) % GENERATING_STEPS.length);
+        }, 3000);
+        const dotTimer = setInterval(() => {
+            setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+        }, 500);
+        return () => {
+            clearInterval(stepTimer);
+            clearInterval(dotTimer);
+        };
+    }, []);
+
+    const step = GENERATING_STEPS[stepIndex];
+
+    return (
+        <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+            <div className="text-6xl mb-4 animate-bounce">{step.icon}</div>
+            <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 bg-purple-600 rounded-full animate-bounce [animation-delay:0ms]" />
+                <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce [animation-delay:150ms]" />
+                <div className="w-3 h-3 bg-yellow-500 rounded-full animate-bounce [animation-delay:300ms]" />
+            </div>
+            <p className="text-gray-700 font-bold text-lg mt-4">
+                {step.text}
+                <span className="text-purple-600">{dots}</span>
+            </p>
+            <p className="text-gray-400 text-sm mt-1">
+                Lagi serius bikin game terbaik buat kamu!
+            </p>
+        </div>
+    );
+}
+
 interface CreditInfo {
     credits: number;
     adsWatchedToday: number;
@@ -343,26 +393,31 @@ function CreateGameContent() {
                                 className="absolute inset-0 w-full h-full border-0"
                                 title="Game Preview"
                             />
+                            {generating && <GeneratingOverlay />}
                         </div>
                     ) : (
-                        <div className="flex-1 flex items-center justify-center text-center p-8">
-                            <div>
-                                <div className="text-7xl mb-4 animate-float">🤖</div>
-                                <h2 className="font-head text-2xl text-gray-800 mb-2">Buat Game dengan AI</h2>
-                                <p className="text-gray-500 max-w-md mx-auto">
-                                    Deskripsikan game yang kamu inginkan di kolom bawah, lalu klik Generate. AI akan membuatkannya secara instan!
-                                </p>
-                                <div className="mt-6 flex flex-wrap justify-center gap-2">
-                                    {TEMPLATES.flatMap((g) => g.items).slice(0, 6).map((t) => (
-                                        <button key={t.label} onClick={() => { setPrompt(t.prompt); promptRef.current?.focus(); }} className="cat-btn text-xs">
-                                            {t.label}
-                                        </button>
-                                    ))}
+                        <div className="flex-1 flex items-center justify-center text-center p-8 relative">
+                            {generating ? (
+                                <GeneratingOverlay />
+                            ) : (
+                                <div>
+                                    <div className="text-7xl mb-4 animate-float">🤖</div>
+                                    <h2 className="font-head text-2xl text-gray-800 mb-2">Buat Game dengan AI</h2>
+                                    <p className="text-gray-500 max-w-md mx-auto">
+                                        Deskripsikan game yang kamu inginkan di kolom bawah, lalu klik Generate. AI akan membuatkannya secara instan!
+                                    </p>
+                                    <div className="mt-6 flex flex-wrap justify-center gap-2">
+                                        {TEMPLATES.flatMap((g) => g.items).slice(0, 6).map((t) => (
+                                            <button key={t.label} onClick={() => { setPrompt(t.prompt); promptRef.current?.focus(); }} className="cat-btn text-xs">
+                                                {t.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-4">
+                                        💰 Biaya: Generate {COST_GENERATE} 💎 | Regenerate {COST_REGENERATE} 💎 | Iterasi {COST_ITERATE} 💎
+                                    </p>
                                 </div>
-                                <p className="text-xs text-gray-400 mt-4">
-                                    💰 Biaya: Generate {COST_GENERATE} 💎 | Regenerate {COST_REGENERATE} 💎 | Iterasi {COST_ITERATE} 💎
-                                </p>
-                            </div>
+                            )}
                         </div>
                     )}
 
@@ -410,7 +465,7 @@ function CreateGameContent() {
                         <div className="max-w-4xl mx-auto">
                             {error && <p className="text-red-500 text-xs mb-2">❌ {error}</p>}
 
-                            <div className="flex items-end gap-2">
+                            <div className="flex items-center gap-2">
                                 <div className="flex-1 relative">
                                     <textarea
                                         ref={promptRef}
@@ -419,12 +474,12 @@ function CreateGameContent() {
                                         onKeyDown={handleKeyDown}
                                         placeholder="Deskripsikan game yang kamu inginkan..."
                                         rows={2}
-                                        className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 outline-none text-sm font-semibold text-gray-700 resize-none focus:border-purple-400 pr-12"
+                                        className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3.5 outline-none text-sm font-semibold text-gray-700 resize-none focus:border-purple-400 pr-12"
                                     />
                                     {preview && !showSaveForm && (
                                         <button
                                             onClick={() => setShowSaveForm(true)}
-                                            className="absolute right-2 bottom-2.5 text-sm text-gray-400 hover:text-purple-600 transition px-2 py-1 rounded-lg hover:bg-gray-100"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-purple-600 transition px-2 py-1 rounded-lg hover:bg-gray-100"
                                             title="Simpan Game"
                                         >
                                             💾
@@ -433,23 +488,21 @@ function CreateGameContent() {
                                 </div>
 
                                 {/* Action buttons */}
-                                <div className="flex gap-1.5">
+                                <div className="flex gap-1.5 shrink-0">
                                     {preview && (
-                                        <>
-                                            <button
-                                                onClick={() => handleGenerate("regenerate")}
-                                                disabled={generating || credits.credits < COST_REGENERATE}
-                                                className="px-3 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200 transition disabled:opacity-50"
-                                                title="Regenerate (10 💎)"
-                                            >
-                                                🔄
-                                            </button>
-                                        </>
+                                        <button
+                                            onClick={() => handleGenerate("regenerate")}
+                                            disabled={generating || credits.credits < COST_REGENERATE}
+                                            className="px-3.5 py-3.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition disabled:opacity-50"
+                                            title="Regenerate (10 💎)"
+                                        >
+                                            🔄
+                                        </button>
                                     )}
                                     <button
                                         onClick={submitPrompt}
                                         disabled={generating || !prompt.trim() || credits.credits < (preview ? COST_ITERATE : COST_GENERATE)}
-                                        className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl text-sm font-bold hover:from-purple-700 hover:to-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                        className="px-5 py-3.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl text-sm font-bold hover:from-purple-700 hover:to-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                     >
                                         {generating ? (
                                             <>⏳ Generating...</>
