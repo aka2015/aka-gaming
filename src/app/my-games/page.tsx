@@ -195,6 +195,12 @@ export default function MyGames() {
                                     </button>
                                 )}
                                 <Link
+                                    href={`/edit/${game.id}`}
+                                    className="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-full text-xs font-bold no-underline hover:bg-blue-200 transition"
+                                >
+                                    ✏️ Edit
+                                </Link>
+                                <Link
                                     href={`/game/${game.id}`}
                                     className="px-3 py-1.5 bg-purple-100 text-purple-600 rounded-full text-xs font-bold no-underline hover:bg-purple-200 transition"
                                 >

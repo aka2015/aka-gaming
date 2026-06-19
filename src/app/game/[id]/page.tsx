@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase";
 import { Game, Comment } from "@/lib/types";
 import Link from "next/link";
 
+
 export default function GamePage() {
     const { id } = useParams<{ id: string }>();
     const { data: session } = useSession();
@@ -219,6 +220,14 @@ export default function GamePage() {
                     </span>
                 )}
 
+                {isOwnGame && (
+                    <Link
+                        href={`/edit/${game.id}`}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-blue-100 text-blue-600 hover:bg-blue-200 transition no-underline"
+                    >
+                        ✏️ Edit Game
+                    </Link>
+                )}
                 {!isOwnGame && session && (
                     <button
                         onClick={handleFork}
