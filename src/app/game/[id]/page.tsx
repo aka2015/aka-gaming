@@ -284,7 +284,7 @@ export default function GamePage() {
                     </button>
                 </div>
                 <iframe
-                    src={`/api/game-file/${game.id}`}
+                    src={`/api/game-file/${game.id}/`}
                     sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                     className={`w-full border-0 ${isFullscreen ? "h-screen" : "h-[700px]"}`}
                     title={game.title}
