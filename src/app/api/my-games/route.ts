@@ -13,13 +13,13 @@ export async function GET() {
     const snap = await adminDb
       .collection("games")
       .where("authorId", "==", session.user.email)
-      .orderBy("createdAt", "desc")
       .get();
 
     const games = snap.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+    games.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
     return NextResponse.json({ games });
   } catch (err) {
