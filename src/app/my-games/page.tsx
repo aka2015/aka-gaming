@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Game } from "@/lib/types";
 import Link from "next/link";
 
@@ -11,26 +9,32 @@ export default function MyGames() {
   const { data: session } = useSession();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!session?.user?.email) return;
-    async function fetch() {
+    async function fetchGames() {
       try {
-        const q = query(
-          collection(db, "games"),
-          where("authorId", "==", session!.user!.email)
-        );
-        const snap = await getDocs(q);
-        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game));
-        data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        setGames(data);
-      } catch {
+        console.log("[MyGames] Fetching games for:", session!.user!.email);
+        const res = await window.fetch("/api/my-games");
+        console.log("[MyGames] API response status:", res.status);
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "Gagal fetch games");
+        }
+        const data = await res.json();
+        console.log("[MyGames] Games received:", data.games?.length || 0);
+        console.log("[MyGames] Games data:", data.games);
+        setGames(data.games || []);
+      } catch (err) {
+        console.error("[MyGames] Failed to fetch games:", err);
+        setError("Gagal memuat game: " + (err instanceof Error ? err.message : String(err)));
         setGames([]);
       } finally {
         setLoading(false);
       }
     }
-    fetch();
+    fetchGames();
   }, [session]);
 
   async function publishGame(id: string) {
@@ -85,6 +89,13 @@ export default function MyGames() {
 
       {loading ? (
         <div className="text-center py-12 text-gray-400">⏳ Memuat...</div>
+      ) : error ? (
+        <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
+          <div className="text-5xl mb-3">⚠️</div>
+          <h3 className="font-bold text-red-500 mb-2">Terjadi Kesalahan</h3>
+          <p className="text-gray-500 mb-4 text-sm">{error}</p>
+          <button onClick={() => window.location.reload()} className="btn-primary-custom">🔄 Coba Lagi</button>
+        </div>
       ) : games.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
           <div className="text-5xl mb-3">🎮</div>

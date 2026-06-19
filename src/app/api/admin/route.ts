@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
     case "add-game": {
+      if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      }
       const { title, description, emoji, category, html, gameId } = await req.json();
       if (!title || !html || !gameId) {
         return NextResponse.json({ error: "Title, html, and gameId required" }, { status: 400 });

@@ -36,8 +36,9 @@ service cloud.firestore {
 
     // ===== GAMES COLLECTION =====
     match /games/{gameId} {
-      // Anyone can read published games
-      allow read: if resource.data.status == 'published' || isOwner(resource.data.authorId);
+      // Anyone can read published games; owners can read their own (including drafts)
+      allow read: if resource.data.status == 'published';
+      allow read: if isAuthenticated() && request.auth.token.email == resource.data.authorId;
       // Authenticated users can create games (limit enforced server-side)
       allow create: if isAuthenticated();
       // Only owner or admin can update

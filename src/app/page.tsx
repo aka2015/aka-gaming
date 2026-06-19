@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Game } from "@/lib/types";
 import GameCard from "@/components/GameCard";
 import DailyCheckin from "@/components/DailyCheckin";
@@ -68,14 +66,10 @@ export default function Home() {
   useEffect(() => {
     async function fetchGames() {
       try {
-        const q = query(
-          collection(db, "games"),
-          where("status", "==", "published")
-        );
-        const snap = await getDocs(q);
-        const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Game));
-        data.sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0));
-        setGames(data);
+        const res = await fetch("/api/games");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setGames(data.games || []);
       } catch {
         setGames([]);
       } finally {

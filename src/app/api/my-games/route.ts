@@ -1,0 +1,32 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { getAdminDb } from "@/lib/firebase-admin";
+
+export async function GET() {
+  try {
+    const session = await auth();
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Login diperlukan" }, { status: 401 });
+    }
+
+    const adminDb = getAdminDb();
+    const snap = await adminDb
+      .collection("games")
+      .where("authorId", "==", session.user.email)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const games = snap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return NextResponse.json({ games });
+  } catch (err) {
+    console.error("[API my-games] Error:", err);
+    return NextResponse.json(
+      { error: "Terjadi kesalahan server" },
+      { status: 500 }
+    );
+  }
+}

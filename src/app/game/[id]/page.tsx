@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { doc, getDoc, updateDoc, increment, collection, getDocs, addDoc } from "firebase/firestore";
+import { doc, updateDoc, increment, collection, getDocs, addDoc } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { db } from "@/lib/firebase";
 import { Game, Comment } from "@/lib/types";
@@ -18,11 +18,16 @@ export default function GamePage() {
   useEffect(() => {
     async function load() {
       try {
-        const snap = await getDoc(doc(db, "games", id));
-        if (snap.exists()) {
-          setGame({ id: snap.id, ...snap.data() } as Game);
-          await updateDoc(doc(db, "games", id), { plays: increment(1) });
+        const res = await fetch(`/api/game/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setGame(data.game);
+
+          if (data.fileExists) {
+            fetch(`/api/game/${id}/play`, { method: "POST" }).catch(() => {});
+          }
         }
+
         const cSnap = await getDocs(
           collection(db, "games", id, "comments")
         );
@@ -30,7 +35,7 @@ export default function GamePage() {
         commentsData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         setComments(commentsData);
       } catch {
-        // Firestore error
+        // Error fetching game
       } finally {
         setLoading(false);
       }
