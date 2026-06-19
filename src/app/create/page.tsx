@@ -224,6 +224,8 @@ function CreateGameContent() {
                 setCredits((prev) => ({ ...prev, credits: data.credits }));
                 window.dispatchEvent(new Event("credits-updated"));
             }
+
+            setPrompt("");
             if (mode === "iterate") setIterateNotes("");
         } catch (e) {
             setError(e instanceof Error ? e.message : "Gagal generate game");
