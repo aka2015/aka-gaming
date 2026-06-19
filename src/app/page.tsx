@@ -163,6 +163,93 @@ export default function Home() {
         )}
       </section>
 
+      {/* Info Section */}
+      <section className="max-w-[1200px] mx-auto px-5 py-14">
+        <div className="text-center mb-10">
+          <h2 className="font-head text-3xl text-gray-800 mb-3">🎯 Mengapa Game Edukasi?</h2>
+          <p className="text-gray-500 max-w-2xl mx-auto">
+            Game edukasi membantu anak-anak mengembangkan keterampilan kognitif, kreativitas, dan 
+            pemecahan masalah sambil bersenang-senang. Di AKA Gaming, setiap game dirancang untuk 
+            memberikan manfaat belajar yang nyata.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+            <div className="text-5xl mb-4">🧠</div>
+            <h3 className="font-bold text-gray-800 mb-2">Melatih Logika</h3>
+            <p className="text-sm text-gray-500">
+              Game puzzle dan strategi melatih kemampuan berpikir logis, perencanaan, dan pengambilan 
+              keputusan pada anak-anak.
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+            <div className="text-5xl mb-4">🎨</div>
+            <h3 className="font-bold text-gray-800 mb-2">Mengembangkan Kreativitas</h3>
+            <p className="text-sm text-gray-500">
+              Dengan AI Game Builder, anak-anak bisa menuangkan imajinasi mereka menjadi game 
+              interaktif yang bisa dimainkan bersama teman.
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+            <div className="text-5xl mb-4">📖</div>
+            <h3 className="font-bold text-gray-800 mb-2">Belajar Sambil Bermain</h3>
+            <p className="text-sm text-gray-500">
+              Setiap game mengandung elemen edukatif seperti matematika, bahasa, sains, dan 
+              keterampilan hidup yang dikemas dalam format menyenangkan.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Game Builder Section */}
+      <section className="bg-gradient-to-r from-purple-600 to-pink-500 py-14 px-5 text-center text-white">
+        <div className="max-w-[700px] mx-auto">
+          <div className="text-6xl mb-4">🤖</div>
+          <h2 className="font-head text-3xl mb-3">Buat Game Sendiri dengan AI!</h2>
+          <p className="text-white/90 text-lg mb-2">
+            Tidak punya kemampuan coding? Tidak masalah! Cukup tulis deskripsi game yang kamu 
+            inginkan, dan AI kami akan membuatkannya secara instan.
+          </p>
+          <p className="text-white/80 text-sm mb-6">
+            Dari game puzzle, petualangan, aksi, hingga edukasi — semua bisa dibuat dalam hitungan detik. 
+            Kreasikan ide game-mu sekarang juga!
+          </p>
+          <a
+            href="/create"
+            className="inline-block bg-white text-purple-700 font-head text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+          >
+            🚀 Mulai Buat Game
+          </a>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="max-w-[1200px] mx-auto px-5 py-14">
+        <h2 className="font-head text-3xl text-gray-800 text-center mb-10">📋 Cara Kerja</h2>
+        <div className="grid md:grid-cols-4 gap-6">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-2xl font-head text-purple-600 mx-auto mb-3">1</div>
+            <h3 className="font-bold text-gray-800 mb-1">Login</h3>
+            <p className="text-sm text-gray-500">Masuk dengan akun Google kamu</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center text-2xl font-head text-pink-600 mx-auto mb-3">2</div>
+            <h3 className="font-bold text-gray-800 mb-1">Deskripsikan</h3>
+            <p className="text-sm text-gray-500">Tulis ide game yang kamu inginkan</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-2xl font-head text-yellow-600 mx-auto mb-3">3</div>
+            <h3 className="font-bold text-gray-800 mb-1">Generate</h3>
+            <p className="text-sm text-gray-500">AI membuat game-mu secara otomatis</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-2xl font-head text-green-600 mx-auto mb-3">4</div>
+            <h3 className="font-bold text-gray-800 mb-1">Mainkan!</h3>
+            <p className="text-sm text-gray-500">Publikasikan dan bagikan ke teman-teman</p>
+          </div>
+        </div>
+      </section>
+
       {showCheckin && session && (
         <DailyCheckin
           streak={checkinStreak}
