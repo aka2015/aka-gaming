@@ -94,6 +94,21 @@ export async function GET(
         } catch {
             content = await readFile(flatFilePath, "utf-8");
         }
+
+        // Inject <base> tag so relative paths (style.css, script.js) resolve correctly
+        const baseUrl = `/api/game-file/${safeId}/`;
+        if (content.includes("<head>")) {
+            content = content.replace(
+                "<head>",
+                `<head><base href="${baseUrl}">`,
+            );
+        } else if (content.includes("<html")) {
+            content = content.replace(
+                /<html[^>]*>/i,
+                (match) => `${match}<head><base href="${baseUrl}"></head>`,
+            );
+        }
+
         return new NextResponse(content, {
             headers: { "Content-Type": "text/html; charset=utf-8" },
         });
