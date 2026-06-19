@@ -128,6 +128,7 @@ function CreateGameContent() {
     const [loadingCredits, setLoadingCredits] = useState(true);
     const [watchingAd, setWatchingAd] = useState(false);
     const [iterateNotes, setIterateNotes] = useState("");
+    const [description, setDescription] = useState("");
     const [showSaveForm, setShowSaveForm] = useState(false);
     const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
     const [selectedTemplateCategory, setSelectedTemplateCategory] = useState<string | null>(null);
@@ -239,7 +240,7 @@ function CreateGameContent() {
         setSaving(true);
         setError("");
         try {
-            const body: Record<string, unknown> = { title, description: forkId ? prompt : prompt, emoji, category, html: preview };
+            const body: Record<string, unknown> = { title, description: description || title, emoji, category, html: preview };
             if (forkId) { body.forkedFrom = forkId; body.forkedFromTitle = forkSource?.title || ""; }
             const res = await fetch("/api/save-game", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
             const data = await res.json();
@@ -250,7 +251,7 @@ function CreateGameContent() {
         } finally {
             setSaving(false);
         }
-    }, [preview, title, emoji, category, prompt, forkId, forkSource?.title ?? ""]);
+    }, [preview, title, description, emoji, category, prompt, forkId, forkSource?.title ?? ""]);
 
     const submitPrompt = () => {
         if (generating || !prompt.trim()) return;
@@ -443,9 +444,9 @@ function CreateGameContent() {
                     {preview && showSaveForm && (
                         <div className="bg-white border-t border-gray-100 px-5 py-4 shrink-0">
                             <div className="max-w-3xl mx-auto">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nama game kamu" className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-full px-4 py-2 outline-none text-sm font-semibold focus:border-purple-300" />
-                                    <input type="text" value={emoji} onChange={(e) => setEmoji(e.target.value)} className="bg-gray-50 border-2 border-gray-100 rounded-full px-4 py-2 outline-none text-sm w-20 text-center" />
+                                <div className="flex items-center gap-3 mb-2">
+                                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nama game" className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-full px-4 py-2 outline-none text-sm font-semibold focus:border-purple-300" />
+                                    <input type="text" value={emoji} onChange={(e) => setEmoji(e.target.value)} className="bg-gray-50 border-2 border-gray-100 rounded-full px-4 py-2 outline-none text-sm w-16 text-center" />
                                     <select value={category} onChange={(e) => setCategory(e.target.value)} className="bg-gray-50 border-2 border-gray-100 rounded-full px-4 py-2 outline-none text-sm font-semibold">
                                         <option value="action">⚔️ Aksi</option>
                                         <option value="puzzle">🧩 Puzzle</option>
@@ -458,6 +459,13 @@ function CreateGameContent() {
                                     </button>
                                     <button onClick={() => setShowSaveForm(false)} className="cat-btn text-sm">Batal</button>
                                 </div>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Deskripsi singkat tentang game ini (akan muncul di halaman game)..."
+                                    rows={2}
+                                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2 outline-none text-sm text-gray-600 resize-none focus:border-purple-300"
+                                />
                             </div>
                         </div>
                     )}
