@@ -2,19 +2,28 @@
 
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
   const [credits, setCredits] = useState(0);
 
-  useEffect(() => {
+  const fetchCredits = useCallback(() => {
     if (!session) return;
     fetch("/api/credits")
       .then((r) => r.json())
       .then((d) => setCredits(d.credits))
       .catch(() => {});
   }, [session]);
+
+  useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
+
+  useEffect(() => {
+    window.addEventListener("credits-updated", fetchCredits);
+    return () => window.removeEventListener("credits-updated", fetchCredits);
+  }, [fetchCredits]);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-purple-100 shadow-sm">
